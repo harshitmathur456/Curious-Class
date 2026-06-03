@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import {
   demoChatMessages,
   suggestedChips,
@@ -94,10 +95,120 @@ const aiFollowUps = [
   },
 ];
 
+const SUBJECT_CONFIGS = {
+  history: {
+    title: "History",
+    goal: {
+      topic: "Salt March & Civil Disobedience",
+      objective: "Understand why Gandhi chose salt as a symbol and connect historical protest to modern movements."
+    },
+    progress: [
+      { id: 1, label: "Causes of Civil Disobedience", status: "completed" },
+      { id: 2, label: "The Salt March", status: "active" },
+      { id: 3, label: "Impact & Legacy", status: "upcoming" }
+    ],
+    chips: [
+      "Maybe to show defiance?",
+      "Petitions didn't work before...",
+      "Taki sab log jud sakein?"
+    ],
+    taughtTopics: ["Causes of Civil Disobedience", "The Salt March"],
+    upcomingClasses: ["Impact & Legacy", "Quit India Movement"],
+    initialMessages: demoChatMessages,
+    defaultActiveTopic: "Salt March"
+  },
+  physics: {
+    title: "Physics",
+    goal: {
+      topic: "Reflection & Mirrors",
+      objective: "Understand how light behaves when striking different surfaces and connect reflection to everyday mirrors."
+    },
+    progress: [
+      { id: 1, label: "Properties of Light", status: "completed" },
+      { id: 2, label: "Reflection & Mirrors", status: "active" },
+      { id: 3, label: "Refraction & Lenses", status: "upcoming" }
+    ],
+    chips: [
+      "Because of our eyes?",
+      "It's about the mirror's flat surface?",
+      "Left-right symmetry?"
+    ],
+    taughtTopics: ["Properties of Light", "Reflection & Mirrors"],
+    upcomingClasses: ["Refraction & Lenses", "Prisms & Rainbows"],
+    initialMessages: [
+      {
+        id: 1,
+        sender: "ai",
+        mode: "question",
+        text: "Welcome! Today we're exploring **Reflection and Mirrors**. Let's start with a puzzle: when you look in a mirror, your left hand looks like your right hand. But why doesn't your head look like your feet? Why does the mirror invert left-to-right but not top-to-bottom?",
+        timestamp: "10:02 AM"
+      },
+      {
+        id: 2,
+        sender: "student",
+        text: "Because mirrors flip things horizontally, not vertically.",
+        timestamp: "10:03 AM"
+      },
+      {
+        id: 3,
+        sender: "ai",
+        mode: "explano",
+        text: "That's how we describe it, but *why* does it choose the horizontal axis? A mirror doesn't know what 'horizontal' is. If you turn the mirror 90 degrees, does it start flipping your head and feet? What is the mirror *actually* doing to the light rays?",
+        timestamp: "10:04 AM"
+      }
+    ],
+    defaultActiveTopic: "Reflection & Mirrors"
+  },
+  mathematics: {
+    title: "Mathematics",
+    goal: {
+      topic: "Linear Equations",
+      objective: "Learn to model real-world word problems using mathematical equations and solve for the unknown variable."
+    },
+    progress: [
+      { id: 1, label: "Algebraic Expressions", status: "completed" },
+      { id: 2, label: "Solving Basic Equations", status: "active" },
+      { id: 3, label: "Word Problems & Applications", status: "upcoming" }
+    ],
+    chips: [
+      "x + 5 = 2x - 3?",
+      "Is x the number of mangoes?",
+      "I need a hint..."
+    ],
+    taughtTopics: ["Algebraic Expressions", "Solving Basic Equations"],
+    upcomingClasses: ["Word Problems & Applications", "Graphing Linear Equations"],
+    initialMessages: [
+      {
+        id: 1,
+        sender: "ai",
+        mode: "question",
+        text: "Welcome! Today we're exploring **Linear Equations**. Imagine you have a mystery box of mangoes. If you add 5 mangoes to it, you get double what you had minus 3 mangoes. How would you write this relationship as a mathematical equation? What does the variable represent?",
+        timestamp: "10:02 AM"
+      },
+      {
+        id: 2,
+        sender: "student",
+        text: "The equation would be x + 5 = 2x - 3. And x is the original number of mangoes.",
+        timestamp: "10:03 AM"
+      },
+      {
+        id: 3,
+        sender: "ai",
+        mode: "explano",
+        text: "Spot on with the equation! But let's look closer: you wrote `2x - 3` for 'double what you had minus 3'. Why didn't you write `2(x - 3)`? What's the difference between double of (mangoes minus 3) and (double of mangoes) minus 3? How does grouping change the problem?",
+        timestamp: "10:04 AM"
+      }
+    ],
+    defaultActiveTopic: "Linear Equations"
+  }
+};
+
 /* ─── Main Component ─────────────────────────────────────────── */
 
-export default function StudentChat() {
-  const [messages, setMessages] = useState(demoChatMessages);
+export default function StudentChat({ subject = "history" }) {
+  const config = SUBJECT_CONFIGS[subject] || SUBJECT_CONFIGS.history;
+
+  const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
@@ -109,18 +220,30 @@ export default function StudentChat() {
   const [news, setNews] = useState({});
   const [loadingNews, setLoadingNews] = useState(false);
   
-  const [activeTopic, setActiveTopic] = useState("Salt March");
+  const [activeTopic, setActiveTopic] = useState("");
 
   const [sharedNotes, setSharedNotes] = useState([]);
   const [loadingNotes, setLoadingNotes] = useState(true);
 
+  // Initialize/reset states when subject changes
+  useEffect(() => {
+    setMessages(config.initialMessages);
+    setActiveTopic(config.defaultActiveTopic);
+    setTrackedTopics([]);
+    setNews({});
+    setInputValue("");
+    setFollowUpIndex(0);
+    setTopicInput("");
+  }, [subject]);
+
   useEffect(() => {
     fetchSharedNotes();
-  }, []);
+  }, [subject]);
 
   async function fetchSharedNotes() {
+    setLoadingNotes(true);
     try {
-      const res = await fetch("/api/notes");
+      const res = await fetch(`/api/notes?subject=${subject}`);
       if (res.ok) {
         const data = await res.json();
         setSharedNotes(data);
@@ -284,21 +407,37 @@ export default function StudentChat() {
             </div>
           </div>
 
+          {/* Subjects Navigation */}
+          <div className="sc-subject-nav">
+            <div className="sc-subject-nav-label">Subjects</div>
+            <div className="sc-subject-nav-links">
+              <Link href="/student" className={`sc-subject-link ${subject === "history" ? "sc-subject-link--active" : ""}`}>
+                📜 History
+              </Link>
+              <Link href="/student/physics" className={`sc-subject-link ${subject === "physics" ? "sc-subject-link--active" : ""}`}>
+                ⚡ Physics
+              </Link>
+              <Link href="/student/mathematics" className={`sc-subject-link ${subject === "mathematics" ? "sc-subject-link--active" : ""}`}>
+                📐 Mathematics
+              </Link>
+            </div>
+          </div>
+
           {/* Today's Goal */}
           <div className="sc-goal-card">
             <div className="sc-goal-header">
               <span className="sc-goal-icon"><FlagIcon /></span>
               <span className="sc-goal-label">Today&apos;s goal</span>
             </div>
-            <div className="sc-goal-topic">{todaysGoal.topic}</div>
-            <div className="sc-goal-objective">{todaysGoal.objective}</div>
+            <div className="sc-goal-topic">{config.goal.topic}</div>
+            <div className="sc-goal-objective">{config.goal.objective}</div>
           </div>
 
           {/* Topic Progress */}
           <div className="sc-progress">
             <div className="sc-progress-label">Topic progress</div>
             <div className="sc-progress-steps">
-              {topicProgress.map((step, i) => (
+              {config.progress.map((step, i) => (
                 <div
                   key={step.id}
                   className={`sc-step ${step.status === "completed" ? "sc-step--done" : ""} ${step.status === "active" ? "sc-step--active" : ""} ${step.status === "upcoming" ? "sc-step--upcoming" : ""}`}
@@ -313,7 +452,7 @@ export default function StudentChat() {
                     {step.status === "upcoming" && <div className="sc-step-dot sc-step-dot--upcoming" />}
                   </div>
                   <span className="sc-step-text">{step.label}</span>
-                  {i < topicProgress.length - 1 && <div className="sc-step-line" />}
+                  {i < config.progress.length - 1 && <div className="sc-step-line" />}
                 </div>
               ))}
             </div>
@@ -402,7 +541,7 @@ export default function StudentChat() {
         <div className="sc-input-area">
           {/* Suggested Chips */}
           <div className="sc-chips">
-            {suggestedChips.map((chip) => (
+            {config.chips.map((chip) => (
               <button
                 key={chip}
                 className="sc-chip"
@@ -447,16 +586,18 @@ export default function StudentChat() {
         <div className="sc-rs-section">
           <h3 className="sc-rs-subtitle">Taught by Teacher</h3>
           <ul className="sc-rs-list">
-            <li onClick={() => handleTopicSelect("Causes of Civil Disobedience")} style={{cursor: "pointer"}}>Causes of Civil Disobedience</li>
-            <li onClick={() => handleTopicSelect("The Salt March")} style={{cursor: "pointer"}}>The Salt March</li>
+            {config.taughtTopics.map((topic) => (
+              <li key={topic} onClick={() => handleTopicSelect(topic)} style={{cursor: "pointer"}}>{topic}</li>
+            ))}
           </ul>
         </div>
 
         <div className="sc-rs-section">
           <h3 className="sc-rs-subtitle">Upcoming Classes</h3>
           <ul className="sc-rs-list">
-            <li onClick={() => handleTopicSelect("Impact & Legacy")} style={{cursor: "pointer"}}>Impact & Legacy</li>
-            <li onClick={() => handleTopicSelect("Quit India Movement")} style={{cursor: "pointer"}}>Quit India Movement</li>
+            {config.upcomingClasses.map((topic) => (
+              <li key={topic} onClick={() => handleTopicSelect(topic)} style={{cursor: "pointer"}}>{topic}</li>
+            ))}
           </ul>
         </div>
 

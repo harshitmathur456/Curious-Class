@@ -6,7 +6,8 @@
     "fileUrl": "/notes/civil_disobedience_causes.pdf",
     "uploadedBy": "Mrs. Sharma",
     "uploadDate": "2026-06-01",
-    "fileSize": "1.2 KB"
+    "fileSize": "1.2 KB",
+    "subject": "history"
   },
   {
     "id": 2,
@@ -15,6 +16,47 @@
     "fileUrl": "/notes/salt_march_handout.pdf",
     "uploadedBy": "Mrs. Sharma",
     "uploadDate": "2026-06-02",
-    "fileSize": "1.3 KB"
+    "fileSize": "1.3 KB",
+    "subject": "history"
+  },
+  {
+    "id": 3,
+    "title": "Light Properties Summary",
+    "fileName": "light_properties_summary.pdf",
+    "fileUrl": "/notes/light_properties_summary.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-03",
+    "fileSize": "1.4 KB",
+    "subject": "physics"
+  },
+  {
+    "id": 4,
+    "title": "Mirrors & Reflection Diagrams",
+    "fileName": "mirrors_reflection_diagrams.pdf",
+    "fileUrl": "/notes/mirrors_reflection_diagrams.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-03",
+    "fileSize": "1.5 KB",
+    "subject": "physics"
+  },
+  {
+    "id": 5,
+    "title": "Linear Equations Guide",
+    "fileName": "linear_equations_guide.pdf",
+    "fileUrl": "/notes/linear_equations_guide.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-03",
+    "fileSize": "1.2 KB",
+    "subject": "mathematics"
+  },
+  {
+    "id": 6,
+    "title": "Algebra Cheat Sheet",
+    "fileName": "algebra_cheat_sheet.pdf",
+    "fileUrl": "/notes/algebra_cheat_sheet.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-03",
+    "fileSize": "1.6 KB",
+    "subject": "mathematics"
   }
 ]

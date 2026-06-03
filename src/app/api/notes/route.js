@@ -1,12 +1,20 @@
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 
-// GET handler to list notes
-export async function GET() {
+// GET handler to list notes (with optional subject filter)
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const subject = searchParams.get("subject");
+
     const jsonPath = path.join(process.cwd(), "src", "data", "notes.json");
     const jsonContent = await readFile(jsonPath, "utf8");
-    const notes = JSON.parse(jsonContent);
+    let notes = JSON.parse(jsonContent);
+
+    if (subject) {
+      notes = notes.filter((n) => n.subject === subject.toLowerCase());
+    }
+
     return Response.json(notes);
   } catch (error) {
     console.error("Error reading notes:", error);
@@ -20,6 +28,7 @@ export async function POST(request) {
     const formData = await request.formData();
     const file = formData.get("file");
     const title = formData.get("title") || "";
+    const subject = formData.get("subject") || "history";
 
     if (!file) {
       return Response.json({ error: "No file uploaded" }, { status: 400 });
@@ -60,6 +69,7 @@ export async function POST(request) {
       uploadedBy: "Mrs. Sharma",
       uploadDate: new Date().toISOString().split("T")[0],
       fileSize: `${(file.size / 1024).toFixed(1)} KB`,
+      subject: subject.toLowerCase(),
     };
 
     notes.push(newNote);
