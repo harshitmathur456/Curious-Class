@@ -29,7 +29,7 @@ Rules:
 4. Use formatting like **bold** for key concepts.
 5. If the student asks about a different topic, guide them back to "${activeTopic}" or challenge them on it.`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: "POST",
