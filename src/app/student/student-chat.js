@@ -70,6 +70,118 @@ function PdfIconMini() {
   );
 }
 
+function QuizIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="9" y1="15" x2="15" y2="15"/>
+      <line x1="9" y1="11" x2="15" y2="11"/>
+      <circle cx="7" cy="11" r="0.5" fill="currentColor"/>
+      <circle cx="7" cy="15" r="0.5" fill="currentColor"/>
+    </svg>
+  );
+}
+
+const fallbackQuizzes = {
+  "salt march": [
+    {
+      question: "In which year did the Salt March take place?",
+      options: ["1920", "1930", "1942", "1947"],
+      answerIndex: 1,
+      explanation: "The Salt March (also known as the Dandi March) took place from March to April 1930."
+    },
+    {
+      question: "Which Ashram did Gandhi start the Salt March from?",
+      options: ["Sabarmati Ashram", "Sevagram Ashram", "Phoenix Settlement", "Tolstoy Farm"],
+      answerIndex: 0,
+      explanation: "Gandhi started the march from Sabarmati Ashram in Ahmedabad."
+    },
+    {
+      question: "What was the length of the Salt March in miles?",
+      options: ["120 miles", "240 miles", "360 miles", "400 miles"],
+      answerIndex: 1,
+      explanation: "The march spanned 240 miles (approx. 385 km) from Ahmedabad to Dandi."
+    },
+    {
+      question: "Who was the British Viceroy during the Salt March?",
+      options: ["Lord Curzon", "Lord Mountbatten", "Lord Irwin", "Lord Chelmsford"],
+      answerIndex: 2,
+      explanation: "Lord Irwin was the Viceroy of India from 1926 to 1931."
+    },
+    {
+      question: "Which Act gave the British government a monopoly on salt?",
+      options: ["The Salt Tax Act", "The Indian Salt Act of 1882", "The Rowlatt Act", "The Dandi Monopoly Act"],
+      answerIndex: 1,
+      explanation: "The Indian Salt Act of 1882 gave the British government a monopoly on manufacturing and selling salt."
+    }
+  ],
+  "reflection & mirrors": [
+    {
+      question: "According to the Law of Reflection, the angle of incidence is _______ the angle of reflection.",
+      options: ["Greater than", "Less than", "Equal to", "Double of"],
+      answerIndex: 2,
+      explanation: "The first law of reflection states that the angle of incidence equals the angle of reflection (i = r)."
+    },
+    {
+      question: "Which type of mirror is commonly used as a rear-view mirror in vehicles?",
+      options: ["Plane mirror", "Concave mirror", "Convex mirror", "Parabolic mirror"],
+      answerIndex: 2,
+      explanation: "Convex mirrors diverge light and provide a wider field of view, making them ideal for vehicles."
+    },
+    {
+      question: "The focal length of a plane mirror is:",
+      options: ["Zero", "Infinite", "10 cm", "Dependent on distance"],
+      answerIndex: 1,
+      explanation: "Since a plane mirror has no curvature, its focal point lies at infinity."
+    },
+    {
+      question: "Dentists use which type of mirror to see larger images of teeth?",
+      options: ["Plane mirror", "Concave mirror", "Convex mirror", "Double mirror"],
+      answerIndex: 1,
+      explanation: "Concave mirrors form a magnified, virtual, and erect image when objects are placed close to them."
+    },
+    {
+      question: "What is the speed of light in a vacuum?",
+      options: ["3,000 km/s", "300,000 km/s", "30,000 km/s", "3,000,000 km/s"],
+      answerIndex: 1,
+      explanation: "Light travels at approximately 300,000 km/s (or 3 x 10^8 m/s) in a vacuum."
+    }
+  ],
+  "linear equations": [
+    {
+      question: "What is the value of x in the equation: 2x + 5 = 15?",
+      options: ["x = 5", "x = 10", "x = 15", "x = 20"],
+      answerIndex: 0,
+      explanation: "Subtract 5 from both sides: 2x = 10. Divide by 2: x = 5."
+    },
+    {
+      question: "If 3x - 7 = x + 9, what is the value of x?",
+      options: ["x = 4", "x = 8", "x = 10", "x = 16"],
+      answerIndex: 1,
+      explanation: "Subtract x from both sides: 2x - 7 = 9. Add 7: 2x = 16. Divide by 2: x = 8."
+    },
+    {
+      question: "The equation y = mx + c represents a:",
+      options: ["Quadratic curve", "Straight line", "Circle", "Parabola"],
+      answerIndex: 1,
+      explanation: "y = mx + c is the slope-intercept form representing a straight line (linear equation)."
+    },
+    {
+      question: "In the expression 4x + 3, what is 'x' called?",
+      options: ["Constant", "Coefficient", "Variable", "Exponent"],
+      answerIndex: 2,
+      explanation: "'x' is a variable because its value can change. '4' is the coefficient, and '3' is the constant."
+    },
+    {
+      question: "If a number is multiplied by 3 and then increased by 7, the result is 22. What is the number?",
+      options: ["x = 3", "x = 5", "x = 7", "x = 9"],
+      answerIndex: 1,
+      explanation: "Let the number be x. 3x + 7 = 22. Subtract 7: 3x = 15. Divide by 3: x = 5."
+    }
+  ]
+};
+
 /* ─── Reasoning depth level from messages ────────────────────── */
 function getReasoningLevel(messages) {
   const studentMsgs = messages.filter((m) => m.sender === "student");
@@ -225,6 +337,16 @@ export default function StudentChat({ subject = "history" }) {
   const [sharedNotes, setSharedNotes] = useState([]);
   const [loadingNotes, setLoadingNotes] = useState(true);
 
+  // Quiz States
+  const [quizActive, setQuizActive] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [loadingQuiz, setLoadingQuiz] = useState(false);
+  const [answerSubmitted, setAnswerSubmitted] = useState(false);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
+  const [quizScore, setQuizScore] = useState(0);
+
   // Initialize/reset states when subject changes
   useEffect(() => {
     setMessages(config.initialMessages);
@@ -234,6 +356,13 @@ export default function StudentChat({ subject = "history" }) {
     setInputValue("");
     setFollowUpIndex(0);
     setTopicInput("");
+    setQuizActive(false);
+    setQuizQuestions([]);
+    setCurrentQuestionIndex(0);
+    setUserAnswers([]);
+    setAnswerSubmitted(false);
+    setSelectedOptionIndex(null);
+    setQuizScore(0);
   }, [subject]);
 
   useEffect(() => {
@@ -253,6 +382,82 @@ export default function StudentChat({ subject = "history" }) {
     } finally {
       setLoadingNotes(false);
     }
+  }
+
+  async function handleStartQuiz() {
+    setLoadingQuiz(true);
+    setQuizActive(true);
+    setCurrentQuestionIndex(0);
+    setUserAnswers([]);
+    setAnswerSubmitted(false);
+    setSelectedOptionIndex(null);
+    setQuizScore(0);
+
+    try {
+      const res = await fetch("/api/quiz", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subject: config.title,
+          topic: activeTopic,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch quiz");
+      }
+
+      const data = await res.json();
+      if (Array.isArray(data) && data.length === 5) {
+        setQuizQuestions(data);
+      } else {
+        throw new Error("Invalid quiz format received");
+      }
+    } catch (e) {
+      console.error("Failed to generate custom quiz with Gemini, using high-quality local quiz:", e);
+      // Fallback to local high-quality quiz matching current active topic
+      const topicKey = activeTopic.toLowerCase();
+      let questions = fallbackQuizzes[topicKey];
+      if (!questions) {
+        if (subject === "physics") {
+          questions = fallbackQuizzes["reflection & mirrors"];
+        } else if (subject === "mathematics") {
+          questions = fallbackQuizzes["linear equations"];
+        } else {
+          questions = fallbackQuizzes["salt march"];
+        }
+      }
+      setQuizQuestions(questions);
+    } finally {
+      setLoadingQuiz(false);
+    }
+  }
+
+  function handleSelectOption(index) {
+    if (answerSubmitted) return;
+    setSelectedOptionIndex(index);
+  }
+
+  function handleSubmitAnswer() {
+    if (selectedOptionIndex === null || answerSubmitted) return;
+    
+    const currentQuestion = quizQuestions[currentQuestionIndex];
+    const isCorrect = selectedOptionIndex === currentQuestion.answerIndex;
+    
+    if (isCorrect) {
+      setQuizScore((prev) => prev + 1);
+    }
+    
+    setUserAnswers((prev) => [...prev, selectedOptionIndex]);
+    setAnswerSubmitted(true);
+  }
+
+  function handleNextQuestion() {
+    setAnswerSubmitted(false);
+    setSelectedOptionIndex(null);
+    setCurrentQuestionIndex((prev) => prev + 1);
   }
 
   const reasoning = getReasoningLevel(messages);
@@ -459,124 +664,287 @@ export default function StudentChat({ subject = "history" }) {
           </div>
         </div>
 
-        <button className="sc-past-chats-btn" id="view-past-chats">
-          <HistoryIcon />
-          <span>View past chats</span>
+        <button
+          className="sc-quiz-btn"
+          id="start-quiz-btn"
+          onClick={handleStartQuiz}
+          disabled={loadingQuiz}
+        >
+          <QuizIcon />
+          <span>{loadingQuiz ? "Loading Quiz..." : "Start Topic Quiz"}</span>
         </button>
       </aside>
 
-      {/* ── Main Chat Area ── */}
       <main className="sc-main">
-        {/* Reasoning Depth Bar */}
-        <div className="sc-depth-bar">
-          <div className="sc-depth-label">
-            <span>Reasoning depth</span>
-            <span className="sc-depth-level">Level {reasoning.level}/{reasoning.max}</span>
-          </div>
-          <div className="sc-depth-track">
-            <div
-              className="sc-depth-fill"
-              style={{ width: `${(reasoning.level / reasoning.max) * 100}%` }}
-            />
-          </div>
-          <div className="sc-depth-sublabel">{reasoning.label}</div>
-        </div>
-
-        {/* Topic Pill */}
-        <div className="sc-topic-pill-wrap">
-          <div className="sc-topic-pill">Topic: {activeTopic}</div>
-        </div>
-
-        {/* Chat Messages */}
-        <div className="sc-chat-messages">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`sc-msg ${msg.sender === "ai" ? "sc-msg--ai" : "sc-msg--student"} ${msg.mode === "explano" ? "sc-msg--devils" : ""}`}
-            >
-              {msg.sender === "ai" && (
-                <div className="sc-msg-avatar">
-                  {msg.mode === "explano" ? (
-                    <div className="sc-avatar sc-avatar--devils"><BrainIcon /></div>
-                  ) : (
-                    <div className="sc-avatar sc-avatar--ai"><RobotIcon /></div>
-                  )}
-                </div>
-              )}
-              <div className="sc-msg-content">
-                {msg.mode === "explano" && (
-                  <div className="sc-devils-label">Explano</div>
-                )}
-                <div className="sc-msg-bubble">
-                  <p dangerouslySetInnerHTML={{
-                    __html: msg.text
-                      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                      .replace(/\*(.*?)\*/g, "<em>$1</em>"),
-                  }} />
-                </div>
-                <div className="sc-msg-time">{msg.timestamp}</div>
-              </div>
+        {quizActive ? (
+          <div className="sc-quiz-view">
+            <div className="sc-quiz-header">
+              <h2 className="sc-quiz-title">{config.title} Quiz: {activeTopic}</h2>
+              <span className="sc-quiz-badge">Interactive MCQ</span>
             </div>
-          ))}
 
-          {isTyping && (
-            <div className="sc-msg sc-msg--ai">
-              <div className="sc-msg-avatar">
-                <div className="sc-avatar sc-avatar--ai"><RobotIcon /></div>
+            {loadingQuiz ? (
+              <div className="sc-quiz-content" style={{ justifyContent: "center", alignItems: "center" }}>
+                <div className="sc-typing-dots" style={{ margin: "var(--space-md) 0" }}>
+                  <span /><span /><span />
+                </div>
+                <p style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>Generating custom quiz with Gemini AI...</p>
               </div>
-              <div className="sc-msg-content">
-                <div className="sc-msg-bubble sc-typing">
-                  <div className="sc-typing-dots">
-                    <span /><span /><span />
+            ) : quizQuestions.length > 0 && currentQuestionIndex < 5 ? (
+              // Quiz Question View
+              <div className="sc-quiz-content">
+                <div className="sc-quiz-progress-bar">
+                  <div 
+                    className="sc-quiz-progress-fill" 
+                    style={{ width: `${((currentQuestionIndex + (answerSubmitted ? 1 : 0)) / 5) * 100}%` }}
+                  />
+                </div>
+                
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span className="sc-quiz-question-num">Question {currentQuestionIndex + 1} of 5</span>
+                  <span style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>Score: {quizScore}/{currentQuestionIndex}</span>
+                </div>
+
+                <h3 className="sc-quiz-question-text">{quizQuestions[currentQuestionIndex].question}</h3>
+
+                <div className="sc-quiz-options">
+                  {quizQuestions[currentQuestionIndex].options.map((option, i) => {
+                    const isSelected = selectedOptionIndex === i;
+                    const isCorrectAnswer = quizQuestions[currentQuestionIndex].answerIndex === i;
+                    
+                    let btnClass = "sc-quiz-option-btn";
+                    if (isSelected) btnClass += " sc-quiz-option-btn--selected";
+                    
+                    if (answerSubmitted) {
+                      if (isCorrectAnswer) {
+                        btnClass += " sc-quiz-option-btn--correct";
+                      } else if (isSelected) {
+                        btnClass += " sc-quiz-option-btn--incorrect";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={i}
+                        className={btnClass}
+                        onClick={() => handleSelectOption(i)}
+                        disabled={answerSubmitted}
+                      >
+                        <div className="sc-quiz-option-indicator">
+                          {String.fromCharCode(65 + i)}
+                        </div>
+                        <span>{option}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {answerSubmitted && (
+                  <div className="sc-quiz-explanation">
+                    <strong>Explanation:</strong> {quizQuestions[currentQuestionIndex].explanation}
+                  </div>
+                )}
+
+                <div className="sc-quiz-action-row">
+                  {!answerSubmitted ? (
+                    <button
+                      className="sc-quiz-submit-btn"
+                      onClick={handleSubmitAnswer}
+                      disabled={selectedOptionIndex === null}
+                    >
+                      Submit Answer
+                    </button>
+                  ) : (
+                    <button
+                      className="sc-quiz-submit-btn"
+                      onClick={handleNextQuestion}
+                    >
+                      {currentQuestionIndex < 4 ? "Next Question" : "View Results"}
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => setQuizActive(false)} 
+                    style={{ background: "transparent", color: "var(--color-text-secondary)", fontSize: "13px", padding: "10px 20px", border: "none", cursor: "pointer" }}
+                  >
+                    Exit Quiz
+                  </button>
+                </div>
+              </div>
+            ) : quizQuestions.length > 0 ? (
+              // Quiz Results View
+              <div className="sc-quiz-content" style={{ overflowY: "auto" }}>
+                <div className="sc-quiz-summary">
+                  <div className="sc-quiz-score-circle">
+                    <span className="sc-quiz-score-val">{quizScore}/5</span>
+                    <span className="sc-quiz-score-lbl">Score</span>
+                  </div>
+                  
+                  <h3 className="sc-quiz-summary-title">
+                    {quizScore === 5 ? "Perfect Score!" : quizScore >= 3 ? "Well Done!" : "Keep Learning!"}
+                  </h3>
+                  
+                  <p className="sc-quiz-summary-desc">
+                    {quizScore === 5 
+                      ? "Outstanding! You got a perfect 100% on this topic! You've mastered these concepts."
+                      : quizScore >= 3 
+                      ? "Great job! You have a solid understanding of the concepts. Review the incorrect answers below to improve."
+                      : "Good effort! Try reading the shared notes or discussing more with Explano to strengthen your grasp of the topic."
+                    }
+                  </p>
+
+                  <div className="sc-quiz-review-section">
+                    <h4 className="sc-quiz-review-title">Review Questions</h4>
+                    <div className="sc-quiz-review-list">
+                      {quizQuestions.map((q, idx) => {
+                        const userAnswer = userAnswers[idx];
+                        const isCorrect = userAnswer === q.answerIndex;
+                        return (
+                          <div key={idx} className="sc-quiz-review-item">
+                            <p className="sc-quiz-review-q">{idx + 1}. {q.question}</p>
+                            <p className={`sc-quiz-review-ans ${isCorrect ? "sc-quiz-review-ans--correct" : "sc-quiz-review-ans--incorrect"}`}>
+                              {isCorrect ? "✓ Correct: " : "✗ Your Answer: "} 
+                              {q.options[userAnswer]} 
+                              {!isCorrect && ` (Correct: ${q.options[q.answerIndex]})`}
+                            </p>
+                            <p style={{ fontSize: "11px", color: "var(--color-text-tertiary)", marginTop: "4px", fontStyle: "italic" }}>
+                              {q.explanation}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <button
+                    className="sc-quiz-submit-btn"
+                    onClick={() => setQuizActive(false)}
+                    style={{ marginTop: "var(--space-md)" }}
+                  >
+                    Back to Chat
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="sc-quiz-content" style={{ justifyContent: "center", alignItems: "center" }}>
+                <p style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>Failed to load quiz. Please try again.</p>
+                <button className="sc-quiz-submit-btn" onClick={() => setQuizActive(false)}>Back to Chat</button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Reasoning Depth Bar */}
+            <div className="sc-depth-bar">
+              <div className="sc-depth-label">
+                <span>Reasoning depth</span>
+                <span className="sc-depth-level">Level {reasoning.level}/{reasoning.max}</span>
+              </div>
+              <div className="sc-depth-track">
+                <div
+                  className="sc-depth-fill"
+                  style={{ width: `${(reasoning.level / reasoning.max) * 100}%` }}
+                />
+              </div>
+              <div className="sc-depth-sublabel">{reasoning.label}</div>
+            </div>
+
+            {/* Topic Pill */}
+            <div className="sc-topic-pill-wrap">
+              <div className="sc-topic-pill">Topic: {activeTopic}</div>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="sc-chat-messages">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`sc-msg ${msg.sender === "ai" ? "sc-msg--ai" : "sc-msg--student"} ${msg.mode === "explano" ? "sc-msg--devils" : ""}`}
+                >
+                  {msg.sender === "ai" && (
+                    <div className="sc-msg-avatar">
+                      {msg.mode === "explano" ? (
+                        <div className="sc-avatar sc-avatar--devils"><BrainIcon /></div>
+                      ) : (
+                        <div className="sc-avatar sc-avatar--ai"><RobotIcon /></div>
+                      )}
+                    </div>
+                  )}
+                  <div className="sc-msg-content">
+                    {msg.mode === "explano" && (
+                      <div className="sc-devils-label">Explano</div>
+                    )}
+                    <div className="sc-msg-bubble">
+                      <p dangerouslySetInnerHTML={{
+                        __html: msg.text
+                          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                          .replace(/\*(.*?)\*/g, "<em>$1</em>"),
+                      }} />
+                    </div>
+                    <div className="sc-msg-time">{msg.timestamp}</div>
                   </div>
                 </div>
-              </div>
+              ))}
+
+              {isTyping && (
+                <div className="sc-msg sc-msg--ai">
+                  <div className="sc-msg-avatar">
+                    <div className="sc-avatar sc-avatar--ai"><RobotIcon /></div>
+                  </div>
+                  <div className="sc-msg-content">
+                    <div className="sc-msg-bubble sc-typing">
+                      <div className="sc-typing-dots">
+                        <span /><span /><span />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={chatEndRef} />
             </div>
-          )}
 
-          <div ref={chatEndRef} />
-        </div>
+            {/* Bottom Input Area */}
+            <div className="sc-input-area">
+              {/* Suggested Chips */}
+              <div className="sc-chips">
+                {config.chips.map((chip) => (
+                  <button
+                    key={chip}
+                    className="sc-chip"
+                    onClick={() => handleChipClick(chip)}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
 
-        {/* Bottom Input Area */}
-        <div className="sc-input-area">
-          {/* Suggested Chips */}
-          <div className="sc-chips">
-            {config.chips.map((chip) => (
-              <button
-                key={chip}
-                className="sc-chip"
-                onClick={() => handleChipClick(chip)}
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
+              {/* Input Row */}
+              <div className="sc-input-row">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="sc-input"
+                  id="student-chat-input"
+                  placeholder="Type your answer here..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <button
+                  className="sc-send-btn"
+                  id="send-message-btn"
+                  onClick={handleSend}
+                  disabled={!inputValue.trim()}
+                  aria-label="Send message"
+                >
+                  <SendIcon />
+                </button>
+              </div>
 
-          {/* Input Row */}
-          <div className="sc-input-row">
-            <input
-              ref={inputRef}
-              type="text"
-              className="sc-input"
-              id="student-chat-input"
-              placeholder="Type your answer here..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <button
-              className="sc-send-btn"
-              id="send-message-btn"
-              onClick={handleSend}
-              disabled={!inputValue.trim()}
-              aria-label="Send message"
-            >
-              <SendIcon />
-            </button>
-          </div>
-
-          <p className="sc-disclaimer">AI can make mistakes. Focus on the concepts.</p>
-        </div>
+              <p className="sc-disclaimer">AI can make mistakes. Focus on the concepts.</p>
+            </div>
+          </>
+        )}
       </main>
 
       {/* ── Right Sidebar (Knowledge Hub) ── */}
