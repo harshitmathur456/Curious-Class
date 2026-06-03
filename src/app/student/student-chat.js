@@ -347,6 +347,10 @@ export default function StudentChat({ subject = "history" }) {
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
   const [quizScore, setQuizScore] = useState(0);
 
+  // Pre-fetching and Caching States
+  const [cachedQuizzes, setCachedQuizzes] = useState({});
+  const prefetchPromisesRef = useRef({});
+
   // Initialize/reset states when subject changes
   useEffect(() => {
     setMessages(config.initialMessages);
@@ -363,11 +367,55 @@ export default function StudentChat({ subject = "history" }) {
     setAnswerSubmitted(false);
     setSelectedOptionIndex(null);
     setQuizScore(0);
+    setCachedQuizzes({});
+    prefetchPromisesRef.current = {};
   }, [subject]);
 
   useEffect(() => {
     fetchSharedNotes();
   }, [subject]);
+
+  // Background pre-fetch quiz when activeTopic changes
+  useEffect(() => {
+    if (!activeTopic) return;
+    
+    // If already in cache, do nothing
+    if (cachedQuizzes[activeTopic]) return;
+    
+    // If already prefetching, do nothing
+    if (prefetchPromisesRef.current[activeTopic]) return;
+
+    console.log(`[Prefetch] Starting prefetch for subject: "${config.title}", topic: "${activeTopic}"`);
+
+    const promise = fetch("/api/quiz", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        subject: config.title,
+        topic: activeTopic,
+      }),
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Prefetch response was not ok");
+        const data = await res.json();
+        if (Array.isArray(data) && data.length === 5) {
+          console.log(`[Prefetch] Successfully prefetched and cached quiz for topic: "${activeTopic}"`);
+          setCachedQuizzes((prev) => ({ ...prev, [activeTopic]: data }));
+          return data;
+        }
+        throw new Error("Prefetch returned invalid format");
+      })
+      .catch((err) => {
+        console.warn(`[Prefetch] Failed to prefetch quiz for "${activeTopic}":`, err);
+        // Clear the promise from ref so we can retry on demand/click
+        delete prefetchPromisesRef.current[activeTopic];
+        throw err;
+      });
+
+    prefetchPromisesRef.current[activeTopic] = promise;
+  }, [subject, activeTopic, config.title]);
 
   async function fetchSharedNotes() {
     setLoadingNotes(true);
@@ -385,7 +433,6 @@ export default function StudentChat({ subject = "history" }) {
   }
 
   async function handleStartQuiz() {
-    setLoadingQuiz(true);
     setQuizActive(true);
     setCurrentQuestionIndex(0);
     setUserAnswers([]);
@@ -393,25 +440,48 @@ export default function StudentChat({ subject = "history" }) {
     setSelectedOptionIndex(null);
     setQuizScore(0);
 
-    try {
-      const res = await fetch("/api/quiz", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subject: config.title,
-          topic: activeTopic,
-        }),
-      });
+    const cached = cachedQuizzes[activeTopic];
+    if (cached) {
+      console.log(`[Quiz] Loading quiz for "${activeTopic}" instantly from cache.`);
+      setQuizQuestions(cached);
+      setLoadingQuiz(false);
+      return;
+    }
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch quiz");
+    setLoadingQuiz(true);
+    console.log(`[Quiz] Cache miss or pending prefetch for "${activeTopic}". Loading...`);
+
+    try {
+      let data;
+      // If there is an active prefetch promise, await it
+      if (prefetchPromisesRef.current[activeTopic]) {
+        console.log(`[Quiz] Awaiting active prefetch promise for "${activeTopic}"`);
+        data = await prefetchPromisesRef.current[activeTopic];
+      } else {
+        // Otherwise, fetch normally
+        console.log(`[Quiz] Fetching quiz on demand for "${activeTopic}"`);
+        const res = await fetch("/api/quiz", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            subject: config.title,
+            topic: activeTopic,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch quiz");
+        }
+
+        data = await res.json();
       }
 
-      const data = await res.json();
       if (Array.isArray(data) && data.length === 5) {
         setQuizQuestions(data);
+        // Also cache it
+        setCachedQuizzes((prev) => ({ ...prev, [activeTopic]: data }));
       } else {
         throw new Error("Invalid quiz format received");
       }
