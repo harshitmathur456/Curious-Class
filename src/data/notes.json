@@ -58,5 +58,335 @@
     "uploadDate": "2026-06-03",
     "fileSize": "1.6 KB",
     "subject": "mathematics"
+  },
+  {
+    "id": 7,
+    "title": "Chemical Reactions & Equations Note",
+    "fileName": "chemical_reactions_note.pdf",
+    "fileUrl": "/notes/chemical_reactions_note.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-03",
+    "fileSize": "1.4 KB",
+    "subject": "science"
+  },
+  {
+    "id": 101,
+    "title": "Real Numbers - Chapter 1 Notes",
+    "fileName": "maths_ch1.pdf",
+    "fileUrl": "/notes/maths_ch1.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "4.1 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 102,
+    "title": "Polynomials - Chapter 2 Notes",
+    "fileName": "maths_ch2.pdf",
+    "fileUrl": "/notes/maths_ch2.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "3.9 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 103,
+    "title": "Pair of Linear Equations in Two Variables - Chapter 3 Notes",
+    "fileName": "maths_ch3.pdf",
+    "fileUrl": "/notes/maths_ch3.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.8 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 104,
+    "title": "Quadratic Equations - Chapter 4 Notes",
+    "fileName": "maths_ch4.pdf",
+    "fileUrl": "/notes/maths_ch4.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "12.4 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 105,
+    "title": "Arithmetic Progressions - Chapter 5 Notes",
+    "fileName": "maths_ch5.pdf",
+    "fileUrl": "/notes/maths_ch5.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "9.0 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 106,
+    "title": "Triangles - Chapter 6 Notes",
+    "fileName": "maths_ch6.pdf",
+    "fileUrl": "/notes/maths_ch6.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.3 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 107,
+    "title": "Coordinate Geometry - Chapter 7 Notes",
+    "fileName": "maths_ch7.pdf",
+    "fileUrl": "/notes/maths_ch7.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "4.0 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 108,
+    "title": "Introduction to Trigonometry - Chapter 8 Notes",
+    "fileName": "maths_ch8.pdf",
+    "fileUrl": "/notes/maths_ch8.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "18.1 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 109,
+    "title": "Some Applications of Trigonometry - Chapter 9 Notes",
+    "fileName": "maths_ch9.pdf",
+    "fileUrl": "/notes/maths_ch9.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.7 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 110,
+    "title": "Circles - Chapter 10 Notes",
+    "fileName": "maths_ch10.pdf",
+    "fileUrl": "/notes/maths_ch10.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "1.7 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 111,
+    "title": "Areas Related to Circles - Chapter 11 Notes",
+    "fileName": "maths_ch11.pdf",
+    "fileUrl": "/notes/maths_ch11.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.5 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 112,
+    "title": "Surface Areas and Volumes - Chapter 12 Notes",
+    "fileName": "maths_ch12.pdf",
+    "fileUrl": "/notes/maths_ch12.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.2 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 113,
+    "title": "Statistics - Chapter 13 Notes",
+    "fileName": "maths_ch13.pdf",
+    "fileUrl": "/notes/maths_ch13.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "4.1 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 114,
+    "title": "Probability - Chapter 14 Notes",
+    "fileName": "maths_ch14.pdf",
+    "fileUrl": "/notes/maths_ch14.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.9 MB",
+    "subject": "mathematics_class10"
+  },
+  {
+    "id": 201,
+    "title": "Chemical Reactions and Equations - Chapter 1 Notes",
+    "fileName": "science_ch1.pdf",
+    "fileUrl": "/notes/science_ch1.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "4.1 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 202,
+    "title": "Acids, Bases and Salts - Chapter 2 Notes",
+    "fileName": "science_ch2.pdf",
+    "fileUrl": "/notes/science_ch2.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "3.9 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 203,
+    "title": "Metals and Non-metals - Chapter 3 Notes",
+    "fileName": "science_ch3.pdf",
+    "fileUrl": "/notes/science_ch3.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.8 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 204,
+    "title": "Carbon and its Compounds - Chapter 4 Notes",
+    "fileName": "science_ch4.pdf",
+    "fileUrl": "/notes/science_ch4.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "12.4 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 205,
+    "title": "Life Processes - Chapter 5 Notes",
+    "fileName": "science_ch5.pdf",
+    "fileUrl": "/notes/science_ch5.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "9.0 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 206,
+    "title": "Control and Coordination - Chapter 6 Notes",
+    "fileName": "science_ch6.pdf",
+    "fileUrl": "/notes/science_ch6.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.3 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 207,
+    "title": "How Do Organisms Reproduce? - Chapter 7 Notes",
+    "fileName": "science_ch7.pdf",
+    "fileUrl": "/notes/science_ch7.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "4.0 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 208,
+    "title": "Heredity and Evolution - Chapter 8 Notes",
+    "fileName": "science_ch8.pdf",
+    "fileUrl": "/notes/science_ch8.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "18.1 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 209,
+    "title": "Light - Reflection and Refraction - Chapter 9 Notes",
+    "fileName": "science_ch9.pdf",
+    "fileUrl": "/notes/science_ch9.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.7 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 210,
+    "title": "The Human Eye and the Colourful World - Chapter 10 Notes",
+    "fileName": "science_ch10.pdf",
+    "fileUrl": "/notes/science_ch10.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "1.7 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 211,
+    "title": "Electricity - Chapter 11 Notes",
+    "fileName": "science_ch11.pdf",
+    "fileUrl": "/notes/science_ch11.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.5 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 212,
+    "title": "Magnetic Effects of Electric Current - Chapter 12 Notes",
+    "fileName": "science_ch12.pdf",
+    "fileUrl": "/notes/science_ch12.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "2.2 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 213,
+    "title": "Our Environment - Chapter 13 Notes",
+    "fileName": "science_ch13.pdf",
+    "fileUrl": "/notes/science_ch13.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-28",
+    "fileSize": "4.1 MB",
+    "subject": "science_class10"
+  },
+  {
+    "id": 301,
+    "title": "The Rise of Nationalism in Europe - Chapter 1 Notes",
+    "fileName": "history_ch1.pdf",
+    "fileUrl": "/notes/history_ch1.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-29",
+    "fileSize": "5.4 MB",
+    "subject": "history_class10"
+  },
+  {
+    "id": 302,
+    "title": "Nationalism in India - Chapter 2 Notes",
+    "fileName": "history_ch2.pdf",
+    "fileUrl": "/notes/history_ch2.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-29",
+    "fileSize": "4.8 MB",
+    "subject": "history_class10"
+  },
+  {
+    "id": 303,
+    "title": "The Making of a Global World - Chapter 3 Notes",
+    "fileName": "history_ch3.pdf",
+    "fileUrl": "/notes/history_ch3.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-29",
+    "fileSize": "5.8 MB",
+    "subject": "history_class10"
+  },
+  {
+    "id": 304,
+    "title": "The Age of Industrialisation - Chapter 4 Notes",
+    "fileName": "history_ch4.pdf",
+    "fileUrl": "/notes/history_ch4.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-29",
+    "fileSize": "5.7 MB",
+    "subject": "history_class10"
+  },
+  {
+    "id": 305,
+    "title": "Print Culture and The Modern World - Chapter 5 Notes",
+    "fileName": "history_ch5.pdf",
+    "fileUrl": "/notes/history_ch5.pdf",
+    "uploadedBy": "Mrs. Sharma",
+    "uploadDate": "2026-06-29",
+    "fileSize": "5.2 MB",
+    "subject": "history_class10"
   }
 ]

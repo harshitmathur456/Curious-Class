@@ -68,76 +68,9 @@ function RefreshIcon() {
 
 export default function Home() {
   const router = useRouter();
-  const [showCaptcha, setShowCaptcha] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("");
-  const [captcha, setCaptcha] = useState(generateCaptcha);
-  const [userAnswer, setUserAnswer] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | success | error
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [shake, setShake] = useState(false);
 
   function handleCardClick(role) {
-    setSelectedRole(role);
-    setCaptcha(generateCaptcha());
-    setUserAnswer("");
-    setStatus("idle");
-    setShake(false);
-    setShowCaptcha(true);
-  }
-
-  function handleRefresh() {
-    setCaptcha(generateCaptcha());
-    setUserAnswer("");
-    setStatus("idle");
-    setShake(false);
-  }
-
-  function handleClose() {
-    setShowCaptcha(false);
-    setStatus("idle");
-    setUserAnswer("");
-  }
-
-  async function handleVerify(e) {
-    e.preventDefault();
-    if (!userAnswer.trim() || isVerifying) return;
-
-    setIsVerifying(true);
-    const isCorrect = parseInt(userAnswer.trim(), 10) === captcha.answer;
-
-    // Log to Supabase
-    try {
-      await fetch("/api/captcha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: selectedRole,
-          captcha_answer: userAnswer.trim(),
-          is_correct: isCorrect,
-        }),
-      });
-    } catch (err) {
-      console.error("Failed to log captcha:", err);
-    }
-
-    if (isCorrect) {
-      setStatus("success");
-      setTimeout(() => {
-        const dest = selectedRole === "student" ? "/student" : "/teacher";
-        router.push(dest);
-      }, 800);
-    } else {
-      setStatus("error");
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
-      setTimeout(() => {
-        setCaptcha(generateCaptcha());
-        setUserAnswer("");
-        setStatus("idle");
-      }, 1500);
-    }
-
-    setIsVerifying(false);
+    router.push(`/select-class?role=${role}`);
   }
 
   return (
@@ -198,81 +131,9 @@ export default function Home() {
           </button>
         </div>
 
-        <p className="landing-footer">Built for Indian government schools · Class 6–10 · Works on 2G</p>
       </div>
 
-      {/* ── CAPTCHA Modal Overlay ── */}
-      {showCaptcha && (
-        <div className="captcha-overlay" onClick={handleClose}>
-          <div
-            className={`captcha-modal ${shake ? "captcha-modal--shake" : ""}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button className="captcha-close" onClick={handleClose} aria-label="Close">
-              <XIcon />
-            </button>
 
-            {/* Header */}
-            <div className="captcha-header">
-              <div className={`captcha-shield ${status === "success" ? "captcha-shield--success" : ""}`}>
-                {status === "success" ? <CheckIcon /> : <ShieldIcon />}
-              </div>
-              <div className="captcha-header-text">
-                <h3>Quick Verification</h3>
-                <p>Solve this to continue as <span className="captcha-role-tag">{selectedRole}</span></p>
-              </div>
-            </div>
-
-            {/* Question */}
-            <div className="captcha-question-box">
-              <div className="captcha-question-label">What is</div>
-              <div className="captcha-question-expr">{captcha.question}</div>
-              <button
-                className="captcha-refresh"
-                onClick={handleRefresh}
-                title="New question"
-                type="button"
-              >
-                <RefreshIcon />
-              </button>
-            </div>
-
-            {/* Input + Submit */}
-            <form onSubmit={handleVerify} className="captcha-form">
-              <div className="captcha-input-wrap">
-                <input
-                  type="number"
-                  className={`captcha-input ${status === "error" ? "captcha-input--error" : ""} ${status === "success" ? "captcha-input--success" : ""}`}
-                  placeholder="Your answer"
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  autoFocus
-                  disabled={status === "success"}
-                />
-              </div>
-              <button
-                type="submit"
-                className={`captcha-submit ${status === "success" ? "captcha-submit--success" : ""}`}
-                disabled={!userAnswer.trim() || isVerifying || status === "success"}
-              >
-                {status === "success" ? (
-                  <>
-                    <CheckIcon /> Verified!
-                  </>
-                ) : (
-                  "Verify"
-                )}
-              </button>
-            </form>
-
-            {/* Error message */}
-            {status === "error" && (
-              <div className="captcha-error-msg">Incorrect answer. Trying a new one...</div>
-            )}
-          </div>
-        </div>
-      )}
 
       <style>{`
         .landing-page {

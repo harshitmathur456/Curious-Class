@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   dashboardStats,
   currentUnit,
@@ -10,6 +10,7 @@ import {
   teacherNavItems,
   studentRoster,
 } from "@/data/mockData";
+import { CHAPTERS_DATA } from "@/data/chaptersData";
 import "./teacher-dashboard.css";
 
 /* ─── Icons ──────────────────────────────────────────────────── */
@@ -139,9 +140,53 @@ function CloudUploadIcon() {
 /* ─── Main Component ─────────────────────────────────────────── */
 
 export default function TeacherDashboard() {
+  const [selectedClass, setSelectedClass] = useState("Class 8-B");
+  const [subject, setSubject] = useState("history");
+
+  const isClass10 = selectedClass && selectedClass.includes("10");
+  let subjectKey = subject;
+  if (isClass10) {
+    if (subject === "mathematics") {
+      subjectKey = "mathematics_class10";
+    } else if (subject === "science") {
+      subjectKey = "science_class10";
+    } else if (subject === "history") {
+      subjectKey = "history_class10";
+    }
+  }
+
   const [activeNav, setActiveNav] = useState("dashboard");
   const [expandedAlerts, setExpandedAlerts] = useState({});
-  const [selectedTopic, setSelectedTopic] = useState(currentUnit.currentTopic);
+  const [selectedTopic, setSelectedTopic] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const cls = localStorage.getItem("selectedClass");
+      if (cls) {
+        setSelectedClass(cls);
+        let sub = "history";
+        if (cls.includes("11") || cls.includes("12")) {
+          sub = "physics";
+        } else if (cls.includes("10")) {
+          sub = "mathematics";
+        }
+        setSubject(sub);
+        const isC10 = cls.includes("10");
+        const subKey = (sub === "mathematics" && isC10) ? "mathematics_class10" :
+                       (sub === "science" && isC10) ? "science_class10" :
+                       (sub === "history" && isC10) ? "history_class10" : sub;
+        const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
+        if (chapters.length > 0) {
+          setSelectedTopic(chapters[0].name);
+        }
+      } else {
+        const chapters = CHAPTERS_DATA["history"]?.chapters || [];
+        if (chapters.length > 0) {
+          setSelectedTopic(chapters[0].name);
+        }
+      }
+    }
+  }, []);
 
   const [notes, setNotes] = useState([]);
   const [loadingNotes, setLoadingNotes] = useState(true);
@@ -150,21 +195,32 @@ export default function TeacherDashboard() {
   const [uploading, setUploading] = useState(false);
   const [statusMsg, setStatusMsg] = useState({ text: "", type: "" });
 
+  const subjectKeyRef = useRef(subjectKey);
+  useEffect(() => {
+    subjectKeyRef.current = subjectKey;
+  }, [subjectKey]);
+
   useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [subjectKey]);
 
   async function fetchNotes() {
+    const activeSubjectKey = subjectKey;
+    setLoadingNotes(true);
     try {
-      const res = await fetch("/api/notes");
+      const res = await fetch(`/api/notes?subject=${activeSubjectKey}`);
       if (res.ok) {
         const data = await res.json();
-        setNotes(data);
+        if (activeSubjectKey === subjectKeyRef.current) {
+          setNotes(data);
+        }
       }
     } catch (e) {
       console.error("Failed to fetch notes:", e);
     } finally {
-      setLoadingNotes(false);
+      if (activeSubjectKey === subjectKeyRef.current) {
+        setLoadingNotes(false);
+      }
     }
   }
 
@@ -181,6 +237,7 @@ export default function TeacherDashboard() {
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("title", uploadTitle);
+    formData.append("subject", subjectKey);
 
     try {
       const res = await fetch("/api/notes", {
@@ -227,7 +284,6 @@ export default function TeacherDashboard() {
             </div>
             <div>
               <div className="td-nav-school">CuriousClass</div>
-              <div className="td-nav-sub">Govt. School, Delhi</div>
             </div>
           </div>
 
@@ -272,14 +328,63 @@ export default function TeacherDashboard() {
       <div className="td-content">
         {/* Top Bar */}
         <header className="td-header">
-          <div className="td-header-left">
-            <h1 className="td-page-title">Class 8-B</h1>
-            <span className="td-page-subtitle">Overview</span>
+          <div className="td-header-left" style={{ display: "flex", alignItems: "center", gap: "var(--space-md)" }}>
+            <div>
+              <h1 className="td-page-title" style={{ margin: 0 }}>{selectedClass}</h1>
+            </div>
+            <div style={{ marginLeft: "var(--space-md)" }}>
+              <select
+                value={subject}
+                onChange={(e) => {
+                  const newSub = e.target.value;
+                  setSubject(newSub);
+                  const isC10 = selectedClass && selectedClass.includes("10");
+                  const subKey = (newSub === "mathematics" && isC10) ? "mathematics_class10" :
+                                 (newSub === "science" && isC10) ? "science_class10" :
+                                 (newSub === "history" && isC10) ? "history_class10" : newSub;
+                  const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
+                  if (chapters.length > 0) {
+                    setSelectedTopic(chapters[0].name);
+                  }
+                }}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--color-border-light)",
+                  background: "var(--color-bg-mint)",
+                  color: "var(--color-primary)",
+                  fontWeight: "500",
+                  outline: "none",
+                  cursor: "pointer"
+                }}
+              >
+                {selectedClass && (selectedClass.includes("11") || selectedClass.includes("12")) ? (
+                  <>
+                    <option value="physics">Physics</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="biology">Biology</option>
+                    <option value="mathematics">Mathematics</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="history">History</option>
+                    <option value="science">Science</option>
+                    <option value="mathematics">Mathematics</option>
+                  </>
+                )}
+              </select>
+            </div>
           </div>
           <div className="td-header-right">
             <div className="td-teacher-info">
               <div className="td-teacher-name">Mrs. Sharma</div>
-              <div className="td-teacher-dept">Social Science</div>
+              <div className="td-teacher-dept">
+                {subject === "mathematics" ? "Mathematics" :
+                 subject === "physics" ? "Physics" :
+                 subject === "chemistry" ? "Chemistry" :
+                 subject === "biology" ? "Biology" :
+                 subject === "science" ? "Science" : "Social Science"}
+              </div>
             </div>
             <div className="td-teacher-avatar">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -296,8 +401,20 @@ export default function TeacherDashboard() {
           <div className="td-unit-card" id="current-unit-card">
             <div className="td-unit-info">
               <div className="td-unit-eyebrow">Current unit</div>
-              <div className="td-unit-name">{currentUnit.name}</div>
-              <div className="td-unit-desc">{currentUnit.description}</div>
+              <div className="td-unit-name">
+                {subject === "mathematics" ? "Class 10 Mathematics" :
+                 subject === "physics" ? "Class 11/12 Physics" :
+                 subject === "chemistry" ? "Class 11/12 Chemistry" :
+                 subject === "biology" ? "Class 11/12 Biology" :
+                 subject === "science" ? "Science Curriculum" : currentUnit.name}
+              </div>
+              <div className="td-unit-desc">
+                {subject === "mathematics" ? "CBSE Class 10 Curriculum" :
+                 subject === "physics" ? "Higher Secondary Physics" :
+                 subject === "chemistry" ? "Higher Secondary Chemistry" :
+                 subject === "biology" ? "Higher Secondary Biology" :
+                 subject === "science" ? "General Science Concepts" : currentUnit.description}
+              </div>
             </div>
             <div className="td-unit-actions">
               <select
@@ -306,10 +423,9 @@ export default function TeacherDashboard() {
                 value={selectedTopic}
                 onChange={(e) => setSelectedTopic(e.target.value)}
               >
-                <option>Non-Cooperation Movement</option>
-                <option>Salt March</option>
-                <option>Quit India Movement</option>
-                <option>Partition of India</option>
+                {(CHAPTERS_DATA[subjectKey]?.chapters || []).map((ch) => (
+                  <option key={ch.id} value={ch.name}>{ch.name}</option>
+                ))}
               </select>
               <button className="td-set-btn" id="set-topic-btn">Set</button>
             </div>
