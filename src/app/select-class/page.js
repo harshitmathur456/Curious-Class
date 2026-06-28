@@ -118,7 +118,7 @@ function ClassSelectionForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          role: `${role}-${selectedClass.toLowerCase().replace(" ", "")}`,
+          role: role,
           captcha_answer: userAnswer.trim(),
           is_correct: isCorrect,
         }),
