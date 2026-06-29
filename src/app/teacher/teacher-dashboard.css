@@ -1,21 +1,7 @@
-/* ─── Teacher Dashboard Layout ───────────────────────────────── */
-
 .td-layout {
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   background: var(--color-bg-page);
-}
-
-.td-content {
-  flex: 1;
-  overflow-y: auto;
-  min-width: 0;
-}
-
-.td-dashboard {
-  padding: var(--space-xl);
-  padding-bottom: 100px;
 }
 
 /* ─── Left Navigation ────────────────────────────────────────── */
@@ -29,6 +15,9 @@
   flex-direction: column;
   justify-content: space-between;
   padding: var(--space-xl) var(--space-md);
+  position: sticky;
+  top: 0;
+  height: 100vh;
   overflow-y: auto;
 }
 
@@ -118,24 +107,36 @@
   font-weight: var(--font-weight-medium);
 }
 
-/* ─── Main Content ───────────────────────────────────────────── */
-
 .td-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow: hidden;
+}
+
+/* Dashboard Content - this is the ONLY scrollable area */
+.td-dashboard {
+  flex: 1;
+  padding: var(--space-2xl);
+  padding-bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
 }
 
 /* Header */
 .td-header {
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-lg) var(--space-2xl);
+  padding: 0 var(--space-2xl);
   border-bottom: 0.5px solid var(--color-border-light);
   background: var(--color-bg-white);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .td-header-left {
@@ -187,17 +188,6 @@
   color: var(--color-primary);
 }
 
-/* ─── Dashboard Content ──────────────────────────────────────── */
-
-.td-dashboard {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-2xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-  min-height: 0;
-}
 
 /* Current Unit Card */
 .td-unit-card {

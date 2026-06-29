@@ -157,6 +157,8 @@ export default function StudentChat({ subject = null }) {
   const taughtTopics = activeIndex >= 0 ? allChapters.slice(0, activeIndex).map((c) => c.name) : [];
   const upcomingClasses = activeIndex >= 0 ? allChapters.slice(activeIndex + 1).map((c) => c.name) : allChapters.map((c) => c.name);
 
+  const activeChapterId = activeChapter?.id;
+
   const config = {
     title: CHAPTERS_DATA[subjectKey]?.title || subject,
     goal: {
@@ -209,11 +211,10 @@ export default function StudentChat({ subject = null }) {
   const [cachedQuizzes, setCachedQuizzes] = useState({});
   const prefetchPromisesRef = useRef({});
 
-  const filteredNotes = activeTopic
-    ? (sharedNotes.some(note => note.fileName && note.fileName.toLowerCase().endsWith(`_ch${activeIndex + 1}.pdf`))
-        ? sharedNotes.filter(note => note.fileName && note.fileName.toLowerCase().endsWith(`_ch${activeIndex + 1}.pdf`))
-        : sharedNotes)
-    : sharedNotes;
+  // Curriculum and Pushed Quizzes States
+  const [curriculumData, setCurriculumData] = useState({});
+  const [pushedQuizzes, setPushedQuizzes] = useState([]);
+  const [activeQuizTopic, setActiveQuizTopic] = useState("");
 
   // Initialize/reset states when subject changes
   useEffect(() => {
@@ -233,7 +234,24 @@ export default function StudentChat({ subject = null }) {
     setQuizScore(0);
     setCachedQuizzes({});
     prefetchPromisesRef.current = {};
+    setCurriculumData({});
+    setPushedQuizzes([]);
+    setActiveQuizTopic("");
   }, [currentSubject]);
+
+  // Derived computations - MUST be after state declarations
+  const chapterCurriculum = curriculumData[activeChapterId] || { status: 'pending', topics: [] };
+  const chapterTopics = chapterCurriculum.topics || [];
+  const topicsWithQuizzes = chapterTopics.map(topic => {
+    const hasQuiz = pushedQuizzes.some(q => q.topic === topic.name);
+    return { ...topic, hasQuiz };
+  });
+
+  const filteredNotes = activeTopic
+    ? (sharedNotes.some(note => note.fileName && note.fileName.toLowerCase().endsWith(`_ch${activeIndex + 1}.pdf`))
+        ? sharedNotes.filter(note => note.fileName && note.fileName.toLowerCase().endsWith(`_ch${activeIndex + 1}.pdf`))
+        : sharedNotes)
+    : sharedNotes;
 
   useEffect(() => {
     let active = true;
@@ -259,6 +277,39 @@ export default function StudentChat({ subject = null }) {
       active = false;
     };
   }, [subjectKey]);
+
+  // Fetch curriculum and pushed quizzes for student
+  useEffect(() => {
+    let active = true;
+
+    async function fetchCurriculumAndQuizzes() {
+      if (!selectedClass) return;
+      try {
+        // Fetch curriculum
+        const currRes = await fetch(`/api/curriculum?subject=${subjectKey}`);
+        if (currRes.ok && active) {
+          const currData = await currRes.json();
+          setCurriculumData(currData);
+        }
+
+        // Fetch pushed quizzes
+        const subjectTitle = CHAPTERS_DATA[subjectKey]?.title || currentSubject;
+        const quizRes = await fetch(`/api/pushed_quizzes?subject=${encodeURIComponent(subjectTitle)}&class_name=${encodeURIComponent(selectedClass)}`);
+        if (quizRes.ok && active) {
+          const quizData = await quizRes.json();
+          setPushedQuizzes(quizData.quizzes || []);
+        }
+      } catch (e) {
+        console.error("Failed to fetch curriculum or quizzes:", e);
+      }
+    }
+
+    fetchCurriculumAndQuizzes();
+
+    return () => {
+      active = false;
+    };
+  }, [subjectKey, selectedClass]);
 
   // Background pre-fetch quiz when activeTopic changes
   useEffect(() => {
@@ -302,7 +353,9 @@ export default function StudentChat({ subject = null }) {
     prefetchPromisesRef.current[activeTopic] = promise;
   }, [subject, activeTopic, config.title]);
 
-  async function handleStartQuiz() {
+  async function handleStartQuiz(topicName) {
+    const quizTopicToFetch = topicName || activeTopic;
+    setActiveQuizTopic(quizTopicToFetch);
     setQuizActive(true);
     setCurrentQuestionIndex(0);
     setUserAnswers([]);
@@ -310,37 +363,31 @@ export default function StudentChat({ subject = null }) {
     setSelectedOptionIndex(null);
     setQuizScore(0);
 
-    const cached = cachedQuizzes[activeTopic];
+    const cached = cachedQuizzes[quizTopicToFetch];
     if (cached) {
-      console.log(`[Quiz] Loading quiz for "${activeTopic}" instantly from cache.`);
+      console.log(`[Quiz] Loading quiz for "${quizTopicToFetch}" instantly from cache.`);
       setQuizQuestions(cached);
       setLoadingQuiz(false);
       return;
     }
 
     setLoadingQuiz(true);
-    console.log(`[Quiz] Cache miss or pending prefetch for "${activeTopic}". Loading...`);
+    console.log(`[Quiz] Cache miss. Loading pushed quiz for "${quizTopicToFetch}"...`);
 
     try {
-      let data;
-      if (prefetchPromisesRef.current[activeTopic]) {
-        console.log(`[Quiz] Awaiting active prefetch promise for "${activeTopic}"`);
-        data = await prefetchPromisesRef.current[activeTopic];
-      } else {
-        console.log(`[Quiz] Fetching pushed quiz for "${activeTopic}"`);
-        const res = await fetch(`/api/pushed_quizzes?subject=${encodeURIComponent(config.title)}&topic=${encodeURIComponent(activeTopic)}&class_name=${encodeURIComponent(selectedClass)}`);
+      const subjectTitle = CHAPTERS_DATA[subjectKey]?.title || currentSubject;
+      const res = await fetch(`/api/pushed_quizzes?subject=${encodeURIComponent(subjectTitle)}&topic=${encodeURIComponent(quizTopicToFetch)}&class_name=${encodeURIComponent(selectedClass)}`);
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch pushed quiz");
-        }
-
-        const resData = await res.json();
-        data = resData.quiz ? resData.quiz.quiz_data : null;
+      if (!res.ok) {
+        throw new Error("Failed to fetch pushed quiz");
       }
+
+      const resData = await res.json();
+      const data = resData.quiz ? resData.quiz.quiz_data : null;
 
       if (Array.isArray(data) && data.length === 5) {
         setQuizQuestions(data);
-        setCachedQuizzes((prev) => ({ ...prev, [activeTopic]: data }));
+        setCachedQuizzes((prev) => ({ ...prev, [quizTopicToFetch]: data }));
       } else {
         alert("The teacher has not pushed a quiz for this topic yet.");
         setQuizActive(false);
@@ -359,7 +406,7 @@ export default function StudentChat({ subject = null }) {
     setSelectedOptionIndex(index);
   }
 
-  async function logActivity(activityType, details) {
+  async function logActivity(activityType, details, customTopic) {
     if (typeof window === "undefined") return;
     const sName = localStorage.getItem("studentName") || "Unknown Student";
     const sRoll = localStorage.getItem("rollNumber") || "Unknown Roll";
@@ -372,7 +419,7 @@ export default function StudentChat({ subject = null }) {
           student_name: sName,
           class_name: selectedClass,
           activity_type: activityType,
-          topic: activeTopic,
+          topic: customTopic || activeTopic,
           details
         })
       });
@@ -397,7 +444,7 @@ export default function StudentChat({ subject = null }) {
     setAnswerSubmitted(true);
 
     if (currentQuestionIndex === quizQuestions.length - 1) {
-      logActivity('quiz', { score: newScore, total: quizQuestions.length });
+      logActivity('quiz', { score: newScore, total: quizQuestions.length }, activeQuizTopic);
     }
   }
 
@@ -691,17 +738,6 @@ export default function StudentChat({ subject = null }) {
           </div>
         </div>
 
-        {activeTopic && (
-          <button
-            className="sc-quiz-btn"
-            id="start-quiz-btn"
-            onClick={handleStartQuiz}
-            disabled={loadingQuiz}
-          >
-            <QuizIcon />
-            <span>{loadingQuiz ? "Loading Quiz..." : "Start Topic Quiz"}</span>
-          </button>
-        )}
 
         {activeTopic && (
           <div className="sc-active-chapter-box">
@@ -1014,6 +1050,53 @@ export default function StudentChat({ subject = null }) {
       {activeTopic && (
         <aside className="sc-right-sidebar">
           <h2 className="sc-rs-title">Knowledge Hub</h2>
+
+          {/* Quizzes Section */}
+          <div className="sc-rs-section" style={{ background: '#f5fcf8', border: '1px solid #d4ebd9', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
+            <h3 className="sc-rs-subtitle" style={{ color: 'var(--color-primary-dark)', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>📋 Quizzes Pushed by Teacher</h3>
+            {topicsWithQuizzes.length === 0 ? (
+              <p style={{ fontSize: '12px', color: '#666', margin: 0, fontStyle: 'italic' }}>No topics defined by teacher yet.</p>
+            ) : (
+              <ul className="sc-rs-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: 0, listStyle: 'none' }}>
+                {topicsWithQuizzes.map((t) => (
+                  <li 
+                    key={t.id} 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      padding: '8px 12px', 
+                      background: 'white', 
+                      border: '1px solid var(--color-border-light)', 
+                      borderRadius: '8px',
+                      fontSize: '13px'
+                    }}
+                  >
+                    <span style={{ fontWeight: '500', color: '#333' }}>{t.name}</span>
+                    {t.hasQuiz ? (
+                      <button 
+                        onClick={() => handleStartQuiz(t.name)}
+                        style={{ 
+                          padding: '4px 10px', 
+                          background: 'var(--color-primary)', 
+                          color: 'white', 
+                          border: 'none', 
+                          borderRadius: '6px', 
+                          cursor: 'pointer', 
+                          fontSize: '11px',
+                          fontWeight: '600'
+                        }}
+                      >
+                        Start Quiz
+                      </button>
+                    ) : (
+                      <span style={{ fontSize: '11px', color: '#999', fontStyle: 'italic' }}>Quiz Pending</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           
           <div className="sc-rs-section">
             <h3 className="sc-rs-subtitle">Taught by Teacher</h3>

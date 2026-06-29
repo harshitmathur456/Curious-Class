@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   dashboardStats,
   currentUnit,
@@ -488,6 +488,12 @@ export default function TeacherDashboard() {
   useEffect(() => {
     fetchNotes();
     fetchCurriculum();
+    const chapters = CHAPTERS_DATA[subjectKey]?.chapters || [];
+    if (chapters.length > 0) {
+      setSelectedTopic(chapters[0].name);
+    } else {
+      setSelectedTopic("");
+    }
   }, [subjectKey]);
 
   async function handleUpload(e) {
@@ -545,7 +551,7 @@ export default function TeacherDashboard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          subject: subject,
+          subject: CHAPTERS_DATA[subjectKey]?.title || subject,
           topic: quizTopic,
           class_name: selectedClass
         })
@@ -629,7 +635,47 @@ export default function TeacherDashboard() {
         <header className="td-header">
           <div className="td-header-left" style={{ display: "flex", alignItems: "center", gap: "var(--space-md)" }}>
             <div>
-              <h1 className="td-page-title" style={{ margin: 0 }}>{selectedClass}</h1>
+              <select
+                value={selectedClass}
+                onChange={(e) => {
+                  const newClass = e.target.value;
+                  setSelectedClass(newClass);
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("selectedClass", newClass);
+                  }
+                  // Reset selectedTopic when changing class
+                  const isC10 = newClass.includes("10");
+                  const isC6 = newClass.includes("6");
+                  const subKey = (subject === "mathematics" && isC10) ? "mathematics_class10" :
+                                 (subject === "science" && isC10) ? "science_class10" :
+                                 (subject === "history" && isC10) ? "history_class10" :
+                                 (subject === "science" && isC6) ? "science_class6" :
+                                 (subject === "history" && isC6) ? "history_class6" : subject;
+                  const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
+                  if (chapters.length > 0) {
+                    setSelectedTopic(chapters[0].name);
+                  } else {
+                    setSelectedTopic("");
+                  }
+                }}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--color-border-light)",
+                  background: "var(--color-bg-mint)",
+                  color: "var(--color-primary)",
+                  fontWeight: "700",
+                  fontSize: "18px",
+                  outline: "none",
+                  cursor: "pointer"
+                }}
+              >
+                {Array.from({ length: 10 }, (_, i) => {
+                  const num = i + 1;
+                  const name = num === 1 ? "Class 1st" : num === 2 ? "Class 2nd" : num === 3 ? "Class 3rd" : `Class ${num}th`;
+                  return <option key={name} value={name}>{name}</option>;
+                })}
+              </select>
             </div>
             <div style={{ marginLeft: "var(--space-md)" }}>
               <select
@@ -647,6 +693,8 @@ export default function TeacherDashboard() {
                   const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
                   if (chapters.length > 0) {
                     setSelectedTopic(chapters[0].name);
+                  } else {
+                    setSelectedTopic("");
                   }
                 }}
                 style={{
@@ -762,7 +810,7 @@ export default function TeacherDashboard() {
 
                   {/* Data rows */}
                   {heatmapStudents.map((student) => (
-                    <>
+                    <React.Fragment key={student.name}>
                       <div key={`name-${student.name}`} className="td-hm-label">{student.name}</div>
                       {student.scores.map((score, i) => (
                         <div
@@ -774,7 +822,7 @@ export default function TeacherDashboard() {
                           }}
                         />
                       ))}
-                    </>
+                    </React.Fragment>
                   ))}
                 </div>
 
@@ -954,9 +1002,9 @@ export default function TeacherDashboard() {
                 </div>
                 {quizStatus && <p style={{ marginTop: '12px', fontSize: '13px', color: quizStatus.includes('success') ? 'green' : '#666' }}>{quizStatus}</p>}
                 {pushedQuiz && (
-                  <div style={{ marginTop: '16px', padding: '12px', background: '#f0f9f0', borderRadius: '8px', border: '1px solid #d4edda' }}>
+                  <div style={{ marginTop: '16px', padding: '12px', background: '#f0f9f0', borderRadius: '8px', border: '1px solid var(--color-border-light)' }}>
                     <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-primary)' }}>Pushed Quiz Preview</h4>
-                    {pushedQuiz.questions?.map((q, i) => (
+                    {(pushedQuiz.quiz_data || pushedQuiz.questions || []).map((q, i) => (
                       <div key={i} style={{ marginBottom: '8px' }}>
                         <p style={{ margin: '0 0 4px 0', fontWeight: '500', fontSize: '13px' }}>{i+1}. {q.question}</p>
                         <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Answer: {q.options?.[q.answerIndex]}</p>
