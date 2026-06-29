@@ -75,13 +75,17 @@ function ClassSelectionForm() {
   const [status, setStatus] = useState("idle"); // idle | success | error
   const [isVerifying, setIsVerifying] = useState(false);
   const [shake, setShake] = useState(false);
+  
+  // Student details
+  const [studentName, setStudentName] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
 
   // Initialize CAPTCHA
   useEffect(() => {
     setCaptcha(generateCaptcha());
   }, []);
 
-  const classes = Array.from({ length: 12 }, (_, i) => {
+  const classes = Array.from({ length: 10 }, (_, i) => {
     const num = i + 1;
     if (num === 1) return "Class 1st";
     if (num === 2) return "Class 2nd";
@@ -123,14 +127,31 @@ function ClassSelectionForm() {
           is_correct: isCorrect,
         }),
       });
+
+      // If correct and role is student, register student
+      if (isCorrect && role === "student") {
+        await fetch("/api/students", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: studentName.trim(),
+            roll_number: rollNumber.trim(),
+            class_name: selectedClass,
+          }),
+        });
+      }
     } catch (err) {
-      console.error("Failed to log captcha:", err);
+      console.error("Failed to log data:", err);
     }
 
     if (isCorrect) {
       setStatus("success");
       if (typeof window !== "undefined") {
         localStorage.setItem("selectedClass", selectedClass);
+        if (role === "student") {
+          localStorage.setItem("studentName", studentName.trim());
+          localStorage.setItem("rollNumber", rollNumber.trim());
+        }
       }
       setTimeout(() => {
         const dest = role === "student" ? "/student" : "/teacher";
@@ -168,14 +189,37 @@ function ClassSelectionForm() {
               <path d="M16 23C16 23 18 25 21 25C24 25 26 23 26 23" stroke="#2A7A50" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
           </div>
-          <h1 className="selection-title">Select Your Class</h1>
+          <h1 className="selection-title">{role === "student" ? "Enter Details" : "Select Your Class"}</h1>
           <p className="selection-tagline">
             Continuing as <span className="role-badge">{role === "student" ? "Student" : "Teacher"}</span>
           </p>
         </div>
 
+        {/* Student Details Form */}
+        {role === "student" && (
+          <div className="student-details-form" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={studentName}
+              onChange={(e) => setStudentName(e.target.value)}
+              className="captcha-input"
+              style={{ flex: '1', minWidth: '200px' }}
+            />
+            <input
+              type="text"
+              placeholder="Roll Number"
+              value={rollNumber}
+              onChange={(e) => setRollNumber(e.target.value)}
+              className="captcha-input"
+              style={{ flex: '1', minWidth: '200px' }}
+            />
+          </div>
+        )}
+
         {/* Classes Grid */}
-        <div className="classes-grid">
+        <div className="classes-grid" style={{ opacity: (role === "student" && (!studentName.trim() || !rollNumber.trim())) ? 0.5 : 1, pointerEvents: (role === "student" && (!studentName.trim() || !rollNumber.trim())) ? 'none' : 'auto' }}>
+
           {classes.map((cls) => {
             const isSelected = selectedClass === cls;
             return (

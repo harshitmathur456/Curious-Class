@@ -115,15 +115,8 @@ export default function StudentChat({ subject = "history" }) {
       const cls = localStorage.getItem("selectedClass") || "";
       setSelectedClass(cls);
       
-      const is11or12 = cls.includes("11") || cls.includes("12");
-      if (is11or12) {
-        if (subject === "history" || subject === "science") {
-          router.replace("/student/physics");
-        }
-      } else {
-        if (subject === "physics" || subject === "chemistry" || subject === "biology") {
-          router.replace("/student/science");
-        }
+      if (subject === "physics" || subject === "chemistry" || subject === "biology") {
+        router.replace("/student/science");
       }
     }
   }, [subject]);
