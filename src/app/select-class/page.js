@@ -80,6 +80,10 @@ function ClassSelectionForm() {
   const [studentName, setStudentName] = useState("");
   const [rollNumber, setRollNumber] = useState("");
 
+  // Teacher details
+  const [teacherName, setTeacherName] = useState("");
+  const [teacherSubject, setTeacherSubject] = useState("mathematics");
+
   // Initialize CAPTCHA
   useEffect(() => {
     setCaptcha(generateCaptcha());
@@ -151,6 +155,9 @@ function ClassSelectionForm() {
         if (role === "student") {
           localStorage.setItem("studentName", studentName.trim());
           localStorage.setItem("rollNumber", rollNumber.trim());
+        } else if (role === "teacher") {
+          localStorage.setItem("teacherName", teacherName.trim() || "Teacher");
+          localStorage.setItem("teacherSubject", teacherSubject);
         }
       }
       setTimeout(() => {
@@ -217,8 +224,38 @@ function ClassSelectionForm() {
           </div>
         )}
 
+        {/* Teacher Details Form */}
+        {role === "teacher" && (
+          <div className="student-details-form" style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <input
+              type="text"
+              placeholder="Your Name (e.g. Mrs. Sharma)"
+              value={teacherName}
+              onChange={(e) => setTeacherName(e.target.value)}
+              className="captcha-input"
+              style={{ flex: '1', minWidth: '200px' }}
+            />
+            <select
+              value={teacherSubject}
+              onChange={(e) => setTeacherSubject(e.target.value)}
+              className="captcha-input"
+              style={{ flex: '1', minWidth: '200px', cursor: 'pointer', padding: '0 1rem' }}
+            >
+              <option value="history">History</option>
+              <option value="science">Science</option>
+              <option value="mathematics">Mathematics</option>
+              <option value="biology">Biology</option>
+              <option value="physics">Physics</option>
+              <option value="chemistry">Chemistry</option>
+            </select>
+          </div>
+        )}
+
         {/* Classes Grid */}
-        <div className="classes-grid" style={{ opacity: (role === "student" && (!studentName.trim() || !rollNumber.trim())) ? 0.5 : 1, pointerEvents: (role === "student" && (!studentName.trim() || !rollNumber.trim())) ? 'none' : 'auto' }}>
+        <div className="classes-grid" style={{ 
+          opacity: ((role === "student" && (!studentName.trim() || !rollNumber.trim())) || (role === "teacher" && !teacherName.trim())) ? 0.5 : 1, 
+          pointerEvents: ((role === "student" && (!studentName.trim() || !rollNumber.trim())) || (role === "teacher" && !teacherName.trim())) ? 'none' : 'auto' 
+        }}>
 
           {classes.map((cls) => {
             const isSelected = selectedClass === cls;

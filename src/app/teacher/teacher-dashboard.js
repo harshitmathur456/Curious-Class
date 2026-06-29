@@ -147,6 +147,7 @@ const teacherNavItems = [
 export default function TeacherDashboard() {
   const [selectedClass, setSelectedClass] = useState("Class 8-B");
   const [subject, setSubject] = useState("history");
+  const [teacherName, setTeacherName] = useState("Teacher");
 
   const isClass10 = selectedClass && selectedClass.includes("10");
   const isClass6 = selectedClass && selectedClass.includes("6");
@@ -181,10 +182,15 @@ export default function TeacherDashboard() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const cls = localStorage.getItem("selectedClass");
+      const tName = localStorage.getItem("teacherName");
+      const tSub = localStorage.getItem("teacherSubject");
+
+      if (tName) setTeacherName(tName);
+
       if (cls) {
         setSelectedClass(cls);
-        let sub = "history";
-        if (cls.includes("10")) {
+        let sub = tSub || "history";
+        if (!tSub && cls.includes("10")) {
           sub = "mathematics";
         }
         setSubject(sub);
@@ -587,7 +593,7 @@ export default function TeacherDashboard() {
           </div>
           <div className="td-header-right">
             <div className="td-teacher-info">
-              <div className="td-teacher-name">Mrs. Sharma</div>
+              <div className="td-teacher-name">{teacherName}</div>
               <div className="td-teacher-dept">
                 {subject === "mathematics" ? "Mathematics" :
                  subject === "physics" ? "Physics" :
@@ -801,6 +807,7 @@ export default function TeacherDashboard() {
                                     style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ddd', marginRight: '8px' }}
                                   >
                                     <option value="pending">Pending</option>
+                                    <option value="ongoing">Ongoing</option>
                                     <option value="covered">Covered</option>
                                   </select>
                                   <button onClick={() => removeTopic(ch.id, topic.id)} style={{ color: 'red', border: 'none', background: 'transparent', cursor: 'pointer' }}>✖</button>
