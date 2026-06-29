@@ -420,8 +420,10 @@ export default function StudentChat({ subject = null }) {
           class_name: selectedClass,
           activity_type: activityType,
           topic: customTopic || activeTopic,
-          details
-        })
+          details: {
+            ...details,
+            subject_key: subjectKey
+          }        })
       });
     } catch (e) {
       console.error("Failed to log activity", e);

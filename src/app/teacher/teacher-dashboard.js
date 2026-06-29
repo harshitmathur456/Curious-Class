@@ -239,7 +239,7 @@ export default function TeacherDashboard() {
     if (selectedClass) {
       fetchStudents();
     }
-  }, [selectedClass]);
+  }, [selectedClass, subjectKey, curriculumData]);
 
   async function fetchStudents() {
     try {
@@ -256,7 +256,23 @@ export default function TeacherDashboard() {
       const actRes = await fetch(`/api/activities?class_name=${encodeURIComponent(selectedClass)}`);
       if (actRes.ok) {
         const actData = await actRes.json();
-        activities = actData.activities || [];
+        const allActs = actData.activities || [];
+        
+        const allowedTopics = (CHAPTERS_DATA[subjectKey]?.chapters || []).map(ch => ch.name);
+        const subjectCurriculum = curriculumData[subjectKey] || {};
+        Object.values(subjectCurriculum).forEach(chap => {
+          if (chap.topics) {
+            chap.topics.forEach(t => allowedTopics.push(t.name));
+          }
+        });
+        
+        activities = allActs.filter(a => {
+          if (a.details && a.details.subject_key) {
+            return a.details.subject_key === subjectKey;
+          }
+          return allowedTopics.includes(a.topic);
+        });
+
         setStudentActivities(activities);
       }
 
