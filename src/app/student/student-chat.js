@@ -334,43 +334,32 @@ export default function StudentChat({ subject = null }) {
 
     try {
       let data;
-      // If there is an active prefetch promise, await it
       if (prefetchPromisesRef.current[activeTopic]) {
         console.log(`[Quiz] Awaiting active prefetch promise for "${activeTopic}"`);
         data = await prefetchPromisesRef.current[activeTopic];
       } else {
-        // Otherwise, fetch normally
-        console.log(`[Quiz] Fetching quiz on demand for "${activeTopic}"`);
-        const res = await fetch("/api/quiz", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            subject: config.title,
-            topic: activeTopic,
-          }),
-        });
+        console.log(`[Quiz] Fetching pushed quiz for "${activeTopic}"`);
+        const res = await fetch(`/api/pushed_quizzes?subject=${encodeURIComponent(config.title)}&topic=${encodeURIComponent(activeTopic)}&class_name=${encodeURIComponent(selectedClass)}`);
 
         if (!res.ok) {
-          throw new Error("Failed to fetch quiz");
+          throw new Error("Failed to fetch pushed quiz");
         }
 
-        data = await res.json();
+        const resData = await res.json();
+        data = resData.quiz ? resData.quiz.quiz_data : null;
       }
 
       if (Array.isArray(data) && data.length === 5) {
         setQuizQuestions(data);
-        // Also cache it
         setCachedQuizzes((prev) => ({ ...prev, [activeTopic]: data }));
       } else {
-        throw new Error("Invalid quiz format received");
+        alert("The teacher has not pushed a quiz for this topic yet.");
+        setQuizActive(false);
       }
     } catch (e) {
-      console.error("Failed to generate custom quiz with Gemini, using high-quality local quiz:", e);
-      // Fallback to local high-quality quiz matching current active topic
-      const questions = activeChapter?.quizzes || [];
-      setQuizQuestions(questions);
+      console.error("Failed to load pushed quiz:", e);
+      alert("The teacher has not pushed a quiz for this topic yet.");
+      setQuizActive(false);
     } finally {
       setLoadingQuiz(false);
     }
@@ -381,18 +370,46 @@ export default function StudentChat({ subject = null }) {
     setSelectedOptionIndex(index);
   }
 
+  async function logActivity(activityType, details) {
+    if (typeof window === "undefined") return;
+    const sName = localStorage.getItem("studentName") || "Unknown Student";
+    const sRoll = localStorage.getItem("rollNumber") || "Unknown Roll";
+    try {
+      await fetch('/api/activities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_roll: sRoll,
+          student_name: sName,
+          class_name: selectedClass,
+          activity_type: activityType,
+          topic: activeTopic,
+          details
+        })
+      });
+    } catch (e) {
+      console.error("Failed to log activity", e);
+    }
+  }
+
   function handleSubmitAnswer() {
     if (selectedOptionIndex === null || answerSubmitted) return;
     
     const currentQuestion = quizQuestions[currentQuestionIndex];
     const isCorrect = selectedOptionIndex === currentQuestion.answerIndex;
     
+    let newScore = quizScore;
     if (isCorrect) {
-      setQuizScore((prev) => prev + 1);
+      newScore = quizScore + 1;
+      setQuizScore(newScore);
     }
     
     setUserAnswers((prev) => [...prev, selectedOptionIndex]);
     setAnswerSubmitted(true);
+
+    if (currentQuestionIndex === quizQuestions.length - 1) {
+      logActivity('quiz', { score: newScore, total: quizQuestions.length });
+    }
   }
 
   function handleNextQuestion() {
@@ -478,6 +495,8 @@ export default function StudentChat({ subject = null }) {
     setMessages(newMessages);
     setInputValue("");
     setIsTyping(true);
+
+    logActivity('chat', { message: text });
 
     try {
       const res = await fetch("/api/explano", {

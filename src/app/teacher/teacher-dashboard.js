@@ -5,7 +5,6 @@ import {
   dashboardStats,
   currentUnit,
   heatmapSubtopics,
-  teacherNavItems,
 } from "@/data/mockData";
 import { CHAPTERS_DATA } from "@/data/chaptersData";
 import "./teacher-dashboard.css";
@@ -134,6 +133,15 @@ function CloudUploadIcon() {
   );
 }
 
+/* ─── Teacher Nav Items ──────────────────────────────────────────── */
+const teacherNavItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/teacher' },
+  { id: 'students', label: 'Students', icon: 'users', href: '/teacher' },
+  { id: 'notes', label: 'Notes', icon: 'book', href: '/teacher' },
+  { id: 'quizzes', label: 'Quizzes', icon: 'cpu', href: '/teacher' },
+  { id: 'reports', label: 'Reports', icon: 'bar-chart', href: '/teacher' },
+];
+
 /* ─── Main Component ─────────────────────────────────────────── */
 
 export default function TeacherDashboard() {
@@ -168,6 +176,7 @@ export default function TeacherDashboard() {
   const [studentRoster, setStudentRoster] = useState([]);
   const [heatmapStudents, setHeatmapStudents] = useState([]);
   const [focusAlerts, setFocusAlerts] = useState([]);
+  const [studentActivities, setStudentActivities] = useState([]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -206,6 +215,11 @@ export default function TeacherDashboard() {
   const [uploading, setUploading] = useState(false);
   const [statusMsg, setStatusMsg] = useState({ text: "", type: "" });
 
+  const [quizTopic, setQuizTopic] = useState("");
+  const [generatingQuiz, setGeneratingQuiz] = useState(false);
+  const [pushedQuiz, setPushedQuiz] = useState(null);
+  const [quizStatus, setQuizStatus] = useState("");
+
   const subjectKeyRef = useRef(subjectKey);
   useEffect(() => {
     subjectKeyRef.current = subjectKey;
@@ -217,6 +231,7 @@ export default function TeacherDashboard() {
 
   async function fetchStudents() {
     try {
+      // 1. Fetch Students
       const res = await fetch('/api/students');
       if (res.ok) {
         const data = await res.json();
@@ -254,8 +269,17 @@ export default function TeacherDashboard() {
         }));
         setFocusAlerts(alerts);
       }
+
+      // 2. Fetch Activities
+      if (selectedClass) {
+        const actRes = await fetch(`/api/activities?class_name=${encodeURIComponent(selectedClass)}`);
+        if (actRes.ok) {
+          const actData = await actRes.json();
+          setStudentActivities(actData.activities || []);
+        }
+      }
     } catch (e) {
-      console.error("Failed to fetch students:", e);
+      console.error("Failed to fetch students/activities:", e);
     }
   }
   async function fetchNotes() {
@@ -382,6 +406,39 @@ export default function TeacherDashboard() {
     setExpandedAlerts((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
+  async function handleGenerateAndPushQuiz() {
+    if (!quizTopic) {
+      setQuizStatus("Please select a topic first.");
+      return;
+    }
+    setGeneratingQuiz(true);
+    setQuizStatus("Generating & Pushing quiz using Gemini...");
+    setPushedQuiz(null);
+    try {
+      const res = await fetch("/api/pushed_quizzes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: subject,
+          topic: quizTopic,
+          class_name: selectedClass
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPushedQuiz(data.quiz);
+        setQuizStatus("Quiz pushed successfully to all students!");
+      } else {
+        setQuizStatus("Failed to push quiz: " + (data.error || "Unknown error"));
+      }
+    } catch (e) {
+      setQuizStatus("Error pushing quiz");
+      console.error(e);
+    } finally {
+      setGeneratingQuiz(false);
+    }
+  }
+
   return (
     <div className="td-layout">
       {/* ── Left Navigation ── */}
@@ -477,20 +534,9 @@ export default function TeacherDashboard() {
                   cursor: "pointer"
                 }}
               >
-                {selectedClass && (selectedClass.includes("11") || selectedClass.includes("12")) ? (
-                  <>
-                    <option value="physics">Physics</option>
-                    <option value="chemistry">Chemistry</option>
-                    <option value="biology">Biology</option>
-                    <option value="mathematics">Mathematics</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="history">History</option>
-                    <option value="science">Science</option>
-                    <option value="mathematics">Mathematics</option>
-                  </>
-                )}
+                <option value="history">History</option>
+                <option value="science">Science</option>
+                <option value="mathematics">Mathematics</option>
               </select>
             </div>
           </div>
@@ -754,20 +800,50 @@ export default function TeacherDashboard() {
         {/* Students View */}
         {activeNav === "students" && (
           <div className="td-dashboard">
-            <div className="td-card">
-              <div className="td-card-header">
-                <div className="td-card-title">Student Roster</div>
-              </div>
-              <div className="td-alerts-list">
-                {studentRoster.map((student) => (
-                  <div key={student.id} className="td-alert-item td-alert-item--low">
-                    <div className="td-alert-top">
-                      <span className="td-alert-student">{student.name}</span>
-                      <span className="td-alert-time">Roll No: {student.rollNo}</span>
+            <div className="td-two-col">
+              {/* Roster */}
+              <div className="td-card">
+                <div className="td-card-header">
+                  <div className="td-card-title">Student Roster</div>
+                </div>
+                <div className="td-alerts-list">
+                  {studentRoster.map((student) => (
+                    <div key={student.id} className="td-alert-item td-alert-item--low">
+                      <div className="td-alert-top">
+                        <span className="td-alert-student">{student.name}</span>
+                        <span className="td-alert-time">Roll No: {student.rollNo}</span>
+                      </div>
+                      <div className="td-alert-desc">Last active: {student.lastActive}</div>
                     </div>
-                    <div className="td-alert-desc">Last active: {student.lastActive}</div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+              
+              {/* All Student Activities */}
+              <div className="td-card">
+                <div className="td-card-header">
+                  <div className="td-card-title">Recent Activity</div>
+                </div>
+                <div className="td-alerts-list">
+                  {studentActivities.length === 0 ? (
+                    <div style={{ padding: "var(--space-md)", color: "var(--color-text-tertiary)" }}>No recent activity.</div>
+                  ) : (
+                    studentActivities.map((act) => (
+                      <div key={act.id} className="td-alert-item td-alert-item--low">
+                        <div className="td-alert-top">
+                          <span className="td-alert-student">{act.student_name}</span>
+                          <span className="td-alert-time">
+                            {new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <div className="td-alert-desc">
+                          {act.activity_type === 'chat' && <span>Chatted with Explano about <strong>{act.topic}</strong>.</span>}
+                          {act.activity_type === 'quiz' && <span>Completed quiz on <strong>{act.topic}</strong> (Score: {act.details.score}/{act.details.total}).</span>}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </div>
