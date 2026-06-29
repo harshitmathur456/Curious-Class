@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  dashboardStats,
-  currentUnit,
-} from "@/data/mockData";
+import { currentUnit } from "@/data/mockData";
 import { CHAPTERS_DATA } from "@/data/chaptersData";
 import "./teacher-dashboard.css";
 
@@ -785,22 +782,38 @@ export default function TeacherDashboard() {
             </div>
           </div>
 
-          {/* Stat Cards */}
+          {/* Stat Cards - Real-time from DB */}
           <div className="td-stats-row">
-            {dashboardStats.map((stat) => (
-              <div
-                key={stat.id}
-                className={`td-stat-card td-stat-card--${stat.variant}`}
-                id={`stat-${stat.id}`}
-              >
-                <div className="td-stat-label">{stat.label}</div>
-                <div className="td-stat-value">
-                  {stat.value}
-                  {stat.total && <span className="td-stat-total">{stat.total}</span>}
-                  {stat.trend && <span className="td-stat-trend">{stat.trend}</span>}
-                </div>
+            {/* Active Participants */}
+            <div className="td-stat-card td-stat-card--green" id="stat-participants">
+              <div className="td-stat-label">Active participants</div>
+              <div className="td-stat-value">
+                {studentRoster.filter(s => s.activities.length > 0).length}
+                <span className="td-stat-total">/{studentRoster.length} enrolled</span>
               </div>
-            ))}
+            </div>
+
+            {/* Avg Comprehension */}
+            <div className="td-stat-card td-stat-card--green" id="stat-comprehension">
+              <div className="td-stat-label">Avg comprehension</div>
+              <div className="td-stat-value">
+                {classAnalytics.classAverage > 0 ? `${classAnalytics.classAverage}%` : '—'}
+                {classAnalytics.classAverage > 0 && (
+                  <span className="td-stat-trend" style={{ fontSize: '12px', marginLeft: '6px', color: classAnalytics.classAverage >= 70 ? 'var(--color-primary)' : '#E24B4A' }}>
+                    {classAnalytics.classAverage >= 70 ? '✓ Good' : '⚠ Needs Attention'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Critical Focus Alerts */}
+            <div className="td-stat-card td-stat-card--red" id="stat-alerts">
+              <div className="td-stat-label">Critical focus alerts</div>
+              <div className="td-stat-value">
+                {focusAlerts.length}
+                <span className="td-stat-total"> {focusAlerts.length === 1 ? 'student' : 'students'}</span>
+              </div>
+            </div>
           </div>
 
           {/* Two Column: Heatmap + Focus Alerts */}
