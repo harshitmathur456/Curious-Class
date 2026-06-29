@@ -172,6 +172,53 @@ export default function TeacherDashboard() {
   const [selectedTopic, setSelectedTopic] = useState("");
   const [curriculumData, setCurriculumData] = useState({});
   
+  const updateChapterStatus = (chId, status) => {
+    setCurriculumData(prev => ({
+      ...prev,
+      [chId]: { ...(prev[chId] || { topics: [] }), status, coveredDate: status === 'covered' ? new Date().toLocaleDateString() : null }
+    }));
+  };
+
+  const updateTopicStatus = (chId, topicId, status) => {
+    setCurriculumData(prev => {
+      const chData = prev[chId] || { topics: [] };
+      return {
+        ...prev,
+        [chId]: {
+          ...chData,
+          topics: chData.topics.map(t => t.id === topicId ? { ...t, status } : t)
+        }
+      };
+    });
+  };
+
+  const addTopic = (chId, topicName) => {
+    if (!topicName.trim()) return;
+    setCurriculumData(prev => {
+      const chData = prev[chId] || { status: 'pending', topics: [] };
+      return {
+        ...prev,
+        [chId]: {
+          ...chData,
+          topics: [...(chData.topics || []), { id: Date.now().toString(), name: topicName, status: 'pending' }]
+        }
+      };
+    });
+  };
+
+  const removeTopic = (chId, topicId) => {
+    setCurriculumData(prev => {
+      const chData = prev[chId] || { topics: [] };
+      return {
+        ...prev,
+        [chId]: {
+          ...chData,
+          topics: (chData.topics || []).filter(t => t.id !== topicId)
+        }
+      };
+    });
+  };
+  
   // Dynamic student data
   const [studentRoster, setStudentRoster] = useState([]);
   const [heatmapStudents, setHeatmapStudents] = useState([]);
@@ -839,7 +886,7 @@ export default function TeacherDashboard() {
         
         {/* Quizzes & Topics View */}
         {activeNav === "quizzes" && (
-          <div className="td-dashboard">
+          <div className="td-dashboard" style={{ paddingBottom: '100px' }}>
             {/* Topic Management */}
             <div className="td-card">
               <div className="td-card-header">
