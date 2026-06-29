@@ -157,6 +157,8 @@ export default function TeacherDashboard() {
   } else if (isClass6) {
     if (subject === "science") {
       subjectKey = "science_class6";
+    } else if (subject === "history") {
+      subjectKey = "history_class6";
     }
   }
 
@@ -181,7 +183,8 @@ export default function TeacherDashboard() {
         const subKey = (sub === "mathematics" && isC10) ? "mathematics_class10" :
                        (sub === "science" && isC10) ? "science_class10" :
                        (sub === "history" && isC10) ? "history_class10" :
-                       (sub === "science" && isC6) ? "science_class6" : sub;
+                       (sub === "science" && isC6) ? "science_class6" :
+                       (sub === "history" && isC6) ? "history_class6" : sub;
         const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
         if (chapters.length > 0) {
           setSelectedTopic(chapters[0].name);
@@ -350,7 +353,8 @@ export default function TeacherDashboard() {
                   const subKey = (newSub === "mathematics" && isC10) ? "mathematics_class10" :
                                  (newSub === "science" && isC10) ? "science_class10" :
                                  (newSub === "history" && isC10) ? "history_class10" :
-                                 (newSub === "science" && isC6) ? "science_class6" : newSub;
+                                 (newSub === "science" && isC6) ? "science_class6" :
+                                 (newSub === "history" && isC6) ? "history_class6" : newSub;
                   const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
                   if (chapters.length > 0) {
                     setSelectedTopic(chapters[0].name);
@@ -415,14 +419,16 @@ export default function TeacherDashboard() {
                  subject === "physics" ? "Class 11/12 Physics" :
                  subject === "chemistry" ? "Class 11/12 Chemistry" :
                  subject === "biology" ? "Class 11/12 Biology" :
-                 subject === "science" ? (isClass10 ? "Class 10 Science" : isClass6 ? "Class 6 Science" : "Science Curriculum") : currentUnit.name}
+                 subject === "science" ? (isClass10 ? "Class 10 Science" : isClass6 ? "Class 6 Science" : "Science Curriculum") :
+                 subject === "history" ? (isClass10 ? "Class 10 History" : isClass6 ? "Class 6 History" : "History Curriculum") : currentUnit.name}
               </div>
               <div className="td-unit-desc">
                 {subject === "mathematics" ? (isClass10 ? "CBSE Class 10 Curriculum" : "General Mathematics") :
                  subject === "physics" ? "Higher Secondary Physics" :
                  subject === "chemistry" ? "Higher Secondary Chemistry" :
                  subject === "biology" ? "Higher Secondary Biology" :
-                 subject === "science" ? (isClass10 ? "CBSE Class 10 Science Curriculum" : isClass6 ? "CBSE Class 6 Science Curriculum" : "General Science Concepts") : currentUnit.description}
+                 subject === "science" ? (isClass10 ? "CBSE Class 10 Science Curriculum" : isClass6 ? "CBSE Class 6 Science Curriculum" : "General Science Concepts") :
+                 subject === "history" ? (isClass10 ? "CBSE Class 10 History Curriculum" : isClass6 ? "CBSE Class 6 History Curriculum" : "General History Concepts") : currentUnit.description}
               </div>
             </div>
             <div className="td-unit-actions">

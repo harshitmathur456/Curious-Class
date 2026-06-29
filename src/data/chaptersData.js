@@ -2245,5 +2245,450 @@ export const CHAPTERS_DATA = {
         ]
       }
     ]
+  },
+  history_class6: {
+    title: "History",
+    chapters: [
+      {
+        id: "what-where-how-when",
+        name: "What, Where, How and When?",
+        objective: "Understand history, archaeology, historical sources, dating systems, and geographical impacts.",
+        progress: [
+          { id: 1, label: "Why study history?", status: "completed" },
+          { id: 2, label: "Archaeological Sources & Manuscripts", status: "active" },
+          { id: 3, label: "Dating Systems BC/AD", status: "upcoming" }
+        ],
+        chips: ["Why study history?", "What is an archaeologist?", "What do BC and AD mean?"],
+        initialQuestion: "Welcome to Class 6 History! Imagine finding a mysterious old coin buried in your backyard. How would you figure out who made it, or when it was used? History is like solving mysteries using clues from the past. What is one thing about people of the ancient past you've always wanted to know?",
+        quizzes: [
+          {
+            question: "What do archaeologists use to study the past?",
+            options: ["Only books", "Tools, coins, bones, and ancient ruins", "Only modern maps", "Telescopes"],
+            answerIndex: 1,
+            explanation: "Archaeologists look at physical objects left behind like tools, coins, pots, and ruins to understand past life."
+          },
+          {
+            question: "Where did people first start living and farming in India?",
+            options: ["Near the Thar Desert", "Along the Narmada and Indus river valleys", "In high Himalayan peaks", "Only on islands"],
+            answerIndex: 1,
+            explanation: "Early settlements grew near rivers like Narmada and Indus because water was available for drinking and farming."
+          },
+          {
+            question: "Manuscripts were ancient books written by hand. What material was commonly used to write them?",
+            options: ["Paper made in factories", "Palm leaves or birch bark", "Iron sheets", "Plastic boards"],
+            answerIndex: 2,
+            explanation: "Before paper, manuscripts were written on palm leaves or specially prepared bark of the birch tree."
+          },
+          {
+            question: "What does the term 'AD' stand for in historical dates?",
+            options: ["After Death", "Anno Domini (Year of the Lord)", "Ancient Dates", "Approximate Days"],
+            answerIndex: 1,
+            explanation: "AD stands for Anno Domini, meaning 'in the year of the Lord', referring to dates after the birth of Jesus Christ."
+          },
+          {
+            question: "Why did early people travel from one place to another?",
+            options: ["For vacations", "In search of food, to escape natural disasters, or for trade", "To watch movies", "To take photographs"],
+            answerIndex: 1,
+            explanation: "Ancient people traveled in search of livelihoods, food, to flee floods/droughts, or to trade goods."
+          }
+        ]
+      },
+      {
+        id: "hunting-gathering-growing-food",
+        name: "From Hunting – Gathering to Growing Food",
+        objective: "Trace the transition from nomadic hunter-gatherers to settled farming communities, domestication of animals, and early tools.",
+        progress: [
+          { id: 1, label: "How did fire change lives?", status: "completed" },
+          { id: 2, label: "Farming & Domestication", status: "active" },
+          { id: 3, label: "Neolithic Settlements", status: "upcoming" }
+        ],
+        chips: ["How did fire change lives?", "Why did they domesticate animals?", "What is the Neolithic Age?"],
+        initialQuestion: "Imagine you had to find all your food by hunting wild animals and gathering wild berries every day. You would have to move constantly! Then, one day, humans discovered how to plant seeds and wait for crops to grow. How do you think this change affected where and how they lived?",
+        quizzes: [
+          {
+            question: "Why were early humans called hunter-gatherers?",
+            options: ["Because they lived in brick houses", "Because they hunted wild animals and gathered wild plants for food", "Because they bought food from shops", "Because they grew wheat and barley"],
+            answerIndex: 1,
+            explanation: "They depended on hunting wild animals, catching fish, and gathering wild fruits, seeds, and leaves to survive."
+          },
+          {
+            question: "What was the most important discovery that helped early humans cook food and scare away wild animals?",
+            options: ["The wheel", "Fire", "Iron", "Computers"],
+            answerIndex: 1,
+            explanation: "The discovery of fire allowed humans to cook meat, get light in caves, and keep wild beasts away."
+          },
+          {
+            question: "The transition from moving around to staying in one place happened because humans started:",
+            options: ["Hunting birds", "Farming and domesticating animals", "Building stone pyramids", "Painting on cave walls"],
+            answerIndex: 1,
+            explanation: "Growing crops and rearing animals meant humans had to stay in one place for long periods to take care of plants and herds."
+          },
+          {
+            question: "Which was the first animal to be domesticated by humans?",
+            options: ["Wild ancestor of the dog", "Cat", "Cow", "Horse"],
+            answerIndex: 0,
+            explanation: "The wild ancestor of the dog was the very first animal tamed by early humans."
+          },
+          {
+            question: "What is the name of the archaeological site in modern Pakistan where early evidence of wheat and barley farming was found?",
+            options: ["Bhimbetka", "Mehrgarh", "Hunsgi", "Burzahom"],
+            answerIndex: 1,
+            explanation: "Mehrgarh is one of the earliest villages known, showing evidence of farming wheat, barley, and rearing sheep/goats."
+          }
+        ]
+      },
+      {
+        id: "earliest-cities",
+        name: "In the Earliest Cities",
+        objective: "Explore Harappan civilization, town planning, drainage systems, crafts, and trade network.",
+        progress: [
+          { id: 1, label: "Harappan Town Planning", status: "completed" },
+          { id: 2, label: "Great Bath & Bronze Crafts", status: "active" },
+          { id: 3, label: "Trade Routes & Decline", status: "upcoming" }
+        ],
+        chips: ["What is Harappan town planning?", "Why was the Great Bath built?", "What was the script like?"],
+        initialQuestion: "Nearly 4,700 years ago, amazing cities with double-story brick houses, covered streets, and advanced drainage systems existed in India. This was the Harappan civilization. How do you think they built such neat cities without modern machines?",
+        quizzes: [
+          {
+            question: "Which of these is a unique feature of Harappan cities?",
+            options: ["Houses built randomly without planning", "A well-planned grid system with covered drains", "No water wells", "Huge glass castles"],
+            answerIndex: 1,
+            explanation: "Harappan cities had carefully planned streets, brick houses, and covered drains running along the roads."
+          },
+          {
+            question: "Where was the famous 'Great Bath' structure discovered?",
+            options: ["Harappa", "Mohenjodaro", "Lothal", "Kalibangan"],
+            answerIndex: 1,
+            explanation: "The Great Bath, a special brick-lined water tank, was discovered in Mohenjodaro."
+          },
+          {
+            question: "What metal was mixed with copper to make bronze by Harappan craftsmen?",
+            options: ["Iron", "Tin", "Gold", "Silver"],
+            answerIndex: 1,
+            explanation: "Bronze is an alloy made by mixing copper and tin."
+          },
+          {
+            question: "Which Harappan site in Gujarat had a dockyard showing trade through sea routes?",
+            options: ["Dholavira", "Lothal", "Surkotada", "Mehrgarh"],
+            answerIndex: 1,
+            explanation: "Lothal had a massive brick dockyard where ships came in from the sea and nearby rivers to load and unload goods."
+          },
+          {
+            question: "What happened to the Harappan civilization around 3,900 years ago?",
+            options: ["It was converted into a modern state", "It began to decline, possibly due to rivers drying up or flooding", "People flew away", "It was conquered by Alexander"],
+            answerIndex: 1,
+            explanation: "The cities declined gradually. Scientists suggest reasons like drying rivers, deforestation, or ecological collapse."
+          }
+        ]
+      },
+      {
+        id: "books-burials",
+        name: "What Books and Burials Tell Us",
+        objective: "Analyze the Vedas, Rigvedic society, megalith burials, and social differences in burials.",
+        progress: [
+          { id: 1, label: "Understanding Vedas & Sanskrit", status: "completed" },
+          { id: 2, label: "Megaliths arrangement", status: "active" },
+          { id: 3, label: "Burial Social Differences", status: "upcoming" }
+        ],
+        chips: ["What are the Vedas?", "How do burials show wealth?", "What is a Megalith?"],
+        initialQuestion: "Long before books were printed, people memorized and sang hymns to pass down knowledge. These are the Vedas, some of the oldest books in the world. At the same time, people built large stone monuments called megaliths to bury the dead. What can ancient books and graves tell us about how people lived?",
+        quizzes: [
+          {
+            question: "Which is the oldest of the four Vedas?",
+            options: ["Samaveda", "Yajurveda", "Rigveda", "Atharvaveda"],
+            answerIndex: 2,
+            explanation: "The Rigveda, composed about 3,500 years ago, is the oldest Veda."
+          },
+          {
+            question: "In what language were the hymns of the Rigveda composed?",
+            options: ["Modern Hindi", "Vedic Sanskrit", "Tamil", "English"],
+            answerIndex: 1,
+            explanation: "The Rigveda was composed in old or Vedic Sanskrit, which is different from modern school Sanskrit."
+          },
+          {
+            question: "What are 'Megaliths'?",
+            options: ["Tiny clay pots", "Huge stone boulders used to mark burial sites", "Gold coins", "Ancient wooden houses"],
+            answerIndex: 1,
+            explanation: "Megaliths (literally 'big stones') were carefully arranged by people to mark graves and burial sites."
+          },
+          {
+            question: "How do burial remains show social differences among ancient people?",
+            options: ["All graves had the same items", "Some graves contained gold, copper, and beads while others had only pottery", "Graves were only for kings", "No graves have been found"],
+            answerIndex: 1,
+            explanation: "The variation in grave goods (e.g. 33 gold beads in one grave vs. simple pots in another) reflects differences in wealth and status."
+          },
+          {
+            question: "Which of these was a Rigvedic term used for people who did not perform sacrifices and spoke different languages?",
+            options: ["Aryas", "Dasas or Dasyus", "Rajas", "Janas"],
+            answerIndex: 1,
+            explanation: "The composers of hymns called themselves Aryas and their opponents Dasas or Dasyus."
+          }
+        ]
+      },
+      {
+        id: "kingdoms-kings-early-republic",
+        name: "Kingdoms, Kings and an Early Republic",
+        objective: "Understand Ashvamedha, Janapadas, Mahajanapadas, taxation, Magadha rise, and Vajji republican government.",
+        progress: [
+          { id: 1, label: "Ashvamedha Horse Sacrifice", status: "completed" },
+          { id: 2, label: "Rise of Mahajanapadas", status: "active" },
+          { id: 3, label: "Magadha & Vajji Ganas", status: "upcoming" }
+        ],
+        chips: ["What is Ashvamedha?", "What is a Mahajanapada?", "How did Vajji differ from Magadha?"],
+        initialQuestion: "How does someone become a leader today? We vote! But 3,000 years ago, some men became kings by performing grand rituals like the Ashvamedha (horse sacrifice). Later, powerful kingdoms called Mahajanapadas arose, along with early republics where people ruled together. Let's explore how states were formed!",
+        quizzes: [
+          {
+            question: "What was the 'Ashvamedha' ritual?",
+            options: ["A festival for harvesting crops", "A horse sacrifice ritual to establish a king's power", "A marriage ceremony", "A battle training game"],
+            answerIndex: 1,
+            explanation: "Ashvamedha was a sacrifice where a horse was let loose to wander, and neighboring kings had to accept the host king's power or fight."
+          },
+          {
+            question: "What were the larger, more powerful kingdoms that developed around 2,500 years ago called?",
+            options: ["Janapadas", "Mahajanapadas", "Harappan cities", "States"],
+            answerIndex: 1,
+            explanation: "Janapadas were the lands where people settled. The most important and fortified ones grew into Mahajanapadas."
+          },
+          {
+            question: "Why did kings of Mahajanapadas build huge, thick walls around their capital cities?",
+            options: ["To play climbing games", "For protection against enemy attacks and to show off wealth/power", "To block sunlight", "Because bricks were free"],
+            answerIndex: 1,
+            explanation: "Fortification walls of wood, brick, or stone were built to secure the city from invasions and display the ruler's majesty."
+          },
+          {
+            question: "Which Mahajanapada became the most powerful and strategic empire in ancient India?",
+            options: ["Magadha", "Vajji", "Avanti", "Kosala"],
+            answerIndex: 0,
+            explanation: "Magadha became dominant because of rivers (Ganga and Son) for transport, iron ore mines for weapons, and fertile land."
+          },
+          {
+            question: "How was the government of Vajji different from Magadha?",
+            options: ["It had no rulers", "It was a Gana or Sangha (republic) ruled by many rajas together", "It was ruled by a single queen", "It was ruled by priests only"],
+            answerIndex: 1,
+            explanation: "Vajji was a Gana/Sangha, where thousands of men met in assemblies, discussed, and ruled collectively."
+          }
+        ]
+      },
+      {
+        id: "new-questions-ideas",
+        name: "New Questions and Ideas",
+        objective: "Explore Upanishads, teachings of Gautama Buddha (Buddhism), Vardhamana Mahavira (Jainism), and Sangha rules.",
+        progress: [
+          { id: 1, label: "Teachings of Gautama Buddha", status: "completed" },
+          { id: 2, label: "Teachings of Vardhamana Mahavira", status: "active" },
+          { id: 3, label: "Upanishad dialogues", status: "upcoming" }
+        ],
+        chips: ["Who was Buddha?", "What is Jainism?", "What do the Upanishads teach?"],
+        initialQuestion: "Around 2,500 years ago, thinkers in India started asking deep questions: What happens after death? What is the true meaning of life? This led to the teachings of Buddhism by Gautama Buddha, Jainism by Vardhamana Mahavira, and the ideas of the Upanishads. Let's learn about these paths of wisdom!",
+        quizzes: [
+          {
+            question: "What was the original name of Gautama Buddha, the founder of Buddhism?",
+            options: ["Mahavira", "Siddhartha", "Ashoka", "Chandragupta"],
+            answerIndex: 1,
+            explanation: "Buddha's birth name was Siddhartha, also known as Gautama."
+          },
+          {
+            question: "Where did Gautama Buddha attain enlightenment under a peepal tree?",
+            options: ["Sarnath", "Bodh Gaya", "Kusinara", "Lumbini"],
+            answerIndex: 1,
+            explanation: "He meditated and gained true wisdom (enlightenment) at Bodh Gaya in Bihar."
+          },
+          {
+            question: "What does the term 'Upanishad' literally mean?",
+            options: ["Singing holy hymns", "Approaching and sitting near (a teacher)", "Fighting for truth", "Reading in a temple"],
+            answerIndex: 1,
+            explanation: "Upanishad means sitting near a teacher to receive confidential, philosophical dialogues."
+          },
+          {
+            question: "Who was the 24th Tirthankara of the Jains who spread the teachings of Jainism?",
+            options: ["Rishabhadeva", "Vardhamana Mahavira", "Gautama Buddha", "Panini"],
+            answerIndex: 1,
+            explanation: "Vardhamana Mahavira was the 24th and last major teacher (Tirthankara) of the Jains."
+          },
+          {
+            question: "What was the association or community of Buddhist monks called?",
+            options: ["Sangha", "Vihara", "Stupa", "Ashrama"],
+            answerIndex: 0,
+            explanation: "The Sangha was an organized association of those who left their homes to practice and learn spiritual teachings."
+          }
+        ]
+      },
+      {
+        id: "kingdom-to-empire",
+        name: "From a Kingdom to an Empire",
+        objective: "Analyze the Mauryan Empire, Chandragupta Maurya, Chanakya, Ashoka's Dhamma, and Kalinga War impact.",
+        progress: [
+          { id: 1, label: "Mauryan Empire & Chanakya", status: "completed" },
+          { id: 2, label: "Kalinga War Renunciation", status: "active" },
+          { id: 3, label: "Dhamma Prakrit Inscriptions", status: "upcoming" }
+        ],
+        chips: ["Who was Ashoka?", "How did Chanakya help?", "What is Dhamma?"],
+        initialQuestion: "An empire is much larger than a kingdom and requires more resources, officials, and armies. The Mauryan Empire was the first major empire in India, built by Chandragupta Maurya and ruled by his grandson, Ashoka. Ashoka became famous for giving up war after a big victory. Why did he do that?",
+        quizzes: [
+          {
+            question: "Who founded the Mauryan Empire around 2,300 years ago?",
+            options: ["Ashoka", "Chandragupta Maurya", "Samudragupta", "Bimbisara"],
+            answerIndex: 1,
+            explanation: "Chandragupta Maurya founded the empire with the guidance of his wise advisor, Chanakya."
+          },
+          {
+            question: "Chanakya's wise ideas and rules about politics were written down in which book?",
+            options: ["Indica", "Arthashastra", "Rigveda", "Ramayana"],
+            answerIndex: 1,
+            explanation: "Chanakya (Kautilya) wrote his political ideas in the Arthashastra."
+          },
+          {
+            question: "Which war changed Emperor Ashoka's mind, leading him to give up conquest and violence?",
+            options: ["Battle of Panipat", "Kalinga War", "Kurukshetra War", "Battle of Plassey"],
+            answerIndex: 1,
+            explanation: "The bloodshed and misery of the Kalinga War filled Ashoka with sorrow, prompting him to renounce war."
+          },
+          {
+            question: "What language and script were most of Ashoka's inscriptions written in?",
+            options: ["Sanskrit in Devanagari script", "Prakrit in Brahmi script", "Tamil in Vatteluttu script", "Greek in Latin script"],
+            answerIndex: 1,
+            explanation: "Ashoka's messages to the public were in Prakrit (the local language) written in the Brahmi script."
+          },
+          {
+            question: "What did Ashoka's 'Dhamma' teach?",
+            options: ["Worshipping specific gods and performing sacrifices", "Respecting elders, being kind to animals/slaves, and peaceful co-existence", "Fasting and leaving homes", "Going to war for the empire"],
+            answerIndex: 1,
+            explanation: "Ashoka's Dhamma did not involve worship of a god, but encouraged moral values, kindness, and tolerance."
+          }
+        ]
+      },
+      {
+        id: "villages-towns-trade",
+        name: "Villages, Towns and Trade",
+        objective: "Explore iron tool development, agricultural growth, Sangam literature, and early towns/guilds.",
+        progress: [
+          { id: 1, label: "Iron Farming Tools", status: "completed" },
+          { id: 2, label: "Madurai Sangam Poets", status: "active" },
+          { id: 3, label: "Shrenis Guilds & Arikamedu", status: "upcoming" }
+        ],
+        chips: ["How did iron tools help?", "What is Sangam literature?", "What was Arikamedu?"],
+        initialQuestion: "How did iron tools change farming 2,500 years ago? Axes cleared forests, and iron ploughshares turned hard soil. This increased crop production, helping towns and trade routes grow. At the same time, poets gathered in the south to write Sangam literature. Let's discover how everyday people lived in ancient towns and villages!",
+        quizzes: [
+          {
+            question: "When did the use of iron tools begin to grow rapidly in the Indian subcontinent?",
+            options: ["4,700 years ago", "3,000 years ago", "1,000 years ago", "500 years ago"],
+            answerIndex: 1,
+            explanation: "Iron use began around 3,000 years ago, with a major increase in tools/weapons around 2,500 years ago."
+          },
+          {
+            question: "What was the assembly of Tamil poets held in Madurai called?",
+            options: ["Sangha", "Sangam", "Sabha", "Samiti"],
+            answerIndex: 1,
+            explanation: "Sangam literature was composed and compiled at assemblies (Sangams) of poets held in Madurai."
+          },
+          {
+            question: "What were the associations formed by merchants and craftsmen called?",
+            options: ["Janas", "Shrenis", "Sanghas", "Mahajanapadas"],
+            answerIndex: 1,
+            explanation: "Shrenis provided training, procured raw materials, and distributed finished products for craftsmen and traders."
+          },
+          {
+            question: "Arikamedu in modern Puducherry was famous in ancient history as a:",
+            options: ["Capital city of Ashoka", "Coastal port and trading center", "Forest hermitage", "Mining town"],
+            answerIndex: 1,
+            explanation: "Arikamedu was an active port where goods from Rome and other Mediterranean regions were unloaded."
+          },
+          {
+            question: "What are punch-marked coins?",
+            options: ["Coins made of paper", "Coins made by punching designs onto metal sheets like silver/copper", "Gold bars", "Plastic tokens"],
+            answerIndex: 1,
+            explanation: "These were the earliest coins, made by punching symbols onto silver or copper sheets."
+          }
+        ]
+      },
+      {
+        id: "new-empires-kingdoms",
+        name: "New Empires and Kingdoms",
+        objective: "Analyze the Gupta Empire, Samudragupta's Prashasti, Harshavardhana, Pallavas, and Chalukyas.",
+        progress: [
+          { id: 1, label: "Gupta Samudragupta Prashastis", status: "completed" },
+          { id: 2, label: "Harshavardhana biography", status: "active" },
+          { id: 3, label: "Kanchipuram Pallavas & Chalukyas", status: "upcoming" }
+        ],
+        chips: ["What is a Prashasti?", "Who was Harshavardhana?", "Who were the Pallavas?"],
+        initialQuestion: "After the Mauryan Empire fell, new dynasties arose. The Guptas ruled northern India, and we learn about their kings from Prashastis (poems written in praise). In the south, the Pallavas and Chalukyas became powerful. How did these rulers govern their lands, and what made their kingdoms famous?",
+        quizzes: [
+          {
+            question: "What is a 'Prashasti'?",
+            options: ["A book of recipes", "An inscription written in praise of a ruler", "A declaration of war", "A tax document"],
+            answerIndex: 1,
+            explanation: "Prashasti is a Sanskrit word meaning 'in praise of', referring to inscriptions praising kings' achievements."
+          },
+          {
+            question: "Which Gupta king's conquests are recorded on the Allahabad Pillar inscription composed by poet Harishena?",
+            options: ["Chandragupta I", "Samudragupta", "Ramagupta", "Skandagupta"],
+            answerIndex: 1,
+            explanation: "The pillar records the campaigns and victories of Emperor Samudragupta."
+          },
+          {
+            question: "Who was the ruler of Thanesar and Kanauj whose biography 'Harshacharita' was written by Banabhatta?",
+            options: ["Ashoka", "Harshavardhana", "Pulakeshin II", "Chandragupta II"],
+            answerIndex: 1,
+            explanation: "Banabhatta wrote Harshacharita, the biography of King Harshavardhana in Sanskrit."
+          },
+          {
+            question: "Who was the famous court poet of the Chalukya king Pulakeshin II?",
+            options: ["Harishena", "Ravikirti", "Kalidasa", "Banabhatta"],
+            answerIndex: 1,
+            explanation: "Ravikirti composed the Prashasti of Pulakeshin II, describing his campaigns."
+          },
+          {
+            question: "Which dynasty ruled with their capital at Kanchipuram in South India?",
+            options: ["Guptas", "Pallavas", "Chalukyas", "Mauryas"]            ,
+            answerIndex: 1,
+            explanation: "The Pallavas ruled over a kingdom stretching around Kanchipuram down to the Kaveri delta."
+          }
+        ]
+      },
+      {
+        id: "buildings-paintings-books",
+        name: "Buildings, Paintings and Books",
+        objective: "Understand ancient Indian science (Aryabhata), iron pillar of Mehrauli, stupas, Ajanta cave paintings, and epics.",
+        progress: [
+          { id: 1, label: "Mehrauli Iron Pillar", status: "completed" },
+          { id: 2, label: "Sanchi Stupa & Ajanta", status: "active" },
+          { id: 3, label: "Aryabhatiyam Astronomy & Epics", status: "upcoming" }
+        ],
+        chips: ["What is the Iron Pillar?", "How were Stupas built?", "What are Epics?"],
+        initialQuestion: "Ancient India made incredible contributions to architecture, art, and science. The rust-free Iron Pillar of Delhi, the beautiful Stupas of Sanchi, the vibrant cave paintings of Ajanta, and grand epics like Silappadikaram show the skills of ancient Indians. Let's explore these timeless creations!",
+        quizzes: [
+          {
+            question: "Why is the Iron Pillar at Mehrauli, Delhi, famous worldwide?",
+            options: ["Because it is made of gold", "Because it has not rusted even after 1,600 years", "Because it is the tallest pillar", "Because it is hollow"],
+            answerIndex: 1,
+            explanation: "The Mehrauli iron pillar shows advanced metallurgical skills as it has resisted rusting for over 16 centuries."
+          },
+          {
+            question: "What does the word 'Stupa' literally mean?",
+            options: ["House", "Mound", "Pillar", "Cave"],
+            answerIndex: 1,
+            explanation: "Stupa literally means a mound, usually enclosing a relic casket of Buddha or his followers."
+          },
+          {
+            question: "The famous caves of Ajanta are renowned for what kind of ancient art?",
+            options: ["Stone statues", "Wall paintings depicting Jataka stories", "Glass carvings", "Wooden models"],
+            answerIndex: 1,
+            explanation: "Ajanta is famous for its colorful paintings drawn on cave walls under torchlight, mostly about Buddhist stories."
+          },
+          {
+            question: "Which famous mathematician and astronomer wrote the book 'Aryabhatiyam' in Sanskrit?",
+            options: ["Varahamihira", "Aryabhata", "Charaka", "Sushruta"],
+            answerIndex: 1,
+            explanation: "Aryabhata was a famous astronomer who calculated the Earth's rotation, eclipses, and wrote the Aryabhatiyam."
+          },
+          {
+            question: "The famous Tamil epic 'Silappadikaram' was composed by which poet?",
+            options: ["Sattanar", "Ilango Adigal", "Tiruvalluvar", "Kalidasa"],
+            answerIndex: 1,
+            explanation: "Ilango Adigal composed the Silappadikaram (the story of a anklet) about 1,800 years ago."
+          }
+        ]
+      }
+    ]
   }
 };

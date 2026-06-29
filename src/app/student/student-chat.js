@@ -142,6 +142,8 @@ export default function StudentChat({ subject = "history" }) {
   } else if (isClass6) {
     if (subject === "science") {
       subjectKey = "science_class6";
+    } else if (subject === "history") {
+      subjectKey = "history_class6";
     }
   }
 
