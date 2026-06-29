@@ -176,6 +176,7 @@ export const studentRoster = [
 // ─── Teacher Nav Items ────────────────────────────────────────────
 export const teacherNavItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/teacher' },
+  { id: 'curriculum', label: 'Curriculum', icon: 'book', href: '/teacher' },
   { id: 'students', label: 'Students', icon: 'users', href: '/teacher' },
   { id: 'notes', label: 'Notes', icon: 'book', href: '/teacher' },
   { id: 'reports', label: 'Reports', icon: 'bar-chart', href: '/teacher' },

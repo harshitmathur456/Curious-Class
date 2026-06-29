@@ -165,6 +165,7 @@ export default function TeacherDashboard() {
   const [activeNav, setActiveNav] = useState("dashboard");
   const [expandedAlerts, setExpandedAlerts] = useState({});
   const [selectedTopic, setSelectedTopic] = useState("");
+  const [curriculumData, setCurriculumData] = useState({});
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -210,10 +211,6 @@ export default function TeacherDashboard() {
     subjectKeyRef.current = subjectKey;
   }, [subjectKey]);
 
-  useEffect(() => {
-    fetchNotes();
-  }, [subjectKey]);
-
   async function fetchNotes() {
     const activeSubjectKey = subjectKey;
     setLoadingNotes(true);
@@ -233,6 +230,23 @@ export default function TeacherDashboard() {
       }
     }
   }
+
+  async function fetchCurriculum() {
+    try {
+      const res = await fetch(`/api/curriculum?subject=${subjectKey}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCurriculumData(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch curriculum:", e);
+    }
+  }
+
+  useEffect(() => {
+    fetchNotes();
+    fetchCurriculum();
+  }, [subjectKey]);
 
   async function handleUpload(e) {
     e.preventDefault();
@@ -270,6 +284,51 @@ export default function TeacherDashboard() {
     } finally {
       setUploading(false);
     }
+  }
+
+  async function updateChapterStatus(chapterId, status) {
+    try {
+      await fetch('/api/curriculum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: subjectKey, chapterId, action: 'UPDATE_CHAPTER_STATUS', payload: { status } })
+      });
+      fetchCurriculum();
+    } catch (e) { console.error(e); }
+  }
+
+  async function addTopic(chapterId, name) {
+    if (!name.trim()) return;
+    try {
+      await fetch('/api/curriculum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: subjectKey, chapterId, action: 'ADD_TOPIC', payload: { name } })
+      });
+      fetchCurriculum();
+    } catch (e) { console.error(e); }
+  }
+
+  async function updateTopicStatus(chapterId, topicId, status) {
+    try {
+      await fetch('/api/curriculum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: subjectKey, chapterId, action: 'UPDATE_TOPIC_STATUS', payload: { topicId, status } })
+      });
+      fetchCurriculum();
+    } catch (e) { console.error(e); }
+  }
+
+  async function removeTopic(chapterId, topicId) {
+    try {
+      await fetch('/api/curriculum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: subjectKey, chapterId, action: 'REMOVE_TOPIC', payload: { topicId } })
+      });
+      fetchCurriculum();
+    } catch (e) { console.error(e); }
   }
 
   function toggleAlert(id) {
@@ -557,6 +616,94 @@ export default function TeacherDashboard() {
           </div>
         </div>
         )}
+        
+        {/* Curriculum View */}
+        {activeNav === "curriculum" && (
+          <div className="td-dashboard">
+            <div className="td-card">
+              <div className="td-card-header">
+                <div className="td-card-title">Curriculum Management</div>
+                <div className="td-card-subtitle">Define chapters and topics for {subject}</div>
+              </div>
+              <div style={{ padding: "var(--space-xl)", display: "flex", flexDirection: "column", gap: "20px" }}>
+                {(CHAPTERS_DATA[subjectKey]?.chapters || []).map(ch => {
+                  const chData = curriculumData[ch.id] || { status: 'pending', topics: [] };
+                  return (
+                    <div key={ch.id} style={{ border: '1px solid var(--color-border-light)', borderRadius: '8px', padding: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <h3 style={{ margin: 0, color: 'var(--color-primary)' }}>{ch.name}</h3>
+                        <div>
+                          <select 
+                            value={chData.status} 
+                            onChange={(e) => updateChapterStatus(ch.id, e.target.value)}
+                            style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="covered">Covered</option>
+                          </select>
+                          {chData.coveredDate && <span style={{ marginLeft: '10px', fontSize: '12px', color: '#666' }}>Covered on {chData.coveredDate}</span>}
+                        </div>
+                      </div>
+                      
+                      <div style={{ marginBottom: '16px' }}>
+                        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#555' }}>Topics</h4>
+                        {chData.topics?.length === 0 ? (
+                          <p style={{ fontSize: '13px', color: '#888' }}>No topics defined yet.</p>
+                        ) : (
+                          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                            {chData.topics?.map(topic => (
+                              <li key={topic.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px', background: '#f9f9f9', marginBottom: '4px', borderRadius: '4px' }}>
+                                <span>{topic.name}</span>
+                                <div>
+                                  <select 
+                                    value={topic.status} 
+                                    onChange={(e) => updateTopicStatus(ch.id, topic.id, e.target.value)}
+                                    style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ddd', marginRight: '8px' }}
+                                  >
+                                    <option value="pending">Pending</option>
+                                    <option value="covered">Covered</option>
+                                  </select>
+                                  <button onClick={() => removeTopic(ch.id, topic.id)} style={{ color: 'red', border: 'none', background: 'transparent', cursor: 'pointer' }}>✖</button>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input 
+                          type="text" 
+                          placeholder="New topic name..." 
+                          id={`new-topic-${ch.id}`}
+                          style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                          onKeyDown={(e) => {
+                            if(e.key === 'Enter') {
+                              addTopic(ch.id, e.target.value);
+                              e.target.value = '';
+                            }
+                          }}
+                        />
+                        <button 
+                          onClick={(e) => {
+                            const input = document.getElementById(`new-topic-${ch.id}`);
+                            addTopic(ch.id, input.value);
+                            input.value = '';
+                          }}
+                          style={{ padding: '8px 16px', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                          Add Topic
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Students View */}
         {activeNav === "students" && (
           <div className="td-dashboard">

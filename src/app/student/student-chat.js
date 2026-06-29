@@ -105,7 +105,10 @@ function getReasoningLevel(messages) {
 
 /* ─── Main Component ─────────────────────────────────────────── */
 
-export default function StudentChat({ subject = "history" }) {
+export default function StudentChat({ subject = null }) {
+  const [currentSubject, setCurrentSubject] = useState(subject);
+  const [curriculumData, setCurriculumData] = useState({});
+  const [activeChapterId, setActiveChapterId] = useState(null);
   const router = useRouter();
   const [selectedClass, setSelectedClass] = useState("");
   const [activeTopic, setActiveTopic] = useState("");
@@ -114,42 +117,52 @@ export default function StudentChat({ subject = "history" }) {
     if (typeof window !== "undefined") {
       const cls = localStorage.getItem("selectedClass") || "";
       setSelectedClass(cls);
-      
-      const is11or12 = cls.includes("11") || cls.includes("12");
-      if (is11or12) {
-        if (subject === "history" || subject === "science") {
-          router.replace("/student/physics");
-        }
-      } else {
-        if (subject === "physics" || subject === "chemistry" || subject === "biology") {
-          router.replace("/student/science");
-        }
-      }
     }
-  }, [subject]);
+  }, []);
+
+  function getSubjectKey(subj, cls) {
+    const isC10 = cls && cls.includes("10");
+    const isC6 = cls && cls.includes("6");
+    if (subj === "mathematics" && isC10) return "mathematics_class10";
+    if (subj === "science" && isC10) return "science_class10";
+    if (subj === "history" && isC10) return "history_class10";
+    if (subj === "science" && isC6) return "science_class6";
+    if (subj === "history" && isC6) return "history_class6";
+    return subj;
+  }
+
+  useEffect(() => {
+    if (currentSubject) {
+      const subKey = getSubjectKey(currentSubject, selectedClass);
+      fetch(`/api/curriculum?subject=${subKey}`)
+        .then(r => r.json())
+        .then(data => setCurriculumData(data))
+        .catch(e => console.error(e));
+    }
+  }, [currentSubject, selectedClass]);
 
   const isClass10 = selectedClass && selectedClass.includes("10");
   const isClass6 = selectedClass && selectedClass.includes("6");
-  let subjectKey = subject;
+  let subjectKey = currentSubject;
   if (isClass10) {
-    if (subject === "mathematics") {
+    if (currentSubject === "mathematics") {
       subjectKey = "mathematics_class10";
-    } else if (subject === "science") {
+    } else if (currentSubject === "science") {
       subjectKey = "science_class10";
-    } else if (subject === "history") {
+    } else if (currentSubject === "history") {
       subjectKey = "history_class10";
     }
   } else if (isClass6) {
     if (subject === "science") {
       subjectKey = "science_class6";
-    } else if (subject === "history") {
+    } else if (currentSubject === "history") {
       subjectKey = "history_class6";
     }
   }
 
   const allChapters = CHAPTERS_DATA[subjectKey]?.chapters || [];
-  const activeChapter = allChapters.find((c) => c.name === activeTopic);
-  const activeIndex = activeTopic ? allChapters.findIndex((c) => c.name === activeTopic) : -1;
+  const activeChapter = allChapters.find((c) => c.id === activeChapterId);
+  const activeIndex = activeChapterId ? allChapters.findIndex((c) => c.id === activeChapterId) : -1;
   const taughtTopics = activeIndex >= 0 ? allChapters.slice(0, activeIndex).map((c) => c.name) : [];
   const upcomingClasses = activeIndex >= 0 ? allChapters.slice(activeIndex + 1).map((c) => c.name) : allChapters.map((c) => c.name);
 
@@ -213,6 +226,7 @@ export default function StudentChat({ subject = "history" }) {
 
   // Initialize/reset states when subject changes
   useEffect(() => {
+    setActiveChapterId(null);
     setActiveTopic("");
     setMessages([]);
     setTrackedTopics([]);
@@ -229,7 +243,7 @@ export default function StudentChat({ subject = "history" }) {
     setQuizScore(0);
     setCachedQuizzes({});
     prefetchPromisesRef.current = {};
-  }, [subject]);
+  }, [currentSubject]);
 
   useEffect(() => {
     let active = true;
@@ -528,6 +542,28 @@ export default function StudentChat({ subject = "history" }) {
   }
 
   return (
+    !currentSubject ? (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--color-bg)' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Welcome to CuriousClass</h1>
+        <p style={{ fontSize: '1.2rem', marginBottom: '2.5rem', color: 'var(--color-text-secondary)' }}>What would you like to study today?</p>
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {selectedClass && (selectedClass.includes("11") || selectedClass.includes("12")) ? (
+            <>
+              <button onClick={() => { setCurrentSubject('physics'); router.push('/student/physics'); }} style={{ padding: '20px', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)', background: 'white', cursor: 'pointer' }}>⚡ Physics</button>
+              <button onClick={() => { setCurrentSubject('chemistry'); router.push('/student/chemistry'); }} style={{ padding: '20px', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)', background: 'white', cursor: 'pointer' }}>🧪 Chemistry</button>
+              <button onClick={() => { setCurrentSubject('biology'); router.push('/student/biology'); }} style={{ padding: '20px', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)', background: 'white', cursor: 'pointer' }}>🧬 Biology</button>
+              <button onClick={() => { setCurrentSubject('mathematics'); router.push('/student/mathematics'); }} style={{ padding: '20px', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)', background: 'white', cursor: 'pointer' }}>📐 Mathematics</button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => { setCurrentSubject('history'); router.push('/student'); }} style={{ padding: '20px', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)', background: 'white', cursor: 'pointer' }}>📜 History</button>
+              <button onClick={() => { setCurrentSubject('science'); router.push('/student/science'); }} style={{ padding: '20px', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)', background: 'white', cursor: 'pointer' }}>🔬 Science</button>
+              <button onClick={() => { setCurrentSubject('mathematics'); router.push('/student/mathematics'); }} style={{ padding: '20px', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--color-border-light)', background: 'white', cursor: 'pointer' }}>📐 Mathematics</button>
+            </>
+          )}
+        </div>
+      </div>
+    ) :
     <div className="sc-layout">
       {/* ── Left Sidebar ── */}
       <aside className="sc-sidebar">
@@ -555,28 +591,28 @@ export default function StudentChat({ subject = "history" }) {
             <div className="sc-subject-nav-links">
               {selectedClass && (selectedClass.includes("11") || selectedClass.includes("12")) ? (
                 <>
-                  <Link href="/student/physics" className={`sc-subject-link ${subject === "physics" ? "sc-subject-link--active" : ""}`}>
+                  <Link href="/student/physics" className={`sc-subject-link ${currentSubject === "physics" ? "sc-subject-link--active" : ""}`}>
                     ⚡ Physics
                   </Link>
-                  <Link href="/student/chemistry" className={`sc-subject-link ${subject === "chemistry" ? "sc-subject-link--active" : ""}`}>
+                  <Link href="/student/chemistry" className={`sc-subject-link ${currentSubject === "chemistry" ? "sc-subject-link--active" : ""}`}>
                     🧪 Chemistry
                   </Link>
-                  <Link href="/student/biology" className={`sc-subject-link ${subject === "biology" ? "sc-subject-link--active" : ""}`}>
+                  <Link href="/student/biology" className={`sc-subject-link ${currentSubject === "biology" ? "sc-subject-link--active" : ""}`}>
                     🧬 Biology
                   </Link>
-                  <Link href="/student/mathematics" className={`sc-subject-link ${subject === "mathematics" ? "sc-subject-link--active" : ""}`}>
+                  <Link href="/student/mathematics" className={`sc-subject-link ${currentSubject === "mathematics" ? "sc-subject-link--active" : ""}`}>
                     📐 Mathematics
                   </Link>
                 </>
               ) : (
                 <>
-                  <Link href="/student" className={`sc-subject-link ${subject === "history" ? "sc-subject-link--active" : ""}`}>
+                  <Link href="/student" className={`sc-subject-link ${currentSubject === "history" ? "sc-subject-link--active" : ""}`}>
                     📜 History
                   </Link>
-                  <Link href="/student/science" className={`sc-subject-link ${subject === "science" ? "sc-subject-link--active" : ""}`}>
+                  <Link href="/student/science" className={`sc-subject-link ${currentSubject === "science" ? "sc-subject-link--active" : ""}`}>
                     🔬 Science
                   </Link>
-                  <Link href="/student/mathematics" className={`sc-subject-link ${subject === "mathematics" ? "sc-subject-link--active" : ""}`}>
+                  <Link href="/student/mathematics" className={`sc-subject-link ${currentSubject === "mathematics" ? "sc-subject-link--active" : ""}`}>
                     📐 Mathematics
                   </Link>
                 </>
@@ -636,11 +672,11 @@ export default function StudentChat({ subject = "history" }) {
           </button>
         )}
 
-        {activeTopic && (
+        {activeChapterId && (
           <div className="sc-active-chapter-box">
             <div className="sc-ac-label">Active Chapter</div>
-            <div className="sc-ac-name">{activeTopic}</div>
-            <button className="sc-change-chapter-btn" onClick={() => setActiveTopic("")}>
+            <div className="sc-ac-name">{activeChapter?.name}</div>
+            <button className="sc-change-chapter-btn" onClick={() => { setActiveChapterId(null); setActiveTopic(""); }}>
               ← Change Chapter
             </button>
           </div>
@@ -648,28 +684,65 @@ export default function StudentChat({ subject = "history" }) {
       </aside>
 
       <main className="sc-main" style={!activeTopic ? { padding: "var(--space-2xl)", overflowY: "auto" } : {}}>
-        {!activeTopic ? (
+        {!activeChapterId ? (
           <div className="sc-topic-select-view">
             <div className="sc-tsv-header">
               <h1>Select a Chapter</h1>
-              <p>Choose a topic to begin Socratic discussion and interactive practice.</p>
+              <p>Choose a chapter to see topics covered by your teacher.</p>
             </div>
             
             <div className="sc-tsv-grid">
-              {allChapters.map((chapter) => (
-                <button
-                  key={chapter.id}
-                  className="sc-tsv-card"
-                  onClick={() => handleTopicSelect(chapter.name)}
-                >
-                  <div className="sc-tsv-card-icon">📚</div>
-                  <div className="sc-tsv-card-info">
-                    <h3>{chapter.name}</h3>
-                    <p>{chapter.objective}</p>
-                  </div>
-                  <div className="sc-tsv-card-arrow">→</div>
-                </button>
-              ))}
+              {allChapters.map((chapter) => {
+                const chData = curriculumData[chapter.id] || {};
+                return (
+                  <button
+                    key={chapter.id}
+                    className="sc-tsv-card"
+                    onClick={() => setActiveChapterId(chapter.id)}
+                  >
+                    <div className="sc-tsv-card-icon">📚</div>
+                    <div className="sc-tsv-card-info">
+                      <h3>{chapter.name}</h3>
+                      <p>{chapter.objective}</p>
+                      {chData.status === 'covered' && <span style={{fontSize: '12px', color: 'green', fontWeight: 'bold', display: 'block', marginTop: '4px'}}>Covered on {chData.coveredDate}</span>}
+                      {chData.status === 'ongoing' && <span style={{fontSize: '12px', color: 'orange', fontWeight: 'bold', display: 'block', marginTop: '4px'}}>Ongoing</span>}
+                    </div>
+                    <div className="sc-tsv-card-arrow">→</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : !activeTopic ? (
+          <div className="sc-topic-select-view">
+            <div className="sc-tsv-header">
+              <h1>{activeChapter?.name} - Topics</h1>
+              <p>Select a topic to begin Socratic discussion.</p>
+              <button onClick={() => setActiveChapterId(null)} style={{background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'underline'}}>← Back to Chapters</button>
+            </div>
+            
+            <div className="sc-tsv-grid">
+              {(() => {
+                const chData = curriculumData[activeChapterId] || { topics: [] };
+                if (chData.topics?.length === 0 || !chData.topics) {
+                  return <p style={{color: 'var(--color-text-secondary)'}}>No topics defined by the teacher yet.</p>
+                }
+                return chData.topics.map(topic => (
+                  <button
+                    key={topic.id}
+                    className="sc-tsv-card"
+                    onClick={() => handleTopicSelect(topic.name)}
+                    style={{ borderLeft: topic.status === 'covered' ? '4px solid green' : '4px solid #ccc' }}
+                  >
+                    <div className="sc-tsv-card-icon">📝</div>
+                    <div className="sc-tsv-card-info">
+                      <h3>{topic.name}</h3>
+                      <p style={{color: topic.status === 'covered' ? 'green' : 'var(--color-text-tertiary)'}}>{topic.status === 'covered' ? 'Covered' : 'Yet to be covered'}</p>
+                    </div>
+                    <div className="sc-tsv-card-arrow">→</div>
+                  </button>
+                ));
+              })()}
             </div>
           </div>
         ) : quizActive ? (
