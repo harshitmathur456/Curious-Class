@@ -1,7 +1,11 @@
 async function callGeminiWithFallback(body) {
-  const primaryKey = process.env.GEMINI_API_KEY;
-  const backupKey = process.env.GEMINI_API_KEY_BACKUP;
-  const keys = [primaryKey, backupKey].filter(Boolean);
+  const keys = [
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_BACKUP,
+    process.env.GEMINI_API_KEY_3,
+    process.env.GEMINI_API_KEY_4,
+    process.env.GEMINI_API_KEY_5
+  ].filter(Boolean);
 
   if (keys.length === 0) {
     throw new Error("No Gemini API keys configured");
