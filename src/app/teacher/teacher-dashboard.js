@@ -136,10 +136,9 @@ function CloudUploadIcon() {
 /* ─── Teacher Nav Items ──────────────────────────────────────────── */
 const teacherNavItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/teacher' },
-  { id: 'curriculum', label: 'Curriculum', icon: 'book', href: '/teacher' },
   { id: 'students', label: 'Students', icon: 'users', href: '/teacher' },
   { id: 'notes', label: 'Notes', icon: 'book', href: '/teacher' },
-  { id: 'quizzes', label: 'Quizzes', icon: 'cpu', href: '/teacher' },
+  { id: 'quizzes', label: 'Quizzes & Topics', icon: 'cpu', href: '/teacher' },
   { id: 'reports', label: 'Reports', icon: 'bar-chart', href: '/teacher' },
 ];
 
@@ -507,7 +506,7 @@ export default function TeacherDashboard() {
           </div>
 
           {/* New Topic Button */}
-          <button className="td-new-topic-btn" id="new-topic-btn" onClick={() => setActiveNav('curriculum')}>
+          <button className="td-new-topic-btn" id="new-topic-btn" onClick={() => setActiveNav('quizzes')}>
             <PlusIcon />
             <span>New Topic</span>
           </button>
@@ -756,13 +755,14 @@ export default function TeacherDashboard() {
         </div>
         )}
         
-        {/* Curriculum View */}
-        {activeNav === "curriculum" && (
+        {/* Quizzes & Topics View */}
+        {activeNav === "quizzes" && (
           <div className="td-dashboard">
+            {/* Topic Management */}
             <div className="td-card">
               <div className="td-card-header">
-                <div className="td-card-title">Curriculum Management</div>
-                <div className="td-card-subtitle">Define chapters and topics for {subject}</div>
+                <div className="td-card-title">Manage Topics</div>
+                <div className="td-card-subtitle">Define topics under each chapter for {subject}. These topics are used for quiz generation.</div>
               </div>
               <div style={{ padding: "var(--space-xl)", display: "flex", flexDirection: "column", gap: "20px" }}>
                 {(CHAPTERS_DATA[subjectKey]?.chapters || []).map(ch => {
@@ -788,7 +788,7 @@ export default function TeacherDashboard() {
                       <div style={{ marginBottom: '16px' }}>
                         <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#555' }}>Topics</h4>
                         {chData.topics?.length === 0 ? (
-                          <p style={{ fontSize: '13px', color: '#888' }}>No topics defined yet.</p>
+                          <p style={{ fontSize: '13px', color: '#888' }}>No topics defined yet. Add topics below to enable quiz generation for this chapter.</p>
                         ) : (
                           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                             {chData.topics?.map(topic => (
@@ -838,6 +838,50 @@ export default function TeacherDashboard() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* Quiz Generation */}
+            <div className="td-card" style={{ marginTop: '20px' }}>
+              <div className="td-card-header">
+                <div className="td-card-title">Generate & Push Quiz</div>
+                <div className="td-card-subtitle">Select a topic and push a Gemini-generated quiz to all students.</div>
+              </div>
+              <div style={{ padding: "var(--space-xl)" }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <select
+                    value={quizTopic}
+                    onChange={(e) => setQuizTopic(e.target.value)}
+                    style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc', minWidth: '200px' }}
+                  >
+                    <option value="">Select a topic...</option>
+                    {(CHAPTERS_DATA[subjectKey]?.chapters || []).map(ch => {
+                      const chData = curriculumData[ch.id] || { topics: [] };
+                      return (chData.topics || []).map(t => (
+                        <option key={t.id} value={t.name}>{ch.name} → {t.name}</option>
+                      ));
+                    })}
+                  </select>
+                  <button
+                    onClick={handleGenerateAndPushQuiz}
+                    disabled={generatingQuiz || !quizTopic}
+                    style={{ padding: '8px 20px', background: generatingQuiz ? '#ccc' : 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '6px', cursor: generatingQuiz ? 'not-allowed' : 'pointer', fontWeight: '600' }}
+                  >
+                    {generatingQuiz ? 'Generating...' : 'Generate & Push Quiz'}
+                  </button>
+                </div>
+                {quizStatus && <p style={{ marginTop: '12px', fontSize: '13px', color: quizStatus.includes('success') ? 'green' : '#666' }}>{quizStatus}</p>}
+                {pushedQuiz && (
+                  <div style={{ marginTop: '16px', padding: '12px', background: '#f0f9f0', borderRadius: '8px', border: '1px solid #d4edda' }}>
+                    <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-primary)' }}>Pushed Quiz Preview</h4>
+                    {pushedQuiz.questions?.map((q, i) => (
+                      <div key={i} style={{ marginBottom: '8px' }}>
+                        <p style={{ margin: '0 0 4px 0', fontWeight: '500', fontSize: '13px' }}>{i+1}. {q.question}</p>
+                        <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Answer: {q.options?.[q.answerIndex]}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

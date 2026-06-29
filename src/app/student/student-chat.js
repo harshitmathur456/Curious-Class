@@ -107,8 +107,6 @@ function getReasoningLevel(messages) {
 
 export default function StudentChat({ subject = null }) {
   const [currentSubject, setCurrentSubject] = useState(subject);
-  const [curriculumData, setCurriculumData] = useState({});
-  const [activeChapterId, setActiveChapterId] = useState(null);
   const router = useRouter();
   const [selectedClass, setSelectedClass] = useState("");
   const [activeTopic, setActiveTopic] = useState("");
@@ -132,15 +130,7 @@ export default function StudentChat({ subject = null }) {
     return subj;
   }
 
-  useEffect(() => {
-    if (currentSubject) {
-      const subKey = getSubjectKey(currentSubject, selectedClass);
-      fetch(`/api/curriculum?subject=${subKey}`)
-        .then(r => r.json())
-        .then(data => setCurriculumData(data))
-        .catch(e => console.error(e));
-    }
-  }, [currentSubject, selectedClass]);
+
 
   const isClass10 = selectedClass && selectedClass.includes("10");
   const isClass6 = selectedClass && selectedClass.includes("6");
@@ -162,8 +152,8 @@ export default function StudentChat({ subject = null }) {
   }
 
   const allChapters = CHAPTERS_DATA[subjectKey]?.chapters || [];
-  const activeChapter = allChapters.find((c) => c.id === activeChapterId);
-  const activeIndex = activeChapterId ? allChapters.findIndex((c) => c.id === activeChapterId) : -1;
+  const activeChapter = allChapters.find((c) => c.name === activeTopic);
+  const activeIndex = activeTopic ? allChapters.findIndex((c) => c.name === activeTopic) : -1;
   const taughtTopics = activeIndex >= 0 ? allChapters.slice(0, activeIndex).map((c) => c.name) : [];
   const upcomingClasses = activeIndex >= 0 ? allChapters.slice(activeIndex + 1).map((c) => c.name) : allChapters.map((c) => c.name);
 
@@ -227,7 +217,6 @@ export default function StudentChat({ subject = null }) {
 
   // Initialize/reset states when subject changes
   useEffect(() => {
-    setActiveChapterId(null);
     setActiveTopic("");
     setMessages([]);
     setTrackedTopics([]);
@@ -443,6 +432,8 @@ export default function StudentChat({ subject = null }) {
     setAnswerSubmitted(false);
     setSelectedOptionIndex(null);
     setQuizScore(0);
+
+    logActivity('chapter_start', { chapter: topic });
   }
 
   async function fetchNewsForTopic(topic) {
@@ -692,11 +683,11 @@ export default function StudentChat({ subject = null }) {
           </button>
         )}
 
-        {activeChapterId && (
+        {activeTopic && (
           <div className="sc-active-chapter-box">
             <div className="sc-ac-label">Active Chapter</div>
-            <div className="sc-ac-name">{activeChapter?.name}</div>
-            <button className="sc-change-chapter-btn" onClick={() => { setActiveChapterId(null); setActiveTopic(""); }}>
+            <div className="sc-ac-name">{activeTopic}</div>
+            <button className="sc-change-chapter-btn" onClick={() => setActiveTopic("")}>
               ← Change Chapter
             </button>
           </div>
@@ -704,65 +695,28 @@ export default function StudentChat({ subject = null }) {
       </aside>
 
       <main className="sc-main" style={!activeTopic ? { padding: "var(--space-2xl)", overflowY: "auto" } : {}}>
-        {!activeChapterId ? (
+        {!activeTopic ? (
           <div className="sc-topic-select-view">
             <div className="sc-tsv-header">
               <h1>Select a Chapter</h1>
-              <p>Choose a chapter to see topics covered by your teacher.</p>
+              <p>Choose a chapter to begin your Socratic discussion with Explano.</p>
             </div>
             
             <div className="sc-tsv-grid">
-              {allChapters.map((chapter) => {
-                const chData = curriculumData[chapter.id] || {};
-                return (
+              {allChapters.map((chapter) => (
                   <button
                     key={chapter.id}
                     className="sc-tsv-card"
-                    onClick={() => setActiveChapterId(chapter.id)}
+                    onClick={() => handleTopicSelect(chapter.name)}
                   >
                     <div className="sc-tsv-card-icon">📚</div>
                     <div className="sc-tsv-card-info">
                       <h3>{chapter.name}</h3>
                       <p>{chapter.objective}</p>
-                      {chData.status === 'covered' && <span style={{fontSize: '12px', color: 'green', fontWeight: 'bold', display: 'block', marginTop: '4px'}}>Covered on {chData.coveredDate}</span>}
-                      {chData.status === 'ongoing' && <span style={{fontSize: '12px', color: 'orange', fontWeight: 'bold', display: 'block', marginTop: '4px'}}>Ongoing</span>}
                     </div>
                     <div className="sc-tsv-card-arrow">→</div>
                   </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : !activeTopic ? (
-          <div className="sc-topic-select-view">
-            <div className="sc-tsv-header">
-              <h1>{activeChapter?.name} - Topics</h1>
-              <p>Select a topic to begin Socratic discussion.</p>
-              <button onClick={() => setActiveChapterId(null)} style={{background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'underline'}}>← Back to Chapters</button>
-            </div>
-            
-            <div className="sc-tsv-grid">
-              {(() => {
-                const chData = curriculumData[activeChapterId] || { topics: [] };
-                if (chData.topics?.length === 0 || !chData.topics) {
-                  return <p style={{color: 'var(--color-text-secondary)'}}>No topics defined by the teacher yet.</p>
-                }
-                return chData.topics.map(topic => (
-                  <button
-                    key={topic.id}
-                    className="sc-tsv-card"
-                    onClick={() => handleTopicSelect(topic.name)}
-                    style={{ borderLeft: topic.status === 'covered' ? '4px solid green' : '4px solid #ccc' }}
-                  >
-                    <div className="sc-tsv-card-icon">📝</div>
-                    <div className="sc-tsv-card-info">
-                      <h3>{topic.name}</h3>
-                      <p style={{color: topic.status === 'covered' ? 'green' : 'var(--color-text-tertiary)'}}>{topic.status === 'covered' ? 'Covered' : 'Yet to be covered'}</p>
-                    </div>
-                    <div className="sc-tsv-card-arrow">→</div>
-                  </button>
-                ));
-              })()}
+              ))}
             </div>
           </div>
         ) : quizActive ? (
