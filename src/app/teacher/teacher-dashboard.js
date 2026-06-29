@@ -259,9 +259,8 @@ export default function TeacherDashboard() {
         const allActs = actData.activities || [];
         
         const allowedTopics = (CHAPTERS_DATA[subjectKey]?.chapters || []).map(ch => ch.name);
-        const subjectCurriculum = curriculumData[subjectKey] || {};
-        Object.values(subjectCurriculum).forEach(chap => {
-          if (chap.topics) {
+        Object.values(curriculumData).forEach(chap => {
+          if (chap && chap.topics) {
             chap.topics.forEach(t => allowedTopics.push(t.name));
           }
         });
@@ -291,18 +290,16 @@ export default function TeacherDashboard() {
       setStudentRoster(roster);
 
       // Populate Heatmap with real scores
-      // X-axis: we need to find all unique topics the class has taken quizzes on, or just use the current unit's chapters.
-      // We will use the chapters of the current subjectKey as subtopics for the heatmap.
-      // In the mock, heatmap was 4 scores. We will calculate the average quiz score per student per topic.
-      const chapters = (CHAPTERS_DATA[subjectKey]?.chapters || []).slice(0, 4);
-      setCurrentHeatmapSubtopics(chapters.map(ch => ch.name));
+      // Find up to 4 unique topics that have quizzes
+      const quizTopics = Array.from(new Set(activities.filter(a => a.activity_type === 'quiz').map(a => a.topic)));
+      const heatmapTopics = quizTopics.length > 0 ? quizTopics.slice(0, 4) : (CHAPTERS_DATA[subjectKey]?.chapters || []).slice(0, 4).map(ch => ch.name);
+      setCurrentHeatmapSubtopics(heatmapTopics);
       
       const heatmap = students.map(s => {
         const studentQuizzes = activities.filter(a => a.student_roll === s.roll_number && a.activity_type === 'quiz');
         
-        
-        const scores = chapters.map(ch => {
-          const quizzes = studentQuizzes.filter(q => q.topic === ch.name);
+        const scores = heatmapTopics.map(topic => {
+          const quizzes = studentQuizzes.filter(q => q.topic === topic);
           if (quizzes.length === 0) return null; // Not taken
           const totalScore = quizzes.reduce((acc, curr) => acc + (curr.details.score / curr.details.total), 0);
           return Math.round((totalScore / quizzes.length) * 100);
