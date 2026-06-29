@@ -643,32 +643,52 @@ export default function StudentChat({ subject = null }) {
             </div>
           )}
 
-          {/* Topic Progress */}
-          {activeTopic && config.progress.length > 0 && (
-            <div className="sc-progress">
-              <div className="sc-progress-label">Topic progress</div>
-              <div className="sc-progress-steps">
-                {config.progress.map((step, i) => (
-                  <div
-                    key={step.id}
-                    className={`sc-step ${step.status === "completed" ? "sc-step--done" : ""} ${step.status === "active" ? "sc-step--active" : ""} ${step.status === "upcoming" ? "sc-step--upcoming" : ""}`}
-                  >
-                    <div className="sc-step-indicator">
-                      {step.status === "completed" && (
-                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                          <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                      {step.status === "active" && <div className="sc-step-dot sc-step-dot--active" />}
-                      {step.status === "upcoming" && <div className="sc-step-dot sc-step-dot--upcoming" />}
-                    </div>
-                    <span className="sc-step-text">{step.label}</span>
-                    {i < config.progress.length - 1 && <div className="sc-step-line" />}
-                  </div>
-                ))}
-              </div>
+          {/* Track Topics (News) */}
+          <div className="sc-rs-section" style={{ marginTop: "var(--space-xl)", width: "100%" }}>
+            <h3 className="sc-rs-subtitle" style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", color: "var(--color-text-tertiary)", fontWeight: "600", marginBottom: "var(--space-sm)" }}>Track Topics (News)</h3>
+            <p className="sc-rs-desc" style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "var(--space-md)" }}>Add up to 5 topics to get live news</p>
+            <div className="sc-rs-input-group" style={{ display: "flex", gap: "8px", marginBottom: "var(--space-md)" }}>
+              <input 
+                type="text" 
+                placeholder="E.g., Space, AI..." 
+                value={topicInput}
+                onChange={(e) => setTopicInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddTopic();
+                }}
+                disabled={trackedTopics.length >= 5}
+                className="sc-rs-input"
+                style={{ flex: 1, padding: "8px 12px", border: "1px solid var(--color-border-light)", borderRadius: "8px", fontSize: "13px", outline: "none" }}
+              />
+              <button onClick={handleAddTopic} disabled={!topicInput.trim() || trackedTopics.length >= 5} className="sc-rs-add-btn" style={{ padding: "0 12px", background: "var(--color-primary)", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>+</button>
             </div>
-          )}
+            
+            <div className="sc-rs-tracked" style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+              {trackedTopics.map(topic => (
+                <div key={topic} className="sc-rs-topic-card" style={{ background: "white", border: "1px solid var(--color-border-light)", borderRadius: "8px", padding: "var(--space-sm)" }}>
+                  <div className="sc-rs-topic-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <h4 style={{ margin: 0, fontSize: "13px", color: "var(--color-text-primary)", fontWeight: "600" }}>{topic}</h4>
+                    <button onClick={() => handleRemoveTopic(topic)} style={{ background: "none", border: "none", color: "var(--color-text-tertiary)", cursor: "pointer", fontSize: "16px" }}>×</button>
+                  </div>
+                  <div className="sc-rs-news-list" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {news[topic] ? (
+                      news[topic].length > 0 ? (
+                        news[topic].map((article, i) => (
+                          <a key={i} href={article.link} target="_blank" rel="noreferrer" className="sc-rs-news-item" style={{ fontSize: "12px", color: "var(--color-text-secondary)", textDecoration: "none", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            • {article.title}
+                          </a>
+                        ))
+                      ) : (
+                        <span className="sc-rs-no-news" style={{ fontSize: "12px", color: "var(--color-text-tertiary)", fontStyle: "italic" }}>No recent news found.</span>
+                      )
+                    ) : loadingNews ? (
+                      <span className="sc-rs-no-news" style={{ fontSize: "12px", color: "var(--color-text-tertiary)", fontStyle: "italic" }}>Loading...</span>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {activeTopic && (
@@ -1042,50 +1062,7 @@ export default function StudentChat({ subject = null }) {
             )}
           </div>
 
-          <div className="sc-rs-section">
-            <h3 className="sc-rs-subtitle">Track Topics (News)</h3>
-            <p className="sc-rs-desc">Add up to 5 topics to get live news</p>
-            <div className="sc-rs-input-group">
-              <input 
-                type="text" 
-                placeholder="E.g., Space, AI..." 
-                value={topicInput}
-                onChange={(e) => setTopicInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddTopic();
-                }}
-                disabled={trackedTopics.length >= 5}
-                className="sc-rs-input"
-              />
-              <button onClick={handleAddTopic} disabled={!topicInput.trim() || trackedTopics.length >= 5} className="sc-rs-add-btn">+</button>
-            </div>
-            
-            <div className="sc-rs-tracked">
-              {trackedTopics.map(topic => (
-                <div key={topic} className="sc-rs-topic-card">
-                  <div className="sc-rs-topic-header">
-                    <h4>{topic}</h4>
-                    <button onClick={() => handleRemoveTopic(topic)}>×</button>
-                  </div>
-                  <div className="sc-rs-news-list">
-                    {news[topic] ? (
-                      news[topic].length > 0 ? (
-                        news[topic].map((article, i) => (
-                          <a key={i} href={article.link} target="_blank" rel="noreferrer" className="sc-rs-news-item">
-                            • {article.title}
-                          </a>
-                        ))
-                      ) : (
-                        <span className="sc-rs-no-news">No recent news found.</span>
-                      )
-                    ) : loadingNews ? (
-                      <span className="sc-rs-no-news">Loading...</span>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+
         </aside>
       )}
     </div>
