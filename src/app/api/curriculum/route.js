@@ -1,43 +1,36 @@
-import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
-
-const dataFilePath = path.join(process.cwd(), 'src', 'data', 'curriculum.json');
-
-function readCurriculum() {
-  try {
-    if (!fs.existsSync(dataFilePath)) {
-      return {};
-    }
-    const fileContents = fs.readFileSync(dataFilePath, 'utf8');
-    return JSON.parse(fileContents);
-  } catch (error) {
-    console.error('Error reading curriculum.json:', error);
-    return {};
-  }
-}
-
-function writeCurriculum(data) {
-  try {
-    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), 'utf8');
-    return true;
-  } catch (error) {
-    console.error('Error writing curriculum.json:', error);
-    return false;
-  }
-}
+import { supabase } from '@/lib/supabaseClient';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const subject = searchParams.get('subject');
 
-  const data = readCurriculum();
+  try {
+    const { data, error } = await supabase
+      .from('curriculum')
+      .select('subject_key, data');
 
-  if (subject) {
-    return NextResponse.json(data[subject] || {});
+    if (error) {
+      console.error('Supabase fetch error:', error);
+      return NextResponse.json({}, { status: 500 });
+    }
+
+    const curriculumData = {};
+    if (data) {
+      data.forEach(row => {
+        curriculumData[row.subject_key] = row.data;
+      });
+    }
+
+    if (subject) {
+      return NextResponse.json(curriculumData[subject] || {});
+    }
+
+    return NextResponse.json(curriculumData);
+  } catch (err) {
+    console.error('API GET error:', err);
+    return NextResponse.json({});
   }
-
-  return NextResponse.json(data);
 }
 
 export async function POST(request) {
@@ -49,20 +42,33 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const data = readCurriculum();
-    if (!data[subject]) {
-      data[subject] = {};
+    // 1. Fetch current subject data
+    let currentData = {};
+    const { data: fetchRes, error: fetchErr } = await supabase
+      .from('curriculum')
+      .select('data')
+      .eq('subject_key', subject)
+      .single();
+
+    if (fetchRes && fetchRes.data) {
+      currentData = fetchRes.data;
+    } else if (fetchErr && fetchErr.code !== 'PGRST116') {
+      // PGRST116 means no rows found, which is fine for new subjects
+      console.error('Error fetching subject data:', fetchErr);
     }
-    if (!data[subject][chapterId]) {
-      data[subject][chapterId] = {
+
+    // 2. Initialize chapter if it doesn't exist
+    if (!currentData[chapterId]) {
+      currentData[chapterId] = {
         status: 'pending',
         coveredDate: null,
         topics: []
       };
     }
 
-    const chapter = data[subject][chapterId];
+    const chapter = currentData[chapterId];
 
+    // 3. Process action
     switch (action) {
       case 'UPDATE_CHAPTER_STATUS':
         chapter.status = payload.status;
@@ -85,20 +91,29 @@ export async function POST(request) {
       case 'UPDATE_TOPIC_STATUS':
         const topic = chapter.topics.find(t => t.id === payload.topicId);
         if (topic) {
-          topic.status = payload.status; // 'covered' or 'pending'
+          topic.status = payload.status;
         }
         break;
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
 
-    if (writeCurriculum(data)) {
-      return NextResponse.json({ success: true, chapter });
-    } else {
-      return NextResponse.json({ error: 'Failed to write data' }, { status: 500 });
+    // 4. Save back to Supabase (Upsert)
+    const { error: upsertErr } = await supabase
+      .from('curriculum')
+      .upsert({ 
+        subject_key: subject, 
+        data: currentData 
+      });
+
+    if (upsertErr) {
+      console.error('Error updating curriculum:', upsertErr);
+      return NextResponse.json({ error: 'Failed to write data to database' }, { status: 500 });
     }
+
+    return NextResponse.json({ success: true, chapter });
   } catch (error) {
     console.error('POST /api/curriculum error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
