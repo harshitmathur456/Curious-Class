@@ -397,48 +397,92 @@ export default function TeacherDashboard() {
   }
 
   async function updateChapterStatus(chapterId, status) {
+    // Optimistic update
+    setCurriculumData(prev => {
+      const updated = { ...prev };
+      if (!updated[chapterId]) {
+        updated[chapterId] = { status: 'pending', coveredDate: null, topics: [] };
+      }
+      updated[chapterId] = { ...updated[chapterId], status, coveredDate: status === 'covered' ? new Date().toISOString().split('T')[0] : null };
+      return updated;
+    });
     try {
       await fetch('/api/curriculum', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject: subjectKey, chapterId, action: 'UPDATE_CHAPTER_STATUS', payload: { status } })
       });
-      fetchCurriculum();
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('updateChapterStatus error:', e); }
   }
 
   async function addTopic(chapterId, name) {
     if (!name.trim()) return;
+    const tempId = Date.now().toString();
+    // Optimistic update
+    setCurriculumData(prev => {
+      const updated = { ...prev };
+      if (!updated[chapterId]) {
+        updated[chapterId] = { status: 'pending', coveredDate: null, topics: [] };
+      }
+      updated[chapterId] = {
+        ...updated[chapterId],
+        topics: [...(updated[chapterId].topics || []), { id: tempId, name, status: 'pending' }]
+      };
+      return updated;
+    });
     try {
       await fetch('/api/curriculum', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject: subjectKey, chapterId, action: 'ADD_TOPIC', payload: { name } })
       });
+      // Refresh to get the real ID from server
       fetchCurriculum();
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('addTopic error:', e); }
   }
 
   async function updateTopicStatus(chapterId, topicId, status) {
+    // Optimistic update
+    setCurriculumData(prev => {
+      const updated = { ...prev };
+      if (updated[chapterId]) {
+        updated[chapterId] = {
+          ...updated[chapterId],
+          topics: (updated[chapterId].topics || []).map(t =>
+            t.id === topicId ? { ...t, status } : t
+          )
+        };
+      }
+      return updated;
+    });
     try {
       await fetch('/api/curriculum', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject: subjectKey, chapterId, action: 'UPDATE_TOPIC_STATUS', payload: { topicId, status } })
       });
-      fetchCurriculum();
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('updateTopicStatus error:', e); }
   }
 
   async function removeTopic(chapterId, topicId) {
+    // Optimistic update
+    setCurriculumData(prev => {
+      const updated = { ...prev };
+      if (updated[chapterId]) {
+        updated[chapterId] = {
+          ...updated[chapterId],
+          topics: (updated[chapterId].topics || []).filter(t => t.id !== topicId)
+        };
+      }
+      return updated;
+    });
     try {
       await fetch('/api/curriculum', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject: subjectKey, chapterId, action: 'REMOVE_TOPIC', payload: { topicId } })
       });
-      fetchCurriculum();
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('removeTopic error:', e); }
   }
 
   useEffect(() => {
@@ -794,7 +838,7 @@ export default function TeacherDashboard() {
         
         {/* Quizzes & Topics View */}
         {activeNav === "quizzes" && (
-          <div className="td-dashboard" style={{ paddingBottom: '100px' }}>
+          <div className="td-dashboard">
             {/* Topic Management */}
             <div className="td-card">
               <div className="td-card-header">

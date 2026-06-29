@@ -7,6 +7,17 @@
   background: var(--color-bg-page);
 }
 
+.td-content {
+  flex: 1;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.td-dashboard {
+  padding: var(--space-xl);
+  padding-bottom: 100px;
+}
+
 /* ─── Left Navigation ────────────────────────────────────────── */
 
 .td-nav {
