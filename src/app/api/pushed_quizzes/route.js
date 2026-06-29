@@ -24,7 +24,7 @@ async function callGeminiWithFallback(body) {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
       const response = await fetch(url, {
         method: "POST",
         headers: {
