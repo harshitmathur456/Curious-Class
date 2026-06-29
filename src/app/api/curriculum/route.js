@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+}
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const subject = searchParams.get('subject');
 
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('curriculum')
       .select('subject_key, data');
@@ -43,6 +51,7 @@ export async function POST(request) {
     }
 
     // 1. Fetch current subject data
+    const supabase = getSupabaseClient();
     let currentData = {};
     const { data: fetchRes, error: fetchErr } = await supabase
       .from('curriculum')
