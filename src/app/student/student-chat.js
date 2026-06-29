@@ -198,6 +198,8 @@ export default function StudentChat({ subject = null }) {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(false);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const [followUpIndex, setFollowUpIndex] = useState(0);
@@ -684,7 +686,8 @@ export default function StudentChat({ subject = null }) {
     ) :
     <div className="sc-layout">
       {/* ── Left Sidebar ── */}
-      <aside className="sc-sidebar">
+      <aside className={`sc-sidebar ${isLeftSidebarOpen ? 'mobile-open' : ''}`}>
+        <button className="sc-mobile-toggle" onClick={() => setIsLeftSidebarOpen(false)} style={{ position: 'absolute', right: '10px', top: '10px' }}>✕</button>
         <div className="sc-sidebar-top">
           {/* Logo */}
           <div className="sc-logo">
@@ -811,6 +814,10 @@ export default function StudentChat({ subject = null }) {
       </aside>
 
       <main className="sc-main" style={!activeTopic ? { padding: "var(--space-2xl)", overflowY: "auto" } : {}}>
+        <div className="sc-mobile-toggle" style={{ display: 'none', justifyContent: 'space-between', padding: '10px 20px', borderBottom: '1px solid #eee', background: 'white' }}>
+          <button onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)} style={{ background: 'none', border: 'none', fontSize: '20px' }}>☰ Menu</button>
+          {activeTopic && <button onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)} style={{ background: 'none', border: 'none', fontSize: '20px' }}>📘 Hub</button>}
+        </div>
         {!activeTopic ? (
           <div className="sc-topic-select-view">
             <div className="sc-tsv-header">
@@ -1122,7 +1129,8 @@ export default function StudentChat({ subject = null }) {
 
       {/* ── Right Sidebar (Knowledge Hub) ── */}
       {activeTopic && (
-        <aside className="sc-right-sidebar">
+        <aside className={`sc-right-sidebar ${isRightSidebarOpen ? 'mobile-open' : ''}`}>
+          <button className="sc-mobile-toggle" onClick={() => setIsRightSidebarOpen(false)} style={{ position: 'absolute', right: '10px', top: '10px' }}>✕</button>
           <h2 className="sc-rs-title">Knowledge Hub</h2>
 
           {/* Quizzes Section */}

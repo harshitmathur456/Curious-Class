@@ -773,3 +773,30 @@
   border: 0.5px solid var(--color-red-bg);
 }
 
+/* --- Mobile Responsiveness ----------------------------------------- */
+@media (max-width: 768px) {
+  .td-sidebar {
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    background: var(--color-bg-white);
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  .td-sidebar.mobile-open {
+    display: flex;
+  }
+  .td-mobile-toggle {
+    display: flex !important;
+  }
+}
+.td-mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--color-text-secondary);
+}

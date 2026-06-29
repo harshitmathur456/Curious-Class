@@ -1257,3 +1257,37 @@
   color: var(--color-primary-dark);
 }
 
+/* --- Mobile Responsiveness ----------------------------------------- */
+@media (max-width: 768px) {
+  .sc-sidebar, .sc-right-sidebar {
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    background: var(--color-bg-white);
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  .sc-sidebar.mobile-open {
+    display: flex;
+    left: 0;
+  }
+  .sc-right-sidebar.mobile-open {
+    display: flex;
+    right: 0;
+  }
+  .sc-mobile-toggle {
+    display: flex !important;
+  }
+  .sc-main {
+    padding: var(--space-sm) !important;
+  }
+}
+.sc-mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--color-text-secondary);
+}

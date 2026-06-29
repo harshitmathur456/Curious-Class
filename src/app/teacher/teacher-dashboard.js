@@ -165,6 +165,7 @@ export default function TeacherDashboard() {
   }
 
   const [activeNav, setActiveNav] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [expandedAlerts, setExpandedAlerts] = useState({});
   const [selectedTopic, setSelectedTopic] = useState("");
   const [curriculumData, setCurriculumData] = useState({});
@@ -584,7 +585,8 @@ export default function TeacherDashboard() {
   return (
     <div className="td-layout">
       {/* ── Left Navigation ── */}
-      <nav className="td-nav">
+      <nav className={`td-nav ${isSidebarOpen ? 'mobile-open' : ''}`}>
+        <button className="td-mobile-toggle" onClick={() => setIsSidebarOpen(false)} style={{ position: 'absolute', right: '10px', top: '10px' }}>✕</button>
         <div className="td-nav-top">
           {/* Logo */}
           <div className="td-nav-logo">
@@ -644,6 +646,7 @@ export default function TeacherDashboard() {
         {/* Top Bar */}
         <header className="td-header">
           <div className="td-header-left" style={{ display: "flex", alignItems: "center", gap: "var(--space-md)" }}>
+            <button className="td-mobile-toggle" onClick={() => setIsSidebarOpen(true)}>☰</button>
             <div>
               <select
                 value={selectedClass}
