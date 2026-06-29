@@ -39,6 +39,17 @@ function SendIcon() {
   );
 }
 
+function MicIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="23"/>
+      <line x1="8" y1="23" x2="16" y2="23"/>
+    </svg>
+  );
+}
+
 function FlagIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -184,6 +195,8 @@ export default function StudentChat({ subject = null }) {
 
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -516,6 +529,51 @@ export default function StudentChat({ subject = null }) {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        // Using en-IN which handles Hinglish (English + Hindi mix) well
+        recognitionRef.current.lang = 'en-IN';
+        
+        recognitionRef.current.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          setInputValue((prev) => prev ? `${prev} ${transcript}` : transcript);
+          setIsListening(false);
+        };
+        
+        recognitionRef.current.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
+          setIsListening(false);
+        };
+        
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+          setIsListening(true);
+        } catch (e) {
+          console.error("Failed to start speech recognition:", e);
+        }
+      } else {
+        alert("Your browser does not support speech recognition. Please try Chrome or Edge.");
+      }
+    }
+  };
   async function handleSend() {
     const text = inputValue.trim();
     if (!text) return;
@@ -1031,6 +1089,20 @@ export default function StudentChat({ subject = null }) {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
+                <button
+                  className="sc-send-btn"
+                  onClick={toggleListening}
+                  title="Voice Input (Hindi/English)"
+                  style={{
+                    background: isListening ? '#f44336' : 'var(--color-primary-light)',
+                    color: isListening ? 'white' : 'var(--color-primary)',
+                    marginRight: '8px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  aria-label="Toggle voice input"
+                >
+                  <MicIcon />
+                </button>
                 <button
                   className="sc-send-btn"
                   id="send-message-btn"
