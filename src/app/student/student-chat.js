@@ -117,6 +117,7 @@ export default function StudentChat({ subject = null }) {
     if (typeof window !== "undefined") {
       const cls = localStorage.getItem("selectedClass") || "";
       setSelectedClass(cls);
+
     }
   }, []);
 

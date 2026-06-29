@@ -5,10 +5,7 @@ import {
   dashboardStats,
   currentUnit,
   heatmapSubtopics,
-  heatmapStudents,
-  focusAlerts,
   teacherNavItems,
-  studentRoster,
 } from "@/data/mockData";
 import { CHAPTERS_DATA } from "@/data/chaptersData";
 import "./teacher-dashboard.css";
@@ -166,6 +163,11 @@ export default function TeacherDashboard() {
   const [expandedAlerts, setExpandedAlerts] = useState({});
   const [selectedTopic, setSelectedTopic] = useState("");
   const [curriculumData, setCurriculumData] = useState({});
+  
+  // Dynamic student data
+  const [studentRoster, setStudentRoster] = useState([]);
+  const [heatmapStudents, setHeatmapStudents] = useState([]);
+  const [focusAlerts, setFocusAlerts] = useState([]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -173,9 +175,7 @@ export default function TeacherDashboard() {
       if (cls) {
         setSelectedClass(cls);
         let sub = "history";
-        if (cls.includes("11") || cls.includes("12")) {
-          sub = "physics";
-        } else if (cls.includes("10")) {
+        if (cls.includes("10")) {
           sub = "mathematics";
         }
         setSubject(sub);
@@ -211,6 +211,53 @@ export default function TeacherDashboard() {
     subjectKeyRef.current = subjectKey;
   }, [subjectKey]);
 
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  async function fetchStudents() {
+    try {
+      const res = await fetch('/api/students');
+      if (res.ok) {
+        const data = await res.json();
+        const students = data.students || [];
+        
+        // Populate Roster
+        const roster = students.map(s => ({
+          id: s.id,
+          name: s.name,
+          rollNo: s.roll_number,
+          lastActive: 'Just now'
+        }));
+        setStudentRoster(roster);
+
+        // Populate Heatmap with fake scores for now
+        const heatmap = students.map(s => ({
+          name: s.name,
+          scores: [
+            Math.floor(Math.random() * 60) + 40,
+            Math.floor(Math.random() * 60) + 40,
+            Math.floor(Math.random() * 60) + 40,
+            Math.floor(Math.random() * 60) + 40
+          ]
+        }));
+        setHeatmapStudents(heatmap);
+
+        // Populate Focus Alerts
+        const alerts = students.slice(0, 3).map((s, idx) => ({
+          id: s.id,
+          student: s.name,
+          timeAgo: `${(idx + 1) * 5}m ago`,
+          description: idx === 0 ? 'Struggling with cause-effect logic.' : 'Missed sequence in recent exercise.',
+          priority: idx === 0 ? 'urgent' : 'low',
+          aiInsight: 'Needs a quick check-in to confirm understanding of recent material.',
+        }));
+        setFocusAlerts(alerts);
+      }
+    } catch (e) {
+      console.error("Failed to fetch students:", e);
+    }
+  }
   async function fetchNotes() {
     const activeSubjectKey = subjectKey;
     setLoadingNotes(true);
