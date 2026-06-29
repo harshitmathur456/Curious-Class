@@ -52,15 +52,23 @@ export async function POST(request) {
 }
 
 // GET: Fetch all students
-export async function GET() {
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const className = searchParams.get('class_name');
+
     const supabase = getSupabaseClient();
     
-    // Fetch students ordered by creation time descending
-    const { data, error } = await supabase
+    let query = supabase
       .from('students')
       .select('*')
       .order('created_at', { ascending: false });
+
+    if (className) {
+      query = query.eq('class_name', className);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Supabase fetch error:', error);

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import {
   dashboardStats,
   currentUnit,
-  heatmapSubtopics,
 } from "@/data/mockData";
 import { CHAPTERS_DATA } from "@/data/chaptersData";
 import "./teacher-dashboard.css";
@@ -178,6 +177,11 @@ export default function TeacherDashboard() {
   const [heatmapStudents, setHeatmapStudents] = useState([]);
   const [focusAlerts, setFocusAlerts] = useState([]);
   const [studentActivities, setStudentActivities] = useState([]);
+  const [currentHeatmapSubtopics, setCurrentHeatmapSubtopics] = useState([]);
+  
+  // Analytics states
+  const [selectedStudentForReport, setSelectedStudentForReport] = useState(null);
+  const [classAnalytics, setClassAnalytics] = useState({ classAverage: 0, topicsNeedingReview: [], strongTopics: [] });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -232,58 +236,130 @@ export default function TeacherDashboard() {
   }, [subjectKey]);
 
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    if (selectedClass) {
+      fetchStudents();
+    }
+  }, [selectedClass]);
 
   async function fetchStudents() {
     try {
-      // 1. Fetch Students
-      const res = await fetch('/api/students');
+      // 1. Fetch Students for selected class
+      const res = await fetch(`/api/students?class_name=${encodeURIComponent(selectedClass)}`);
+      let students = [];
       if (res.ok) {
         const data = await res.json();
-        const students = data.students || [];
-        
-        // Populate Roster
-        const roster = students.map(s => ({
+        students = data.students || [];
+      }
+
+      // 2. Fetch Activities for selected class
+      let activities = [];
+      const actRes = await fetch(`/api/activities?class_name=${encodeURIComponent(selectedClass)}`);
+      if (actRes.ok) {
+        const actData = await actRes.json();
+        activities = actData.activities || [];
+        setStudentActivities(activities);
+      }
+
+      // Populate Roster
+      const roster = students.map(s => {
+        const studentActs = activities.filter(a => a.student_roll === s.roll_number);
+        const lastAct = studentActs.length > 0 ? new Date(studentActs[0].created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Never';
+        return {
           id: s.id,
           name: s.name,
           rollNo: s.roll_number,
-          lastActive: 'Just now'
-        }));
-        setStudentRoster(roster);
+          lastActive: lastAct,
+          activities: studentActs
+        };
+      });
+      setStudentRoster(roster);
 
-        // Populate Heatmap with fake scores for now
-        const heatmap = students.map(s => ({
+      // Populate Heatmap with real scores
+      // X-axis: we need to find all unique topics the class has taken quizzes on, or just use the current unit's chapters.
+      // We will use the chapters of the current subjectKey as subtopics for the heatmap.
+      // In the mock, heatmap was 4 scores. We will calculate the average quiz score per student per topic.
+      const chapters = (CHAPTERS_DATA[subjectKey]?.chapters || []).slice(0, 4);
+      setCurrentHeatmapSubtopics(chapters.map(ch => ch.name));
+      
+      const heatmap = students.map(s => {
+        const studentQuizzes = activities.filter(a => a.student_roll === s.roll_number && a.activity_type === 'quiz');
+        
+        
+        const scores = chapters.map(ch => {
+          const quizzes = studentQuizzes.filter(q => q.topic === ch.name);
+          if (quizzes.length === 0) return null; // Not taken
+          const totalScore = quizzes.reduce((acc, curr) => acc + (curr.details.score / curr.details.total), 0);
+          return Math.round((totalScore / quizzes.length) * 100);
+        });
+
+        return {
           name: s.name,
-          scores: [
-            Math.floor(Math.random() * 60) + 40,
-            Math.floor(Math.random() * 60) + 40,
-            Math.floor(Math.random() * 60) + 40,
-            Math.floor(Math.random() * 60) + 40
-          ]
-        }));
-        setHeatmapStudents(heatmap);
+          scores: scores
+        };
+      });
+      setHeatmapStudents(heatmap);
 
-        // Populate Focus Alerts
-        const alerts = students.slice(0, 3).map((s, idx) => ({
-          id: s.id,
-          student: s.name,
-          timeAgo: `${(idx + 1) * 5}m ago`,
-          description: idx === 0 ? 'Struggling with cause-effect logic.' : 'Missed sequence in recent exercise.',
-          priority: idx === 0 ? 'urgent' : 'low',
-          aiInsight: 'Needs a quick check-in to confirm understanding of recent material.',
-        }));
-        setFocusAlerts(alerts);
-      }
-
-      // 2. Fetch Activities
-      if (selectedClass) {
-        const actRes = await fetch(`/api/activities?class_name=${encodeURIComponent(selectedClass)}`);
-        if (actRes.ok) {
-          const actData = await actRes.json();
-          setStudentActivities(actData.activities || []);
+      // Populate Focus Alerts
+      // Generate alerts if a student scored less than 60% on any quiz, or hasn't taken a quiz yet
+      let alerts = [];
+      roster.forEach(student => {
+        const studentQuizzes = student.activities.filter(a => a.activity_type === 'quiz');
+        if (studentQuizzes.length === 0) {
+          // Maybe an alert that they haven't started? Let's skip for now.
+        } else {
+          studentQuizzes.forEach(q => {
+            const pct = (q.details.score / q.details.total) * 100;
+            if (pct < 60) {
+              alerts.push({
+                id: `${student.rollNo}-${q.id}`,
+                student: student.name,
+                timeAgo: new Date(q.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                description: `Scored ${q.details.score}/${q.details.total} on ${q.topic}.`,
+                priority: pct < 40 ? 'urgent' : 'low',
+                aiInsight: `Needs review on ${q.topic}. Explano identified gaps in their knowledge.`,
+              });
+            }
+          });
         }
+      });
+      
+      // Sort alerts by urgency and time
+      alerts.sort((a, b) => a.priority === 'urgent' ? -1 : 1);
+      setFocusAlerts(alerts.slice(0, 5)); // Keep top 5 alerts
+
+      
+      // Calculate Class Analytics
+      const quizActivities = activities.filter(a => a.activity_type === 'quiz');
+      if (quizActivities.length > 0) {
+        let totalScore = 0;
+        let totalMax = 0;
+        const topicStats = {};
+        
+        quizActivities.forEach(q => {
+          totalScore += q.details.score;
+          totalMax += q.details.total;
+          if (!topicStats[q.topic]) topicStats[q.topic] = { score: 0, max: 0, count: 0 };
+          topicStats[q.topic].score += q.details.score;
+          topicStats[q.topic].max += q.details.total;
+          topicStats[q.topic].count += 1;
+        });
+        
+        const classAvg = Math.round((totalScore / totalMax) * 100);
+        const review = [];
+        const strong = [];
+        
+        Object.keys(topicStats).forEach(topic => {
+          const stats = topicStats[topic];
+          const pct = (stats.score / stats.max) * 100;
+          if (pct < 60) review.push({ topic, avg: Math.round(pct) });
+          if (pct >= 80) strong.push({ topic, avg: Math.round(pct) });
+        });
+        
+        setClassAnalytics({ classAverage: classAvg, topicsNeedingReview: review, strongTopics: strong });
+      } else {
+        setClassAnalytics({ classAverage: 0, topicsNeedingReview: [], strongTopics: [] });
       }
+
     } catch (e) {
       console.error("Failed to fetch students/activities:", e);
     }
@@ -679,10 +755,10 @@ export default function TeacherDashboard() {
               </div>
               <div className="td-heatmap">
                 {/* Header row */}
-                <div className="td-heatmap-grid" style={{ gridTemplateColumns: `100px repeat(${heatmapSubtopics.length}, 1fr)` }}>
+                <div className="td-heatmap-grid" style={{ gridTemplateColumns: `100px repeat(${currentHeatmapSubtopics.length || 4}, 1fr)` }}>
                   <div className="td-hm-corner" />
-                  {heatmapSubtopics.map((sub) => (
-                    <div key={sub} className="td-hm-header">{sub}</div>
+                  {currentHeatmapSubtopics.map((sub) => (
+                    <div key={sub} className="td-hm-header">{sub.substring(0, 15)}{sub.length > 15 ? '...' : ''}</div>
                   ))}
 
                   {/* Data rows */}
@@ -897,15 +973,68 @@ export default function TeacherDashboard() {
         {/* Students View */}
         {activeNav === "students" && (
           <div className="td-dashboard">
+            {/* Class Analysis Overview */}
+            <div className="td-card" style={{ marginBottom: "var(--space-xl)" }}>
+              <div className="td-card-header">
+                <div className="td-card-title">Class Analytics Overview</div>
+                <div className="td-card-subtitle">Combined performance data for {selectedClass}</div>
+              </div>
+              <div style={{ padding: "var(--space-lg)", display: "flex", gap: "var(--space-xl)", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "200px", padding: "var(--space-md)", background: "var(--color-bg-subtle)", borderRadius: "8px", textAlign: "center" }}>
+                  <h4 style={{ margin: "0 0 8px 0", color: "var(--color-text-secondary)", fontSize: "13px", textTransform: "uppercase" }}>Overall Average</h4>
+                  <div style={{ fontSize: "32px", fontWeight: "700", color: classAnalytics.classAverage >= 60 ? "var(--heatmap-100)" : "var(--heatmap-0)" }}>
+                    {classAnalytics.classAverage}%
+                  </div>
+                  <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "var(--color-text-tertiary)" }}>Based on all quizzes taken</p>
+                </div>
+                
+                <div style={{ flex: 1, minWidth: "200px", padding: "var(--space-md)", background: "var(--color-bg-subtle)", borderRadius: "8px" }}>
+                  <h4 style={{ margin: "0 0 12px 0", color: "var(--color-text-secondary)", fontSize: "13px", textTransform: "uppercase" }}>Needs Review</h4>
+                  {classAnalytics.topicsNeedingReview.length > 0 ? (
+                    <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "13px", color: "var(--color-text-primary)" }}>
+                      {classAnalytics.topicsNeedingReview.map(t => (
+                        <li key={t.topic} style={{ marginBottom: "4px" }}>
+                          <strong>{t.topic}</strong> (Avg: {t.avg}%)
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-tertiary)" }}>No topics currently need review.</p>
+                  )}
+                </div>
+                
+                <div style={{ flex: 1, minWidth: "200px", padding: "var(--space-md)", background: "var(--color-bg-subtle)", borderRadius: "8px" }}>
+                  <h4 style={{ margin: "0 0 12px 0", color: "var(--color-text-secondary)", fontSize: "13px", textTransform: "uppercase" }}>Strong Topics</h4>
+                  {classAnalytics.strongTopics.length > 0 ? (
+                    <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "13px", color: "var(--color-text-primary)" }}>
+                      {classAnalytics.strongTopics.map(t => (
+                        <li key={t.topic} style={{ marginBottom: "4px" }}>
+                          <strong>{t.topic}</strong> (Avg: {t.avg}%)
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-tertiary)" }}>No strong topics identified yet.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="td-two-col">
               {/* Roster */}
               <div className="td-card">
-                <div className="td-card-header">
+                <div className="td-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div className="td-card-title">Student Roster</div>
+                  <button onClick={fetchStudents} style={{ padding: "4px 8px", fontSize: "12px", borderRadius: "4px", border: "1px solid var(--color-border-light)", background: "white", cursor: "pointer" }}>Refresh Data</button>
                 </div>
                 <div className="td-alerts-list">
                   {studentRoster.map((student) => (
-                    <div key={student.id} className="td-alert-item td-alert-item--low">
+                    <div 
+                      key={student.id} 
+                      className={`td-alert-item td-alert-item--low ${selectedStudentForReport?.id === student.id ? 'active' : ''}`}
+                      style={{ cursor: "pointer", background: selectedStudentForReport?.id === student.id ? "var(--color-bg-mint)" : "white" }}
+                      onClick={() => setSelectedStudentForReport(student)}
+                    >
                       <div className="td-alert-top">
                         <span className="td-alert-student">{student.name}</span>
                         <span className="td-alert-time">Roll No: {student.rollNo}</span>
@@ -916,32 +1045,76 @@ export default function TeacherDashboard() {
                 </div>
               </div>
               
-              {/* All Student Activities */}
-              <div className="td-card">
-                <div className="td-card-header">
-                  <div className="td-card-title">Recent Activity</div>
+              {/* Report Card or All Activities */}
+              {selectedStudentForReport ? (
+                <div className="td-card">
+                  <div className="td-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div className="td-card-title">{selectedStudentForReport.name}'s Report Card</div>
+                      <div className="td-card-subtitle">Roll No: {selectedStudentForReport.rollNo}</div>
+                    </div>
+                    <button onClick={() => setSelectedStudentForReport(null)} style={{ padding: "4px 8px", fontSize: "12px", borderRadius: "4px", border: "none", background: "var(--color-bg-subtle)", cursor: "pointer" }}>Close</button>
+                  </div>
+                  <div style={{ padding: "var(--space-lg)" }}>
+                    <h4 style={{ margin: "0 0 12px 0", fontSize: "14px" }}>Quiz Scores</h4>
+                    {selectedStudentForReport.activities.filter(a => a.activity_type === 'quiz').length > 0 ? (
+                      <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px 0" }}>
+                        {selectedStudentForReport.activities.filter(a => a.activity_type === 'quiz').map(q => {
+                          const pct = (q.details.score / q.details.total) * 100;
+                          return (
+                            <li key={q.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--color-border-light)" }}>
+                              <span style={{ fontSize: "13px", fontWeight: "500" }}>{q.topic}</span>
+                              <span style={{ fontSize: "13px", color: pct < 60 ? "red" : "green", fontWeight: "600" }}>{q.details.score}/{q.details.total} ({Math.round(pct)}%)</span>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    ) : (
+                      <p style={{ fontSize: "13px", color: "var(--color-text-tertiary)", marginBottom: "24px" }}>No quizzes taken yet.</p>
+                    )}
+
+                    <h4 style={{ margin: "0 0 12px 0", fontSize: "14px" }}>Recent Chats</h4>
+                    {selectedStudentForReport.activities.filter(a => a.activity_type === 'chat').length > 0 ? (
+                      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                        {selectedStudentForReport.activities.filter(a => a.activity_type === 'chat').slice(0, 5).map(c => (
+                          <li key={c.id} style={{ fontSize: "13px", padding: "6px 0", color: "var(--color-text-secondary)" }}>
+                            • Chatted about <strong>{c.topic}</strong> on {new Date(c.created_at).toLocaleDateString()}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p style={{ fontSize: "13px", color: "var(--color-text-tertiary)" }}>No chat activity yet.</p>
+                    )}
+                  </div>
                 </div>
-                <div className="td-alerts-list">
-                  {studentActivities.length === 0 ? (
-                    <div style={{ padding: "var(--space-md)", color: "var(--color-text-tertiary)" }}>No recent activity.</div>
-                  ) : (
-                    studentActivities.map((act) => (
-                      <div key={act.id} className="td-alert-item td-alert-item--low">
-                        <div className="td-alert-top">
-                          <span className="td-alert-student">{act.student_name}</span>
-                          <span className="td-alert-time">
-                            {new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
+              ) : (
+                <div className="td-card">
+                  <div className="td-card-header">
+                    <div className="td-card-title">Recent Activity (All Students)</div>
+                    <div className="td-card-subtitle">Click a student on the left for detailed analysis</div>
+                  </div>
+                  <div className="td-alerts-list">
+                    {studentActivities.length === 0 ? (
+                      <div style={{ padding: "var(--space-md)", color: "var(--color-text-tertiary)" }}>No recent activity.</div>
+                    ) : (
+                      studentActivities.map((act) => (
+                        <div key={act.id} className="td-alert-item td-alert-item--low">
+                          <div className="td-alert-top">
+                            <span className="td-alert-student">{act.student_name}</span>
+                            <span className="td-alert-time">
+                              {new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <div className="td-alert-desc">
+                            {act.activity_type === 'chat' && <span>Chatted with Explano about <strong>{act.topic}</strong>.</span>}
+                            {act.activity_type === 'quiz' && <span>Completed quiz on <strong>{act.topic}</strong> (Score: {act.details.score}/{act.details.total}).</span>}
+                          </div>
                         </div>
-                        <div className="td-alert-desc">
-                          {act.activity_type === 'chat' && <span>Chatted with Explano about <strong>{act.topic}</strong>.</span>}
-                          {act.activity_type === 'quiz' && <span>Completed quiz on <strong>{act.topic}</strong> (Score: {act.details.score}/{act.details.total}).</span>}
-                        </div>
-                      </div>
-                    ))
-                  )}
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
