@@ -136,6 +136,7 @@ function CloudUploadIcon() {
 /* ─── Teacher Nav Items ──────────────────────────────────────────── */
 const teacherNavItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/teacher' },
+  { id: 'curriculum', label: 'Curriculum', icon: 'book', href: '/teacher' },
   { id: 'students', label: 'Students', icon: 'users', href: '/teacher' },
   { id: 'notes', label: 'Notes', icon: 'book', href: '/teacher' },
   { id: 'quizzes', label: 'Quizzes', icon: 'cpu', href: '/teacher' },
@@ -506,7 +507,7 @@ export default function TeacherDashboard() {
           </div>
 
           {/* New Topic Button */}
-          <button className="td-new-topic-btn" id="new-topic-btn">
+          <button className="td-new-topic-btn" id="new-topic-btn" onClick={() => setActiveNav('curriculum')}>
             <PlusIcon />
             <span>New Topic</span>
           </button>
