@@ -129,6 +129,7 @@ export default function StudentChat({ subject = "history" }) {
   }, [subject]);
 
   const isClass10 = selectedClass && selectedClass.includes("10");
+  const isClass6 = selectedClass && selectedClass.includes("6");
   let subjectKey = subject;
   if (isClass10) {
     if (subject === "mathematics") {
@@ -137,6 +138,10 @@ export default function StudentChat({ subject = "history" }) {
       subjectKey = "science_class10";
     } else if (subject === "history") {
       subjectKey = "history_class10";
+    }
+  } else if (isClass6) {
+    if (subject === "science") {
+      subjectKey = "science_class6";
     }
   }
 

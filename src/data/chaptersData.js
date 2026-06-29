@@ -1707,10 +1707,540 @@ export const CHAPTERS_DATA = {
             explanation: "Martin Luther wrote 95 Theses criticizing the purchase of indulgences, posting them on a church door in Wittenberg."
           },
           {
-            question: "Which weekly newspaper was started by Raja Rammohun Roy in 1821?",
-            options: ["Sambad Kaumudi", "Keshari", "Young India", "Harijan"],
-            answerIndex: 0,
             explanation: "Raja Rammohun Roy published the Sambad Kaumudi in Bengali to spread social reformist ideas."
+          }
+        ]
+      }
+    ]
+  },
+  science_class6: {
+    title: "Science",
+    chapters: [
+      {
+        id: "wonderful-world-science",
+        name: "The Wonderful World of Science",
+        objective: "Explore the nature of science, scientific method, observation, questioning, and basic laboratory safety.",
+        progress: [
+          { id: 1, label: "What is Science?", status: "completed" },
+          { id: 2, label: "Observations and Questions", status: "active" },
+          { id: 3, label: "Designing simple experiments", status: "upcoming" }
+        ],
+        chips: ["Why is the sky blue?", "How do birds fly?", "Why does ice melt?"],
+        initialQuestion: "Welcome to the magical world of Science! Have you ever wondered why leaves are green, or why a ball thrown up always falls back down? Science starts with asking questions. What is one question about the world around you that you have always wanted to answer?",
+        quizzes: [
+          {
+            question: "What is the first step in scientific study?",
+            options: ["Drawing conclusions", "Asking questions and making observations", "Writing a report", "Selling an invention"],
+            answerIndex: 1,
+            explanation: "Scientific study always begins with asking questions and observing the world."
+          },
+          {
+            question: "Which of our senses helps us observe the color and shape of a flower?",
+            options: ["Hearing", "Sight", "Touch", "Smell"],
+            answerIndex: 1,
+            explanation: "We use our sense of sight to observe colors, shapes, and sizes."
+          },
+          {
+            question: "Why do we perform scientific experiments?",
+            options: ["To test our ideas and find answers", "To make a mess", "To pass exams only", "To memorize facts"],
+            answerIndex: 0,
+            explanation: "Experiments are designed to test our hypotheses/ideas and discover answers."
+          },
+          {
+            question: "What should you do first before touching any chemical in a science lab?",
+            options: ["Taste it to check", "Ask your teacher for guidance", "Mix it with water", "Smell it directly"],
+            answerIndex: 1,
+            explanation: "You must always ask your teacher for guidance before handling laboratory chemicals."
+          },
+          {
+            question: "Science is best described as:",
+            options: ["A collection of unchangeable rules", "A systematic way of exploring and understanding nature", "Only for grown-up inventors", "A magic trick"],
+            answerIndex: 1,
+            explanation: "Science is a systematic process of exploring, questioning, and understanding the natural world."
+          }
+        ]
+      },
+      {
+        id: "diversity-living-world",
+        name: "Diversity in the Living World",
+        objective: "Understand plants and animals classification, habitats, biodiversity, and desert adaptions.",
+        progress: [
+          { id: 1, label: "Exploring Plants", status: "completed" },
+          { id: 2, label: "Exploring Animals", status: "active" },
+          { id: 3, label: "Grouping living organisms", status: "upcoming" }
+        ],
+        chips: ["How many types of plants are there?", "Can plants move?", "Why do we group animals?"],
+        initialQuestion: "Look around you—from tiny ants to giant trees, life comes in so many shapes and sizes! This is called biodiversity. How do you think scientists group or organize all these different living things so they are easier to study? What makes a plant different from an animal?",
+        quizzes: [
+          {
+            question: "Plants that have weak stems and take support on neighboring structures are called:",
+            options: ["Herbs", "Shrubs", "Climbers", "Trees"],
+            answerIndex: 2,
+            explanation: "Climbers use support structures to climb up, while creepers spread on the ground."
+          },
+          {
+            question: "Which of the following is a characteristic of all living organisms?",
+            options: ["They can fly", "They need food, air, and water", "They remain the same size forever", "They do not breathe"],
+            answerIndex: 1,
+            explanation: "All living things need nutrition, respiration, and water to survive."
+          },
+          {
+            question: "Animals that eat only plants are classified as:",
+            options: ["Carnivores", "Omnivores", "Herbivores", "Decomposers"],
+            answerIndex: 2,
+            explanation: "Herbivores are plant-eating animals. Carnivores eat other animals."
+          },
+          {
+            question: "What is the natural home of a plant or animal called?",
+            options: ["Habit", "Habitat", "Territory", "Adaptation"],
+            answerIndex: 1,
+            explanation: "A habitat is the natural environment where an organism lives, grows, and reproduces."
+          },
+          {
+            question: "Why do desert plants like cacti have spiny leaves?",
+            options: ["To look beautiful", "To reduce water loss", "To catch insects", "To breathe faster"],
+            answerIndex: 1,
+            explanation: "Cacti leaves are modified into spines to minimize water loss through transpiration in hot deserts."
+          }
+        ]
+      },
+      {
+        id: "mindful-eating",
+        name: "Mindful Eating: A Path to a Healthy Body",
+        objective: "Learn about nutrients, proteins, vitamins, dietary fibers, and a balanced diet.",
+        progress: [
+          { id: 1, label: "Nutrients in Food", status: "completed" },
+          { id: 2, label: "Energy-giving foods", status: "active" },
+          { id: 3, label: "Balanced Diet & Health", status: "upcoming" }
+        ],
+        chips: ["What are carbohydrates?", "Why are vitamins important?", "What is a junk food?"],
+        initialQuestion: "We eat delicious food every day to run, play, and think. But have you ever wondered what is inside our food that gives us energy? These are called nutrients. What do you think happens if we eat only potato chips and no vegetables? What is a balanced diet?",
+        quizzes: [
+          {
+            question: "Which nutrient is the primary source of energy for our body?",
+            options: ["Proteins", "Carbohydrates", "Vitamins", "Minerals"],
+            answerIndex: 1,
+            explanation: "Carbohydrates and fats are energy-giving nutrients."
+          },
+          {
+            question: "Which nutrient is known as a 'body-building' nutrient?",
+            options: ["Fats", "Carbohydrates", "Proteins", "Water"],
+            answerIndex: 2,
+            explanation: "Proteins are essential for growth and repair of cells in our body."
+          },
+          {
+            question: "Lack of Vitamin C in our diet causes which disease?",
+            options: ["Scurvy", "Rickets", "Beriberi", "Goitre"],
+            answerIndex: 0,
+            explanation: "Deficiency of Vitamin C leads to Scurvy, causing bleeding gums."
+          },
+          {
+            question: "Why is dietary fibre (roughage) important in our food?",
+            options: ["It gives us extra energy", "It helps our body get rid of undigested food", "It makes our bones strong", "It contains proteins"],
+            answerIndex: 1,
+            explanation: "Roughage does not provide nutrients, but it helps in digestion and clearing undigested waste."
+          },
+          {
+            question: "A diet containing all the required nutrients in correct proportions is called:",
+            options: ["Heavy diet", "Balanced diet", "Fast food diet", "Liquid diet"],
+            answerIndex: 1,
+            explanation: "A balanced diet provides all nutrients, water, and roughage in the right amounts."
+          }
+        ]
+      },
+      {
+        id: "exploring-magnets",
+        name: "Exploring Magnets",
+        objective: "Understand poles of magnets, magnetic/non-magnetic materials, finding directions, attraction, and repulsion.",
+        progress: [
+          { id: 1, label: "Discovery of Magnets", status: "completed" },
+          { id: 2, label: "Magnetic and Non-magnetic", status: "active" },
+          { id: 3, label: "Attraction and Repulsion", status: "upcoming" }
+        ],
+        chips: ["What are magnetic materials?", "Why are there North and South poles?", "How is a magnet made?"],
+        initialQuestion: "Magnets are like magic! They can pull objects toward them without even touching them. Have you ever played with a magnet? What kinds of materials do you think a magnet can attract? Why do magnets always point in a specific direction when hung freely?",
+        quizzes: [
+          {
+            question: "Which of the following materials is attracted by a magnet?",
+            options: ["Plastic cup", "Iron nail", "Wooden ruler", "Paper sheet"],
+            answerIndex: 1,
+            explanation: "Iron, nickel, and cobalt are magnetic materials and are attracted by magnets."
+          },
+          {
+            question: "Every magnet, no matter its shape, has how many poles?",
+            options: ["One", "Two", "Three", "Four"],
+            answerIndex: 1,
+            explanation: "Every magnet has exactly two poles: a North pole and a South pole."
+          },
+          {
+            question: "What happens when the North pole of one magnet is brought close to the North pole of another?",
+            options: ["They attract each other", "They repel each other", "Nothing happens", "They turn into wood"],
+            answerIndex: 1,
+            explanation: "Like poles (North-North or South-South) repel, while opposite poles (North-South) attract."
+          },
+          {
+            question: "A freely suspended magnet always comes to rest pointing in which direction?",
+            options: ["East-West", "North-South", "Up-Down", "Randomly"],
+            answerIndex: 1,
+            explanation: "Due to Earth's magnetic field, a freely suspended magnet aligns in the North-South direction."
+          },
+          {
+            question: "Which device uses a magnetic needle to help travelers find directions?",
+            options: ["Thermometer", "Barometer", "Compass", "Speedometer"],
+            answerIndex: 2,
+            explanation: "A magnetic compass uses a freely rotating magnetic needle to find geographical directions."
+          }
+        ]
+      },
+      {
+        id: "measurement-length-motion",
+        name: "Measurement of Length and Motion",
+        objective: "Understand measurement history, standard units of length (meter), correction, and rectilinear/periodic motion.",
+        progress: [
+          { id: 1, label: "History of Measurement", status: "completed" },
+          { id: 2, label: "Standard Units of Measurement", status: "active" },
+          { id: 3, label: "Types of Motion", status: "upcoming" }
+        ],
+        chips: ["What is SI unit?", "Why did standard units start?", "What are types of motion?"],
+        initialQuestion: "How do you know how tall you are, or how far your school is? We need to measure! Long ago, people used hand-spans or footsteps. Why do you think we now use standard units like meters and centimeters? What happens if everyone uses their own footsteps to measure a desk?",
+        quizzes: [
+          {
+            question: "What is the SI (International System) unit of length?",
+            options: ["Foot", "Inch", "Meter", "Yard"],
+            answerIndex: 2,
+            explanation: "The meter (m) is the standard SI unit of length."
+          },
+          {
+            question: "Which type of motion is shown by a falling apple?",
+            options: ["Circular motion", "Rectilinear motion", "Periodic motion", "Rotational motion"],
+            answerIndex: 1,
+            explanation: "Rectilinear motion is motion along a straight line path."
+          },
+          {
+            question: "The motion of a child on a swing is an example of:",
+            options: ["Rectilinear motion", "Periodic motion", "Circular motion", "Non-periodic motion"],
+            answerIndex: 1,
+            explanation: "Periodic motion repeats itself at regular intervals of time, like a swing or pendulum."
+          },
+          {
+            question: "How many centimeters are there in 2 meters?",
+            options: ["20 cm", "200 cm", "2000 cm", "2 cm"],
+            answerIndex: 1,
+            explanation: "Since 1 meter = 100 centimeters, 2 meters = 200 centimeters."
+          },
+          {
+            question: "The motion of a wheel on a moving bicycle is:",
+            options: ["Only rectilinear", "Only circular", "Both circular and rectilinear", "Periodic"],
+            answerIndex: 2,
+            explanation: "The wheel rotates (circular motion) and moves forward along the road (rectilinear motion)."
+          }
+        ]
+      },
+      {
+        id: "materials-around-us",
+        name: "Materials Around Us",
+        objective: "Examine transparency (opaque/translucent/transparent), solubility, hardness, luster, and density.",
+        progress: [
+          { id: 1, label: "Grouping Materials", status: "completed" },
+          { id: 2, label: "Hardness and Solubility", status: "active" },
+          { id: 3, label: "Transparency Properties", status: "upcoming" }
+        ],
+        chips: ["What is transparency?", "Why do some things float?", "What is luster?"],
+        initialQuestion: "Look at the objects around you—a steel spoon, a wooden chair, a plastic bucket. Why do you think a bucket is made of plastic and not paper? How do we choose the right material to make an object? Let's explore how materials are grouped based on their properties!",
+        quizzes: [
+          {
+            question: "Materials that allow light to pass through them completely are called:",
+            options: ["Opaque", "Transparent", "Translucent", "Soluble"],
+            answerIndex: 1,
+            explanation: "Transparent materials (like clear glass or water) allow light to pass through completely, making things behind them clearly visible."
+          },
+          {
+            question: "Which of the following is soluble in water?",
+            options: ["Chalk powder", "Sand", "Sugar", "Sawdust"],
+            answerIndex: 2,
+            explanation: "Sugar dissolves completely in water, making it a soluble substance."
+          },
+          {
+            question: "Why is gold used to make jewelry?",
+            options: ["Because it is transparent", "Because it is lustrous (shiny)", "Because it floats on water", "Because it is very soft"],
+            answerIndex: 1,
+            explanation: "Gold is a metal with a bright, shiny surface (luster), which makes it popular for jewelry."
+          },
+          {
+            question: "An object made of which material will sink in water?",
+            options: ["A dry leaf", "A plastic toy", "An iron key", "A piece of cork"],
+            answerIndex: 2,
+            explanation: "Iron is denser than water, so an iron key will sink, whereas dry leaves and cork float."
+          },
+          {
+            question: "Materials through which we cannot see at all are called:",
+            options: ["Transparent", "Translucent", "Opaque", "Lustrous"],
+            answerIndex: 2,
+            explanation: "Opaque materials (like wood, cardboard, or metals) do not allow any light to pass through them."
+          }
+        ]
+      },
+      {
+        id: "temperature-measurement",
+        name: "Temperature and its Measurement",
+        objective: "Understand body temperature, clinical vs. laboratory thermometer, mercury expansion, and Celsius/Fahrenheit scales.",
+        progress: [
+          { id: 1, label: "Understanding Temperature", status: "completed" },
+          { id: 2, label: "Clinical Thermometer", status: "active" },
+          { id: 3, label: "Laboratory Thermometer", status: "upcoming" }
+        ],
+        chips: ["What is temperature?", "Clinical vs. Laboratory Thermometer", "Why does mercury rise?"],
+        initialQuestion: "How do you know if a cup of milk is hot or a bowl of soup is warm? Our touch can give us a guess, but it isn't always accurate. How do we measure hotness precisely? What is temperature, and how does a thermometer work?",
+        quizzes: [
+          {
+            question: "Temperature is a measure of:",
+            options: ["The weight of an object", "The degree of hotness or coldness of an object", "The speed of an object", "The color of an object"],
+            answerIndex: 1,
+            explanation: "Temperature is the quantitative measure of how hot or cold a body is."
+          },
+          {
+            question: "What is the normal temperature of a healthy human body in Celsius?",
+            options: ["98.6°C", "37°C", "0°C", "100°C"],
+            answerIndex: 1,
+            explanation: "The normal human body temperature is 37°C (or 98.6°F)."
+          },
+          {
+            question: "Which liquid is commonly used in traditional thermometers?",
+            options: ["Water", "Alcohol and Mercury", "Cooking Oil", "Milk"],
+            answerIndex: 1,
+            explanation: "Mercury is commonly used because it expands uniformly with heat and does not stick to glass."
+          },
+          {
+            question: "Why is there a small kink (constriction) in a clinical thermometer's tube?",
+            options: ["To make it look stylish", "To prevent mercury from falling back immediately when removed from mouth", "To make it break easily", "To measure room temperature"],
+            answerIndex: 1,
+            explanation: "The kink prevents the mercury level from dropping immediately, allowing the doctor to read the temperature accurately."
+          },
+          {
+            question: "What scale is commonly used to measure body temperature in clinics?",
+            options: ["Celsius and Fahrenheit", "Kelvin only", "Ruler scale", "Decibel scale"],
+            answerIndex: 0,
+            explanation: "Clinical thermometers are calibrated in both Celsius (°C) and Fahrenheit (°F) scales."
+          }
+        ]
+      },
+      {
+        id: "states-water-journey",
+        name: "A Journey through States of Water",
+        objective: "Trace the water cycle: solid/liquid/gas transitions, evaporation, transpiration, condensation, and harvesting.",
+        progress: [
+          { id: 1, label: "States of Water", status: "completed" },
+          { id: 2, label: "Evaporation & Transpiration", status: "active" },
+          { id: 3, label: "The Water Cycle & Harvesting", status: "upcoming" }
+        ],
+        chips: ["What is evaporation?", "How do clouds form?", "Why is water conservation important?"],
+        initialQuestion: "Water is amazing—it can exist as a solid (ice), a liquid (water), and a gas (water vapor). Have you ever watched wet clothes dry in the sun? Where does the water go? Let's explore the water cycle and how water changes its state!",
+        quizzes: [
+          {
+            question: "The process of liquid water turning into water vapor upon heating is called:",
+            options: ["Condensation", "Evaporation", "Freezing", "Precipitation"],
+            answerIndex: 1,
+            explanation: "Evaporation is the conversion of liquid water into gas/vapor state."
+          },
+          {
+            question: "How do clouds form in the sky?",
+            options: ["Water vapor condenses into tiny water droplets upon cooling", "Ice melts in the atmosphere", "Smoke from factories gathers", "Wind blows dust together"],
+            answerIndex: 0,
+            explanation: "When water vapor rises and cools at high altitudes, it condenses into tiny water droplets, forming clouds."
+          },
+          {
+            question: "The release of water vapor from the leaves of plants into the air is called:",
+            options: ["Respiration", "Photosynthesis", "Transpiration", "Evaporation"],
+            answerIndex: 2,
+            explanation: "Transpiration is the process where plants release excess water as vapor through stomata in their leaves."
+          },
+          {
+            question: "What is the continuous movement of water from Earth's surface to the atmosphere and back called?",
+            options: ["Carbon cycle", "Water cycle", "Rock cycle", "Oxygen cycle"],
+            answerIndex: 1,
+            explanation: "The water cycle describes the continuous circulation of water between Earth and the atmosphere."
+          },
+          {
+            question: "Which technique collects rainwater to replenish groundwater tables?",
+            options: ["Deforestation", "Rainwater Harvesting", "Drip Irrigation", "Canal Irrigation"],
+            answerIndex: 1,
+            explanation: "Rainwater harvesting collects and stores rainwater for recharging groundwater or direct use."
+          }
+        ]
+      },
+      {
+        id: "methods-separation",
+        name: "Methods of Separation in Everyday Life",
+        objective: "Understand separation methods: handpicking, threshing, winnowing, decantation, filtration, and evaporation.",
+        progress: [
+          { id: 1, label: "Separation of Solid Mixtures", status: "completed" },
+          { id: 2, label: "Separation of Insoluble Solids", status: "active" },
+          { id: 3, label: "Separation of Soluble Solids", status: "upcoming" }
+        ],
+        chips: ["What is handpicking?", "How does sieving work?", "What is decantation?"],
+        initialQuestion: "Think about how your parents filter tea leaves from tea, or pick small stones out of rice. We separate substances every day! Why do we need to separate mixtures? What are the different ways we can separate solids from liquids, or solids from other solids?",
+        quizzes: [
+          {
+            question: "Which method is best suited to separate small stones from wheat grains?",
+            options: ["Filtration", "Handpicking", "Evaporation", "Decantation"],
+            answerIndex: 1,
+            explanation: "Handpicking is used to separate slightly larger impurities like stones or husk when present in small quantities."
+          },
+          {
+            question: "The process of separating grains from stalks by beating them is called:",
+            options: ["Threshing", "Winnowing", "Sieving", "Handpicking"],
+            answerIndex: 0,
+            explanation: "Threshing is the process of beating stalks to free grain seeds."
+          },
+          {
+            question: "Which method uses wind or blowing air to separate lighter husk particles from heavier grain seeds?",
+            options: ["Sieving", "Threshing", "Winnowing", "Filtration"],
+            answerIndex: 2,
+            explanation: "Winnowing separates components of a mixture based on their weight differences using wind."
+          },
+          {
+            question: "How can we separate sand and water?",
+            options: ["Evaporation", "Sedimentation and Decantation", "Sieving", "Handpicking"],
+            answerIndex: 1,
+            explanation: "Sand is heavy and insoluble, so it settles down (sedimentation), and clean water can be poured out (decantation) or filtered."
+          },
+          {
+            question: "To obtain pure salt from sea water, which process is used?",
+            options: ["Filtration", "Decantation", "Evaporation", "Sieving"],
+            answerIndex: 2,
+            explanation: "Evaporation removes water as vapor, leaving solid salt crystals behind."
+          }
+        ]
+      },
+      {
+        id: "living-creatures-characteristics",
+        name: "Living Creatures: Exploring their Characteristics",
+        objective: "Identify characteristics of living organisms: respiration, stimulus, excretion, reproduction, and adaptations.",
+        progress: [
+          { id: 1, label: "Respiration & Growth", status: "completed" },
+          { id: 2, label: "Response to Stimulus", status: "active" },
+          { id: 3, label: "Adaptations in Habitats", status: "upcoming" }
+        ],
+        chips: ["Do plants breathe?", "What is stimulus?", "How do desert animals adapt?"],
+        initialQuestion: "What makes a dog different from a toy robot? Both can move! But a dog eats, breathes, grows, and responds when you call it. What are the key characteristics that define living organisms? Let's look at how living things adapt to survive in their surroundings!",
+        quizzes: [
+          {
+            question: "What is respiration in living organisms?",
+            options: ["Only taking in oxygen", "Only giving out carbon dioxide", "Breathing in air and using oxygen to release energy from food", "Growing in size"],
+            answerIndex: 2,
+            explanation: "Respiration is the cellular process where oxygen is used to break down food to release energy."
+          },
+          {
+            question: "A plant turns its leaves toward sunlight. The sunlight is a:",
+            options: ["Response", "Stimulus", "Habit", "Growth marker"],
+            answerIndex: 1,
+            explanation: "A stimulus is a change in the environment that causes an organism to react."
+          },
+          {
+            question: "How do fish breathe underwater?",
+            options: ["Through their lungs", "Through their skin", "Through their gills", "They do not breathe"],
+            answerIndex: 2,
+            explanation: "Gills absorb dissolved oxygen from water."
+          },
+          {
+            question: "The process of getting rid of waste products by living organisms is called:",
+            options: ["Reproduction", "Excretion", "Respiration", "Nutrition"],
+            answerIndex: 1,
+            explanation: "Excretion is the removal of toxic metabolic waste from the body."
+          },
+          {
+            question: "Why do camels have long legs?",
+            options: ["To run very fast", "To keep their bodies away from the hot sand", "To swim in water", "To climb trees"],
+            answerIndex: 1,
+            explanation: "The long legs of a camel keep its body raised high, keeping it cooler by avoiding heat radiating from the desert sand."
+          }
+        ]
+      },
+      {
+        id: "natures-treasures",
+        name: "Nature's Treasures",
+        objective: "Understand natural resources: renewable (solar) vs. non-renewable (fossil fuels), forests, afforestation, and 3 R's.",
+        progress: [
+          { id: 1, label: "Forests: Our Green Wealth", status: "completed" },
+          { id: 2, label: "Soil and Water Resources", status: "active" },
+          { id: 3, label: "Conservation & 3 R's", status: "upcoming" }
+        ],
+        chips: ["Renewable vs Non-renewable", "Why is forest important?", "How to save water?"],
+        initialQuestion: "Earth is full of treasures—clean air, fresh water, fertile soil, forests, and minerals. These are called natural resources. But did you know some resources can run out if we waste them? How can we protect nature's treasures for our future?",
+        quizzes: [
+          {
+            question: "Which of the following is a renewable natural resource?",
+            options: ["Coal", "Petroleum", "Solar energy", "Natural Gas"],
+            answerIndex: 2,
+            explanation: "Solar energy is renewable as it is inexhaustible, unlike fossil fuels (coal, petroleum) which take millions of years to form."
+          },
+          {
+            question: "How do forests help prevent soil erosion?",
+            options: ["Roots of trees bind the soil particles together", "Leaves block sunlight", "Animals stomp the soil hard", "Forests stop rainfall"],
+            answerIndex: 0,
+            explanation: "Plant roots hold soil firmly, protecting it from being washed away by water or blown away by wind."
+          },
+          {
+            question: "What is the main cause of the depletion of groundwater?",
+            options: ["Excessive rainfall", "Overuse and drilling borewells", "Planting more trees", "Water harvesting"],
+            answerIndex: 1,
+            explanation: "Excessive extraction of groundwater for irrigation and domestic use without recharging leads to depletion."
+          },
+          {
+            question: "Which of the following is an eco-friendly practice?",
+            options: ["Using plastic bags", "Planting more trees (Afforestation)", "Leaving taps running", "Burning dry leaves"],
+            answerIndex: 1,
+            explanation: "Afforestation increases green cover, controls erosion, and cleans air, supporting environmental conservation."
+          },
+          {
+            question: "What are the three R's of waste management?",
+            options: ["Read, Write, Repeat", "Reduce, Reuse, Recycle", "Run, Rest, Return", "Repair, Remove, Reject"],
+            answerIndex: 1,
+            explanation: "Reduce, Reuse, and Recycle are key practices to minimize waste and conserve resources."
+          }
+        ]
+      },
+      {
+        id: "beyond-earth",
+        name: "Beyond Earth",
+        objective: "Understand the solar system, Sun, planets (Jupiter), constellations, phases of the Moon, and rotation vs. revolution.",
+        progress: [
+          { id: 1, label: "The Solar System", status: "completed" },
+          { id: 2, label: "Stars and Constellations", status: "active" },
+          { id: 3, label: "Moon Phases & Rotation", status: "upcoming" }
+        ],
+        chips: ["Why does the Moon shine?", "What causes day and night?", "How many planets are there?"],
+        initialQuestion: "Look up at the night sky—what do you see? The glowing Moon, sparkling stars, and planets. We live on Earth, which is part of a giant family called the Solar System. Have you ever wondered why the Moon changes its shape, or why we have day and night?",
+        quizzes: [
+          {
+            question: "What lies at the center of our Solar System?",
+            options: ["The Earth", "The Sun", "The Moon", "Jupiter"],
+            answerIndex: 1,
+            explanation: "The Sun is a star located at the center of the Solar System, and all planets revolve around it."
+          },
+          {
+            question: "What causes day and night on Earth?",
+            options: ["Earth revolving around the Sun", "Earth rotating on its own axis", "The Moon blocking the Sun", "The Sun moving around the Earth"],
+            answerIndex: 1,
+            explanation: "Earth's rotation on its axis once every 24 hours brings different parts of the Earth into sunlight, causing day and night."
+          },
+          {
+            question: "Why does the Moon shine at night?",
+            options: ["It produces its own light like the Sun", "It reflects the light of the Sun", "It is made of glowing rocks", "It has electric lights"],
+            answerIndex: 1,
+            explanation: "The Moon does not produce its own light; it shines by reflecting sunlight."
+          },
+          {
+            question: "Which is the largest planet in our solar system?",
+            options: ["Earth", "Saturn", "Jupiter", "Mars"],
+            answerIndex: 2,
+            explanation: "Jupiter is the largest planet in the solar system."
+          },
+          {
+            question: "A group of stars forming a recognizable pattern in the night sky is called:",
+            options: ["Solar system", "Constellation", "Galaxy", "Nebula"],
+            answerIndex: 1,
+            explanation: "Constellations (like Ursa Major or Orion) are patterns formed by groups of stars."
           }
         ]
       }

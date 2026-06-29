@@ -144,6 +144,7 @@ export default function TeacherDashboard() {
   const [subject, setSubject] = useState("history");
 
   const isClass10 = selectedClass && selectedClass.includes("10");
+  const isClass6 = selectedClass && selectedClass.includes("6");
   let subjectKey = subject;
   if (isClass10) {
     if (subject === "mathematics") {
@@ -152,6 +153,10 @@ export default function TeacherDashboard() {
       subjectKey = "science_class10";
     } else if (subject === "history") {
       subjectKey = "history_class10";
+    }
+  } else if (isClass6) {
+    if (subject === "science") {
+      subjectKey = "science_class6";
     }
   }
 
@@ -172,9 +177,11 @@ export default function TeacherDashboard() {
         }
         setSubject(sub);
         const isC10 = cls.includes("10");
+        const isC6 = cls.includes("6");
         const subKey = (sub === "mathematics" && isC10) ? "mathematics_class10" :
                        (sub === "science" && isC10) ? "science_class10" :
-                       (sub === "history" && isC10) ? "history_class10" : sub;
+                       (sub === "history" && isC10) ? "history_class10" :
+                       (sub === "science" && isC6) ? "science_class6" : sub;
         const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
         if (chapters.length > 0) {
           setSelectedTopic(chapters[0].name);
@@ -339,9 +346,11 @@ export default function TeacherDashboard() {
                   const newSub = e.target.value;
                   setSubject(newSub);
                   const isC10 = selectedClass && selectedClass.includes("10");
+                  const isC6 = selectedClass && selectedClass.includes("6");
                   const subKey = (newSub === "mathematics" && isC10) ? "mathematics_class10" :
                                  (newSub === "science" && isC10) ? "science_class10" :
-                                 (newSub === "history" && isC10) ? "history_class10" : newSub;
+                                 (newSub === "history" && isC10) ? "history_class10" :
+                                 (newSub === "science" && isC6) ? "science_class6" : newSub;
                   const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
                   if (chapters.length > 0) {
                     setSelectedTopic(chapters[0].name);
@@ -402,18 +411,18 @@ export default function TeacherDashboard() {
             <div className="td-unit-info">
               <div className="td-unit-eyebrow">Current unit</div>
               <div className="td-unit-name">
-                {subject === "mathematics" ? "Class 10 Mathematics" :
+                {subject === "mathematics" ? (isClass10 ? "Class 10 Mathematics" : "Mathematics Curriculum") :
                  subject === "physics" ? "Class 11/12 Physics" :
                  subject === "chemistry" ? "Class 11/12 Chemistry" :
                  subject === "biology" ? "Class 11/12 Biology" :
-                 subject === "science" ? "Science Curriculum" : currentUnit.name}
+                 subject === "science" ? (isClass10 ? "Class 10 Science" : isClass6 ? "Class 6 Science" : "Science Curriculum") : currentUnit.name}
               </div>
               <div className="td-unit-desc">
-                {subject === "mathematics" ? "CBSE Class 10 Curriculum" :
+                {subject === "mathematics" ? (isClass10 ? "CBSE Class 10 Curriculum" : "General Mathematics") :
                  subject === "physics" ? "Higher Secondary Physics" :
                  subject === "chemistry" ? "Higher Secondary Chemistry" :
                  subject === "biology" ? "Higher Secondary Biology" :
-                 subject === "science" ? "General Science Concepts" : currentUnit.description}
+                 subject === "science" ? (isClass10 ? "CBSE Class 10 Science Curriculum" : isClass6 ? "CBSE Class 6 Science Curriculum" : "General Science Concepts") : currentUnit.description}
               </div>
             </div>
             <div className="td-unit-actions">
