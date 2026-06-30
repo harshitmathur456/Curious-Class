@@ -49,12 +49,67 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
         />
 
-        {/* Suppress the default Google Translate toolbar banner */}
+        {/* Aggressively hide the Google Translate toolbar ribbon */}
         <style>{`
-          .goog-te-banner-frame { display: none !important; }
-          .goog-te-balloon-frame { display: none !important; }
-          body { top: 0 !important; }
+          /* Hide the translate banner iframe */
+          .goog-te-banner-frame,
+          .goog-te-banner-frame.skiptranslate,
+          iframe.skiptranslate,
+          .skiptranslate > iframe {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+          }
+
+          /* Prevent body from being pushed down */
+          body {
+            top: 0 !important;
+            position: static !important;
+          }
+
+          /* Hide tooltip and balloon */
+          #goog-gt-tt,
+          .goog-te-balloon-frame,
+          .goog-tooltip,
+          .goog-tooltip-content {
+            display: none !important;
+          }
+
+          /* Hide the translate element container itself */
+          #google_translate_element,
+          .skiptranslate {
+            display: none !important;
+          }
         `}</style>
+
+        {/* MutationObserver script: re-hides the banner if Google re-injects it */}
+        <Script
+          id="hide-translate-bar"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              function hideGoogleBar() {
+                var frames = document.querySelectorAll('iframe.skiptranslate, .goog-te-banner-frame');
+                frames.forEach(function(el) {
+                  el.style.display = 'none';
+                  el.style.visibility = 'hidden';
+                  el.style.height = '0';
+                });
+                document.body.style.top = '0';
+                document.body.style.position = 'static';
+              }
+
+              // Run immediately and after a short delay
+              hideGoogleBar();
+              setTimeout(hideGoogleBar, 500);
+              setTimeout(hideGoogleBar, 1500);
+
+              // Watch for dynamic DOM insertions by Google Translate
+              var observer = new MutationObserver(hideGoogleBar);
+              observer.observe(document.body, { childList: true, subtree: true });
+            `,
+          }}
+        />
       </body>
     </html>
   );
