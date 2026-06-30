@@ -83,6 +83,10 @@ function ClassSelectionForm() {
   // Teacher details
   const [teacherName, setTeacherName] = useState("");
   const [teacherSubject, setTeacherSubject] = useState("mathematics");
+  const [teacherPassword, setTeacherPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+
+  const TEACHER_PASSWORD = "Teacher@123";
 
   // Initialize CAPTCHA
   useEffect(() => {
@@ -117,6 +121,14 @@ function ClassSelectionForm() {
     if (!selectedClass) return;
     if (!userAnswer.trim() || isVerifying || !captcha) return;
 
+    // Check teacher password before proceeding
+    if (role === "teacher" && teacherPassword !== TEACHER_PASSWORD) {
+      setPasswordError(true);
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
+    }
+    setPasswordError(false);
     setIsVerifying(true);
     const isCorrect = parseInt(userAnswer.trim(), 10) === captcha.answer;
 
@@ -248,6 +260,22 @@ function ClassSelectionForm() {
               <option value="physics">Physics</option>
               <option value="chemistry">Chemistry</option>
             </select>
+            <div style={{ flex: '1 1 100%' }}>
+              <input
+                type="password"
+                placeholder="Teacher Password"
+                value={teacherPassword}
+                onChange={(e) => { setTeacherPassword(e.target.value); setPasswordError(false); }}
+                className={`captcha-input ${passwordError ? 'captcha-input--error' : ''}`}
+                style={{ width: '100%', boxSizing: 'border-box' }}
+                autoComplete="current-password"
+              />
+              {passwordError && (
+                <div className="captcha-error-msg" style={{ marginTop: '6px' }}>
+                  🔒 Incorrect password. Please ask your school administrator.
+                </div>
+              )}
+            </div>
           </div>
         )}
 
