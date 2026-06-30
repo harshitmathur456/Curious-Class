@@ -362,8 +362,8 @@ export default function TeacherDashboard() {
         Object.keys(topicStats).forEach(topic => {
           const stats = topicStats[topic];
           const pct = (stats.score / stats.max) * 100;
-          if (pct < 60) review.push({ topic, avg: Math.round(pct) });
-          if (pct >= 80) strong.push({ topic, avg: Math.round(pct) });
+          if (pct <= 65) review.push({ topic, avg: Math.round(pct) }); // Changed to <= 65% to easily flag topics
+          if (pct >= 75) strong.push({ topic, avg: Math.round(pct) }); // Changed to >= 75% to easily flag strong topics
         });
         
         setClassAnalytics({ classAverage: classAvg, topicsNeedingReview: review, strongTopics: strong });
