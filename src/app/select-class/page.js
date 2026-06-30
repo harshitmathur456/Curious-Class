@@ -132,32 +132,27 @@ function ClassSelectionForm() {
     setIsVerifying(true);
     const isCorrect = parseInt(userAnswer.trim(), 10) === captcha.answer;
 
-    // Log to API
-    try {
-      await fetch("/api/captcha", {
+    // Log to API in the background (fire-and-forget) so it doesn't block the UI
+    fetch("/api/captcha", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        role: role,
+        captcha_answer: userAnswer.trim(),
+        is_correct: isCorrect,
+      }),
+    }).catch(err => console.error("Failed to log captcha:", err));
+
+    if (isCorrect && role === "student") {
+      fetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          role: role,
-          captcha_answer: userAnswer.trim(),
-          is_correct: isCorrect,
+          name: studentName.trim(),
+          roll_number: rollNumber.trim(),
+          class_name: selectedClass,
         }),
-      });
-
-      // If correct and role is student, register student
-      if (isCorrect && role === "student") {
-        await fetch("/api/students", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: studentName.trim(),
-            roll_number: rollNumber.trim(),
-            class_name: selectedClass,
-          }),
-        });
-      }
-    } catch (err) {
-      console.error("Failed to log data:", err);
+      }).catch(err => console.error("Failed to register student:", err));
     }
 
     if (isCorrect) {
@@ -172,10 +167,12 @@ function ClassSelectionForm() {
           localStorage.setItem("teacherSubject", teacherSubject);
         }
       }
+      
+      // Reduced artificial delay from 1000ms to 150ms for instant snappy transition
       setTimeout(() => {
         const dest = role === "student" ? "/student" : "/teacher";
         router.push(dest);
-      }, 1000);
+      }, 150);
     } else {
       setStatus("error");
       setShake(true);
@@ -185,9 +182,8 @@ function ClassSelectionForm() {
         setUserAnswer("");
         setStatus("idle");
       }, 1500);
+      setIsVerifying(false);
     }
-
-    setIsVerifying(false);
   }
 
   return (
