@@ -1547,8 +1547,8 @@ export const CHAPTERS_DATA = {
           { id: 2, label: "Non-Cooperation Movement", status: "active" },
           { id: 3, label: "Towards Civil Disobedience", status: "upcoming" }
         ],
-        chips: ["Satyagraha Meaning", "Jallianwala Bagh Massacre", "Dandi Salt March"],
-        initialQuestion: "Welcome! Today we are exploring **Nationalism in India**. Think about how we celebrate Independence Day today. But back in the early 1900s, India was composed of different princely states, religious groups, and castes. How do you think a diverse country like India came together to fight against British rule? What role did Mahatma Gandhi's idea of Satyagraha play in this?",
+        chips: ["Maybe to show defiance?", "Petitions didn't work before...", "Taki sab log jud sakein?"],
+        initialQuestion: "Welcome! Today we're exploring the **Salt March of 1930**. Let's start with a big question: Gandhi had many options to protest British rule — petitions, boycotts, armed rebellion. Why do you think he chose *salt* as the symbol for his protest?",
         quizzes: [
           {
             question: "What is the core meaning of Mahatma Gandhi's concept of Satyagraha?",
