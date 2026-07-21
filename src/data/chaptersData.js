@@ -3021,28 +3021,543 @@ export const CHAPTERS_DATA = {
             explanation: "Shah Jahan was imprisoned by Aurangzeb in Agra Fort for the remaining years of his life."
           },
           {
-            question: "Who was the founder of the Asaf Jahi dynasty in Hyderabad?",
-            options: ["Nizam-ul-Mulk Asaf Jah", "Saadat Khan", "Murshid Quli Khan", "Alivardi Khan"],
-            answerIndex: 0,
-            explanation: "Nizam-ul-Mulk Asaf Jah founded the Hyderabad state in 1724 as the Mughal control weakened."
-          },
-          {
-            question: "What were the land taxes 'Chauth' and 'Sardeshmukhi' collected by?",
-            options: ["Mughals", "Marathas", "Sikhs", "British"],
-            answerIndex: 1,
-            explanation: "The Marathas collected Chauth (25% of land revenue) and Sardeshmukhi (an additional 9-10%) from neighboring lands."
-          },
-          {
-            question: "Under whose leadership did the Sikhs organize themselves into a political state in late 17th century?",
-            options: ["Guru Nanak", "Guru Gobind Singh", "Banda Bahadur", "Ranjit Singh"],
-            answerIndex: 1,
-            explanation: "Guru Gobind Singh organized the Khalsa in 1699, leading to the rise of a sovereign Sikh state."
-          },
-          {
             question: "Who was the ruler of Awadh who established independent administration in 1722?",
             options: ["Saadat Khan Burhan-ul-Mulk", "Safdar Jang", "Shuja-ud-Daula", "Asaf-ud-Daula"],
             answerIndex: 0,
             explanation: "Saadat Khan was appointed governor of Awadh in 1722 and founded a prosperous, independent state."
+          }
+        ]
+      }
+    ]
+  },
+  science_class7: {
+    title: "Science",
+    chapters: [
+      {
+        id: "world-of-science",
+        name: "The Ever-Evolving World of Science",
+        objective: "Explore scientific methods, variables, hypothesis testing, and the importance of observation.",
+        progress: [
+          { id: 1, label: "Scientific Method Steps", status: "completed" },
+          { id: 2, label: "Variables and Hypotheses", status: "active" },
+          { id: 3, label: "Designing Experiments", status: "upcoming" }
+        ],
+        chips: ["What is a hypothesis?", "Dependent vs Independent variables", "Importance of observation"],
+        initialQuestion: "Welcome to Class 7 Science! Today we start with **The Ever-Evolving World of Science**. Science isn't just about reading facts—it's about asking questions, testing hypotheses, and making observations. If you saw a new plant whose leaves closed when touched, how would you design an experiment to test what triggers this?",
+        quizzes: [
+          {
+            question: "What is a hypothesis in scientific terms?",
+            options: ["An absolute proven fact", "A guess or proposed explanation that can be tested", "A random idea", "A conclusion of an experiment"],
+            answerIndex: 1,
+            explanation: "A hypothesis is a testable statement or educated guess that can be confirmed or disproved by experiments."
+          },
+          {
+            question: "In an experiment testing how water quantity affects plant growth, what is the 'independent variable'?",
+            options: ["The plant growth", "The soil type", "The amount of water given", "The sunlight"],
+            answerIndex: 2,
+            explanation: "The independent variable is the factor that you deliberately change or manipulate (the amount of water)."
+          },
+          {
+            question: "Why is it important to have a 'control group' in an experiment?",
+            options: ["To make the experiment faster", "To compare the experimental group against a baseline that does not receive treatment", "To test multiple variables at once", "To prove the hypothesis is correct"],
+            answerIndex: 1,
+            explanation: "A control group serves as a baseline comparison to prove that any changes are caused by the independent variable."
+          },
+          {
+            question: "What is the first step of the scientific method?",
+            options: ["Drawing conclusions", "Performing experiments", "Making an observation and asking a question", "Writing a report"],
+            answerIndex: 2,
+            explanation: "The scientific process begins with observing a phenomenon and formulating a question about it."
+          },
+          {
+            question: "A conclusion in science must be based on:",
+            options: ["Personal opinions", "Factual data and experimental observations", "Guesses", "What the majority of people believe"],
+            answerIndex: 1,
+            explanation: "Scientific conclusions must always be derived from evidence, data, and observations gathered during testing."
+          }
+        ]
+      },
+      {
+        id: "exploring-substances",
+        name: "Exploring Substances: Acidic, Basic, and Neutral",
+        objective: "Identify acidic, basic, and neutral substances using natural and chemical indicators.",
+        progress: [
+          { id: 1, label: "Acids and Bases properties", status: "completed" },
+          { id: 2, label: "Indicators and pH testing", status: "active" },
+          { id: 3, label: "Neutralisation Reactions", status: "upcoming" }
+        ],
+        chips: ["What are natural indicators?", "The pH scale", "Neutralisation reactions"],
+        initialQuestion: "Welcome! Today we are **Exploring Substances: Acidic, Basic, and Neutral**. If you ever have acidity after eating, you take an antacid. What chemical reaction happens when you mix an acid with a base, and how does it relieve the pain?",
+        quizzes: [
+          {
+            question: "What is the characteristic taste of acids?",
+            options: ["Bitter", "Sour", "Salty", "Sweet"],
+            answerIndex: 1,
+            explanation: "Acids taste sour. For example, lemon juice and vinegar taste sour due to citric and acetic acids."
+          },
+          {
+            question: "Which indicator turns red in acidic solutions and blue in basic solutions?",
+            options: ["Turmeric", "China rose", "Litmus paper", "Phenolphthalein"],
+            answerIndex: 2,
+            explanation: "Litmus paper is a common natural indicator; blue litmus turns red in acid, and red litmus turns blue in base."
+          },
+          {
+            question: "Phenolphthalein turns which color when added to a basic solution?",
+            options: ["Colorless", "Pink", "Yellow", "Blue"],
+            answerIndex: 1,
+            explanation: "Phenolphthalein is synthetic and turns deep pink in basic solutions, but remains colorless in acidic/neutral solutions."
+          },
+          {
+            question: "What is the reaction called when an acid reacts with a base to form salt and water?",
+            options: ["Oxidation", "Crystallization", "Neutralisation", "Evaporation"],
+            answerIndex: 2,
+            explanation: "Neutralisation is the reaction of an acid and a base, which cancels out their acidic and basic properties, producing salt, water, and heat."
+          },
+          {
+            question: "Which of the following is basic in nature?",
+            options: ["Lemon juice", "Vinegar", "Soap solution", "Tomato juice"],
+            answerIndex: 2,
+            explanation: "Soap solution contains sodium hydroxide or potassium hydroxide, which makes it basic (slippery to touch and bitter)."
+          }
+        ]
+      },
+      {
+        id: "electricity-circuits",
+        name: "Electricity: Circuits and their Components",
+        objective: "Understand simple electric circuits, symbols of components, heating and magnetic effects of electric current.",
+        progress: [
+          { id: 1, label: "Circuit Symbols & Connections", status: "completed" },
+          { id: 2, label: "Heating Effect of Current", status: "active" },
+          { id: 3, label: "Magnetic Effect & Electromagnets", status: "upcoming" }
+        ],
+        chips: ["Heating effect of current", "What is an electromagnet?", "Why do we use fuses?"],
+        initialQuestion: "Welcome! Today we study **Electricity: Circuits and their Components**. Have you ever wondered why a fuse breaks when too many appliances are turned on? It prevents electrical fires. How does electric current produce heat, and how does a fuse utilize this property?",
+        quizzes: [
+          {
+            question: "What safety device breaks a circuit when excessive current flows through it?",
+            options: ["Switch", "Fuse", "Battery", "Electromagnet"],
+            answerIndex: 1,
+            explanation: "A fuse contains a wire with a low melting point that melts and breaks the circuit if the current exceeds a safe limit."
+          },
+          {
+            question: "Which effect of electric current is used in electric heaters and irons?",
+            options: ["Chemical effect", "Heating effect", "Magnetic effect", "Lighting effect"],
+            answerIndex: 1,
+            explanation: "Electric heaters use the heating effect of current, where a high-resistance coil (element) becomes red hot when current passes."
+          },
+          {
+            question: "Who discovered the magnetic effect of electric current?",
+            options: ["Newton", "Hans Christian Oersted", "Michael Faraday", "Thomas Edison"],
+            answerIndex: 1,
+            explanation: "Oersted observed that a magnetic compass needle deflected when an electric current flowed through a nearby wire."
+          },
+          {
+            question: "An electromagnet acts as a magnet only when:",
+            options: ["It is painted black", "Electric current is switched on", "It is cooled down", "It is connected to a wooden block"],
+            answerIndex: 1,
+            explanation: "An electromagnet is temporary; it loses its magnetism as soon as the electric current is switched off."
+          },
+          {
+            question: "In a circuit diagram, a long vertical line and a short thick vertical line represent:",
+            options: ["A switch", "A bulb", "A cell", "A wire"],
+            answerIndex: 2,
+            explanation: "In a cell symbol, the long line represents the positive terminal and the short thick line represents the negative terminal."
+          }
+        ]
+      },
+      {
+        id: "metals-nonmetals",
+        name: "The World of Metals and Non-metals",
+        objective: "Differentiate between metals and non-metals based on their physical and chemical properties.",
+        progress: [
+          { id: 1, label: "Physical Properties comparison", status: "completed" },
+          { id: 2, label: "Chemical Properties & Reactivity", status: "active" },
+          { id: 3, label: "Displacement Reactions", status: "upcoming" }
+        ],
+        chips: ["Malleability vs Ductility", "Rusting of iron", "Displacement reactions"],
+        initialQuestion: "Welcome! Today we enter **The World of Metals and Non-metals**. Think about why gold is used for jewelry and copper for electrical wires. What makes metals so malleable and ductile compared to non-metals?",
+        quizzes: [
+          {
+            question: "The property of metals by which they can be beaten into thin sheets is called:",
+            options: ["Ductility", "Malleability", "Sonorousness", "Conductivity"],
+            answerIndex: 1,
+            explanation: "Malleability is the property of metals that allows them to be beaten into thin sheets (e.g., aluminium foils)."
+          },
+          {
+            question: "Which of the following is a non-metal that is liquid at room temperature?",
+            options: ["Mercury", "Bromine", "Carbon", "Oxygen"],
+            answerIndex: 1,
+            explanation: "Bromine is a non-metal that exists as a liquid at room temperature. (Mercury is a metal liquid at room temp)."
+          },
+          {
+            question: "What gas is produced when metals react with acids?",
+            options: ["Oxygen", "Carbon dioxide", "Hydrogen", "Nitrogen"],
+            answerIndex: 2,
+            explanation: "Metals generally react with acids to produce salt and hydrogen gas, which burns with a 'pop' sound."
+          },
+          {
+            question: "What is a displacement reaction?",
+            options: ["A less reactive metal replaces a more reactive metal", "A more reactive metal replaces a less reactive metal from its salt solution", "Non-metals react with water", "Rusting of iron"],
+            answerIndex: 1,
+            explanation: "In a displacement reaction, a highly reactive metal displaces a less reactive metal from its compound (e.g., Iron displacing Copper from Copper Sulphate)."
+          },
+          {
+            question: "Why does iron rust?",
+            options: ["Reaction with nitrogen", "Reaction with oxygen and water (moisture)", "Lack of sunlight", "Bacterial infection"],
+            answerIndex: 1,
+            explanation: "Rusting of iron requires both oxygen from the air and water/moisture to form hydrated iron oxide (rust)."
+          }
+        ]
+      },
+      {
+        id: "physical-chemical-changes",
+        name: "Changes Around Us: Physical and Chemical",
+        objective: "Distinguish between physical and chemical changes, crystallization, and preventing rusting.",
+        progress: [
+          { id: 1, label: "Physical changes characteristics", status: "completed" },
+          { id: 2, label: "Chemical changes & Rusting", status: "active" },
+          { id: 3, label: "Crystallization processes", status: "upcoming" }
+        ],
+        chips: ["What is crystallization?", "Physical vs Chemical changes", "Galvanisation of iron"],
+        initialQuestion: "Welcome! Today we study **Changes Around Us: Physical and Chemical**. When you dissolve sugar in water, is that a physical or a chemical change? What about when you burn a piece of wood? How can you tell if a new substance has been formed?",
+        quizzes: [
+          {
+            question: "Which of the following is a physical change?",
+            options: ["Burning of coal", "Rusting of iron", "Melting of ice", "Ripening of fruits"],
+            answerIndex: 2,
+            explanation: "Melting of ice is a physical change because only the state changes from solid to liquid; no new chemical substance is formed."
+          },
+          {
+            question: "What process is used to prevent rusting of iron by coating it with a layer of zinc?",
+            options: ["Crystallization", "Neutralisation", "Galvanisation", "Oxidation"],
+            answerIndex: 2,
+            explanation: "Galvanisation is the process of depositing a thin protective layer of zinc metal on iron objects to prevent them from rusting."
+          },
+          {
+            question: "A chemical change is also called a:",
+            options: ["Physical reaction", "Chemical reaction", "Temporary change", "Reversible change"],
+            answerIndex: 1,
+            explanation: "A chemical change involves a chemical reaction where new substances with entirely different properties are formed."
+          },
+          {
+            question: "Which of these is a sign of a chemical change?",
+            options: ["Production of gas or heat", "Change in smell or color", "Emission of light or sound", "All of the above"],
+            answerIndex: 3,
+            explanation: "Chemical reactions are often accompanied by gas bubbles, color changes, temperature changes, and light or sound emission."
+          },
+          {
+            question: "What process yields large crystals of pure substances from their hot saturated solutions?",
+            options: ["Evaporation", "Crystallization", "Galvanisation", "Condensation"],
+            answerIndex: 1,
+            explanation: "Crystallization is a physical change used to obtain large, pure crystals of substances (e.g., copper sulphate) from their solutions."
+          }
+        ]
+      },
+      {
+        id: "adolescence",
+        name: "Adolescence: A Stage of Growth and Change",
+        objective: "Understand physical, emotional, and hormonal changes during adolescence, and the importance of personal hygiene and nutrition.",
+        progress: [
+          { id: 1, label: "Adolescence & Puberty changes", status: "completed" },
+          { id: 2, label: "Hormones & Secondary Sexual characteristics", status: "active" },
+          { id: 3, label: "Reproductive health and Hygiene", status: "upcoming" }
+        ],
+        chips: ["Role of hormones", "Target height & Growth", "Personal hygiene and health"],
+        initialQuestion: "Welcome! Today we explore **Adolescence: A Stage of Growth and Change**. Adolescence is a natural bridge between childhood and adulthood, marked by growth spurts and hormonal changes. Why is proper nutrition so critical during this rapid stage of growth?",
+        quizzes: [
+          {
+            question: "What is the period of life called when the body undergoes changes leading to reproductive maturity?",
+            options: ["Infancy", "Adolescence", "Senescence", "Toddlerhood"],
+            answerIndex: 1,
+            explanation: "Adolescence is the phase of transition from childhood to adulthood (usually between ages 11 and 19) during which reproductive maturity occurs."
+          },
+          {
+            question: "Which endocrine gland is known as the 'master gland' because it controls other glands?",
+            options: ["Thyroid", "Adrenal", "Pituitary", "Pancreas"],
+            answerIndex: 2,
+            explanation: "The Pituitary gland secretes hormones that instruct other endocrine glands (like thyroid, testes, ovaries) to release their hormones."
+          },
+          {
+            question: "Which hormone is responsible for secondary sexual characteristics in males?",
+            options: ["Estrogen", "Testosterone", "Insulin", "Thyroxine"],
+            answerIndex: 1,
+            explanation: "Testosterone is the male hormone produced by testes, which stimulates facial hair, voice change, and muscle growth."
+          },
+          {
+            question: "Why is a balanced diet extremely important during adolescence?",
+            options: ["To make people taller overnight", "Because the body is growing rapidly and needs proper protein, vitamins, and minerals", "To avoid drinking water", "To cure infectious diseases"],
+            answerIndex: 1,
+            explanation: "A balanced diet provides the essential nutrients required to support the rapid skeletal and muscular growth during puberty."
+          },
+          {
+            question: "What is the cause of acne and pimples commonly seen in adolescents?",
+            options: ["Lack of exercise", "Increased activity of sweat and sebaceous (oil) glands", "Poor academic performance", "Drinking too much milk"],
+            answerIndex: 1,
+            explanation: "Hormonal changes stimulate the sweat and sebaceous glands, secreting excess oil which clogs pores and leads to acne."
+          }
+        ]
+      },
+      {
+        id: "heat-transfer",
+        name: "Heat Transfer in Nature",
+        objective: "Analyze the three modes of heat transfer: conduction, convection, and radiation, and land/sea breezes.",
+        progress: [
+          { id: 1, label: "Conduction in Solids", status: "completed" },
+          { id: 2, label: "Convection in Liquids & Gases", status: "active" },
+          { id: 3, label: "Radiation in Vacuum", status: "upcoming" }
+        ],
+        chips: ["Conduction, Convection, Radiation", "Sea breeze vs Land breeze", "Thermal conductors & insulators"],
+        initialQuestion: "Welcome! Today we study **Heat Transfer in Nature**. Have you noticed why handles of cooking pans are made of plastic or wood, while the pan is metal? What are the three ways heat moves, and how does heat from the Sun reach Earth through empty space?",
+        quizzes: [
+          {
+            question: "Which process of heat transfer takes place in solids where heat travels from molecule to molecule without actual movement of particles?",
+            options: ["Conduction", "Convection", "Radiation", "Insulation"],
+            answerIndex: 0,
+            explanation: "Conduction is the transfer of heat in solids from a hotter region to a colder region through particle vibration."
+          },
+          {
+            question: "How does heat from the Sun reach the Earth?",
+            options: ["Conduction", "Convection", "Radiation", "Reflection"],
+            answerIndex: 2,
+            explanation: "Radiation does not require any material medium. It travels through empty space (vacuum) in the form of electromagnetic waves."
+          },
+          {
+            question: "During the day, cool air flows from the sea towards the land. This is called:",
+            options: ["Land breeze", "Sea breeze", "Trade wind", "Cyclone"],
+            answerIndex: 1,
+            explanation: "Sea breeze occurs during the day because land heats up faster than water, causing hot air above land to rise and cool air from the sea to flow in."
+          },
+          {
+            question: "Why are woolen clothes worn in winter to keep us warm?",
+            options: ["Wool is a good conductor of heat", "Wool fibers trap air, which is a poor conductor of heat", "Wool generates heat of its own", "Wool reflects sunlight"],
+            answerIndex: 1,
+            explanation: "Air is a poor conductor of heat. The trapped air in wool prevents our body heat from escaping to the cold surroundings."
+          },
+          {
+            question: "Which of the following is a good thermal conductor?",
+            options: ["Wood", "Plastic", "Copper", "Rubber"],
+            answerIndex: 2,
+            explanation: "Copper is a metal and a highly efficient conductor of heat. Wood, plastic, and rubber are insulators."
+          }
+        ]
+      },
+      {
+        id: "time-motion",
+        name: "Measurement of Time and Motion",
+        objective: "Understand speed, uniform and non-uniform motion, and how ancient clocks and modern pendulums measure time.",
+        progress: [
+          { id: 1, label: "Concept of Speed & Motion types", status: "completed" },
+          { id: 2, label: "Simple Pendulum & Time measurement", status: "active" },
+          { id: 3, label: "Distance-Time Graphs", status: "upcoming" }
+        ],
+        chips: ["Simple pendulum period", "Uniform vs Non-uniform speed", "Distance-time graphs"],
+        initialQuestion: "Welcome! Today we look at **Measurement of Time and Motion**. If two cars are traveling, how do we compare who is faster? How did ancient people measure time before clocks, and how does a simple swing (pendulum) keep time so regularly?",
+        quizzes: [
+          {
+            question: "What is the formula to calculate speed?",
+            options: ["Speed = Distance * Time", "Speed = Time / Distance", "Speed = Distance / Time", "Speed = Distance + Time"],
+            answerIndex: 2,
+            explanation: "Speed is defined as the distance covered by an object per unit time (Distance / Time)."
+          },
+          {
+            question: "If an object covers equal distances in equal intervals of time, its motion is:",
+            options: ["Non-uniform", "Uniform", "Oscillatory", "Random"],
+            answerIndex: 1,
+            explanation: "Uniform motion is when an object moves along a straight line with a constant speed."
+          },
+          {
+            question: "What is the time taken by a pendulum to complete one full oscillation called?",
+            options: ["Frequency", "Amplitude", "Time Period", "Velocity"],
+            answerIndex: 2,
+            explanation: "The Time Period is the duration required for the pendulum bob to swing from one extreme position to another and back."
+          },
+          {
+            question: "The basic unit of speed is:",
+            options: ["km/h", "m/s", "m/min", "km/s"],
+            answerIndex: 1,
+            explanation: "The SI unit of distance is meter (m) and time is second (s), making the basic unit of speed meters per second (m/s)."
+          },
+          {
+            question: "On a distance-time graph, a straight diagonal line represents:",
+            options: ["An object at rest", "Constant speed (uniform motion)", "Increasing speed", "Decreasing speed"],
+            answerIndex: 1,
+            explanation: "A straight diagonal line indicates that distance increases proportionally with time, representing constant speed."
+          }
+        ]
+      },
+      {
+        id: "animal-processes",
+        name: "Life Processes in Animals",
+        objective: "Understand digestion, respiration, circulation, and excretion in animals.",
+        progress: [
+          { id: 1, label: "Digestion and Absorption", status: "completed" },
+          { id: 2, label: "Circulation and Heart structure", status: "active" },
+          { id: 3, label: "Respiration and Excretion", status: "upcoming" }
+        ],
+        chips: ["Double circulation", "How do cells get oxygen?", "Role of kidneys"],
+        initialQuestion: "Welcome! Today we study **Life Processes in Animals**. Every second, your heart pumps blood to transport oxygen and nutrients, while your kidneys filter wastes. How do you think animal cells convert food into usable energy, and why is a circulatory system necessary in larger animals?",
+        quizzes: [
+          {
+            question: "Where does the absorption of digested food mainly occur in the human body?",
+            options: ["Stomach", "Large intestine", "Small intestine", "Mouth"],
+            answerIndex: 2,
+            explanation: "The small intestine has thousands of finger-like projections called villi that increase the surface area for food absorption."
+          },
+          {
+            question: "What is the function of Red Blood Cells (RBCs)?",
+            options: ["Fight infections", "Clot blood at wounds", "Transport oxygen using hemoglobin", "Produce digest juices"],
+            answerIndex: 2,
+            explanation: "RBCs contain a red pigment called hemoglobin, which binds with oxygen and transports it to all cells."
+          },
+          {
+            question: "How many chambers are there in the human heart?",
+            options: ["2", "3", "4", "5"],
+            answerIndex: 2,
+            explanation: "The human heart has 4 chambers: two upper auricles (atria) and two lower ventricles to prevent mixing of oxygen-rich and carbon dioxide-rich blood."
+          },
+          {
+            question: "What organs filter nitrogenous wastes from the blood to form urine?",
+            options: ["Lungs", "Kidneys", "Liver", "Intestines"],
+            answerIndex: 1,
+            explanation: "The kidneys act as a filtration system, removing waste materials from the blood, which are excreted as urine."
+          },
+          {
+            question: "During heavy exercise, cramps in leg muscles occur due to the accumulation of:",
+            options: ["Alcohol", "Carbon dioxide", "Lactic acid", "Water"],
+            answerIndex: 2,
+            explanation: "Anaerobic respiration in muscles due to temporary oxygen shortage produces lactic acid, causing muscle cramps."
+          }
+        ]
+      },
+      {
+        id: "plant-processes",
+        name: "Life Processes in Plants",
+        objective: "Explore photosynthesis, transport of water and nutrients (xylem/phloem), and plant respiration.",
+        progress: [
+          { id: 1, label: "Photosynthesis and Stomata", status: "completed" },
+          { id: 2, label: "Transport via Xylem & Phloem", status: "active" },
+          { id: 3, label: "Transpiration and Respiration", status: "upcoming" }
+        ],
+        chips: ["Xylem and Phloem", "Stomata gas exchange", "How do plants breathe?"],
+        initialQuestion: "Welcome! Today we study **Life Processes in Plants**. While animals eat food, plants prepare it using sunlight, carbon dioxide, and water. How do plants absorb water from the soil and transport it all the way to high leaves against gravity?",
+        quizzes: [
+          {
+            question: "What is the green pigment in leaves that traps solar energy for photosynthesis?",
+            options: ["Hemoglobin", "Chlorophyll", "Xanthophyll", "Melanin"],
+            answerIndex: 1,
+            explanation: "Chlorophyll gives leaves their green color and absorbs solar energy to convert water and CO2 into glucose."
+          },
+          {
+            question: "Which plant tissue transports water and dissolved minerals from roots to leaves?",
+            options: ["Phloem", "Xylem", "Stomata", "Pith"],
+            answerIndex: 1,
+            explanation: "Xylem is the vascular tissue that forms a continuous network of channels from roots to leaves to carry water."
+          },
+          {
+            question: "Which tissue carries prepared food from the leaves to other parts of the plant?",
+            options: ["Xylem", "Phloem", "Root hairs", "Guard cells"],
+            answerIndex: 1,
+            explanation: "Phloem is the vascular tissue responsible for the translocation of food (sugar) prepared by the leaves."
+          },
+          {
+            question: "What are the tiny pores on the surface of leaves used for gas exchange called?",
+            options: ["Vessels", "Stomata", "Tracheids", "Villi"],
+            answerIndex: 1,
+            explanation: "Stomata are small pores surrounded by guard cells, allowing carbon dioxide to enter and oxygen/water vapor to exit."
+          },
+          {
+            question: "The loss of water vapor from leaves is called:",
+            options: ["Photosynthesis", "Respiration", "Transpiration", "Translocation"],
+            answerIndex: 2,
+            explanation: "Transpiration is the evaporation of water from stomata. It creates a suction pull that helps draw water up from roots."
+          }
+        ]
+      },
+      {
+        id: "light-shadows",
+        name: "Light: Shadows and Reflections",
+        objective: "Understand reflection, rectilinear propagation of light, shadows, pinhole cameras, and types of mirrors.",
+        progress: [
+          { id: 1, label: "Rectilinear Propagation & Shadows", status: "completed" },
+          { id: 2, label: "Reflection & Lateral Inversion", status: "active" },
+          { id: 3, label: "Spherical Mirrors (Concave/Convex)", status: "upcoming" }
+        ],
+        chips: ["Concave vs Convex mirrors", "Rectilinear propagation", "Lateral inversion"],
+        initialQuestion: "Welcome! Today we study **Light: Shadows and Reflections**. When you look in a mirror, your right hand appears as your left hand—this is called lateral inversion. Why does light travel in a straight line, and how do concave and convex mirrors bend reflections differently?",
+        quizzes: [
+          {
+            question: "Light traveling in a straight line is a property known as:",
+            options: ["Reflection", "Rectilinear propagation", "Refraction", "Dispersion"],
+            answerIndex: 1,
+            explanation: "Rectilinear propagation of light is the tendency of light to travel in straight lines in a uniform medium."
+          },
+          {
+            question: "The phenomenon where the left of an object appears on the right in a plane mirror is:",
+            options: ["Refraction", "Lateral inversion", "Dispersion", "Diffraction"],
+            answerIndex: 1,
+            explanation: "Lateral inversion is the sideways reversal of an image formed by a plane mirror."
+          },
+          {
+            question: "Which mirror is used by dentists to see enlarged images of teeth?",
+            options: ["Convex mirror", "Concave mirror", "Plane mirror", "Double-convex lens"],
+            answerIndex: 1,
+            explanation: "Concave mirrors form virtual, upright, and magnified images when objects are held close, helping dentists see details."
+          },
+          {
+            question: "Which mirror is used as a side-view mirror in vehicles because it provides a wider field of view?",
+            options: ["Concave mirror", "Convex mirror", "Plane mirror", "Cylindrical mirror"],
+            answerIndex: 1,
+            explanation: "Convex mirrors form diminished, upright images, allowing drivers to view a much larger area of traffic behind them."
+          },
+          {
+            question: "What is required to form a shadow?",
+            options: ["A light source and an opaque object", "A transparent sheet", "A magnifying glass", "Only a mirror"],
+            answerIndex: 0,
+            explanation: "A shadow is formed when an opaque object blocks the path of light rays from a light source."
+          }
+        ]
+      },
+      {
+        id: "earth-moon-sun",
+        name: "Earth, Moon, and the Sun",
+        objective: "Explain day and night, seasons, phases of the Moon, and solar/lunar eclipses.",
+        progress: [
+          { id: 1, label: "Rotation and Day/Night", status: "completed" },
+          { id: 2, label: "Revolution and Seasons change", status: "active" },
+          { id: 3, label: "Moon phases and Eclipses", status: "upcoming" }
+        ],
+        chips: ["Why do seasons change?", "Phases of the Moon", "Solar and Lunar Eclipses"],
+        initialQuestion: "Welcome! Today we study **Earth, Moon, and the Sun**. Every month, the Moon seems to change shape from a thin crescent to a bright full circle. What causes these phases, and why do eclipses only happen occasionally rather than every month?",
+        quizzes: [
+          {
+            question: "What causes day and night on Earth?",
+            options: ["Revolution of Earth around the Sun", "Rotation of Earth on its axis", "Movement of the Sun", "Phases of the Moon"],
+            answerIndex: 1,
+            explanation: "Earth rotates on its axis once every 24 hours. The side facing the Sun experiences day, and the side facing away experiences night."
+          },
+          {
+            question: "Why do we have different seasons on Earth?",
+            options: ["Because of the Earth's rotation speed", "The tilt of the Earth's axis combined with its revolution around the Sun", "The distance from the Moon", "Volcanic activity"],
+            answerIndex: 1,
+            explanation: "Earth's axis is tilted at 23.5 degrees. As it revolves around the Sun, different hemispheres receive varying amounts of direct sunlight, causing seasons."
+          },
+          {
+            question: "What is the phase called when the Moon is completely invisible from Earth?",
+            options: ["Full Moon", "New Moon", "Gibbous Moon", "Crescent Moon"],
+            answerIndex: 1,
+            explanation: "On a New Moon day (Amavasya), the dark side of the Moon faces Earth, making it completely invisible."
+          },
+          {
+            question: "During a solar eclipse, what is the alignment of the celestial bodies?",
+            options: ["Earth is between Sun and Moon", "Moon is between Sun and Earth", "Sun is between Earth and Moon", "They are not aligned"],
+            answerIndex: 1,
+            explanation: "A solar eclipse occurs when the Moon passes directly between the Sun and the Earth, casting a shadow on Earth."
+          },
+          {
+            question: "How long does it take for the Moon to complete one orbit around the Earth?",
+            options: ["24 hours", "365 days", "About 27.3 days", "7 days"],
+            answerIndex: 2,
+            explanation: "The Moon takes approximately 27.3 days to complete one full revolution around the Earth."
           }
         ]
       }

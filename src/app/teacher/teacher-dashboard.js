@@ -166,6 +166,8 @@ export default function TeacherDashboard() {
   } else if (isClass7) {
     if (subject === "history") {
       subjectKey = "history_class7";
+    } else if (subject === "science") {
+      subjectKey = "science_class7";
     }
   }
 
@@ -209,7 +211,8 @@ export default function TeacherDashboard() {
                        (sub === "history" && isC10) ? "history_class10" :
                        (sub === "science" && isC6) ? "science_class6" :
                        (sub === "history" && isC6) ? "history_class6" :
-                       (sub === "history" && isC7) ? "history_class7" : sub;
+                       (sub === "history" && isC7) ? "history_class7" :
+                       (sub === "science" && isC7) ? "science_class7" : sub;
         const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
         if (chapters.length > 0) {
           setSelectedTopic(chapters[0].name);
@@ -672,7 +675,8 @@ export default function TeacherDashboard() {
                                  (subject === "history" && isC10) ? "history_class10" :
                                  (subject === "science" && isC6) ? "science_class6" :
                                  (subject === "history" && isC6) ? "history_class6" :
-                                 (subject === "history" && isC7) ? "history_class7" : subject;
+                                 (subject === "history" && isC7) ? "history_class7" :
+                                 (subject === "science" && isC7) ? "science_class7" : subject;
                   const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
                   if (chapters.length > 0) {
                     setSelectedTopic(chapters[0].name);
@@ -713,7 +717,8 @@ export default function TeacherDashboard() {
                                  (newSub === "history" && isC10) ? "history_class10" :
                                  (newSub === "science" && isC6) ? "science_class6" :
                                  (newSub === "history" && isC6) ? "history_class6" :
-                                 (newSub === "history" && isC7) ? "history_class7" : newSub;
+                                 (newSub === "history" && isC7) ? "history_class7" :
+                                 (newSub === "science" && isC7) ? "science_class7" : newSub;
                   const chapters = CHAPTERS_DATA[subKey]?.chapters || [];
                   if (chapters.length > 0) {
                     setSelectedTopic(chapters[0].name);
@@ -769,7 +774,7 @@ export default function TeacherDashboard() {
                  subject === "physics" ? "Class 11/12 Physics" :
                  subject === "chemistry" ? "Class 11/12 Chemistry" :
                  subject === "biology" ? "Class 11/12 Biology" :
-                 subject === "science" ? (isClass10 ? "Class 10 Science" : isClass6 ? "Class 6 Science" : "Science Curriculum") :
+                 subject === "science" ? (isClass10 ? "Class 10 Science" : isClass6 ? "Class 6 Science" : isClass7 ? "Class 7 Science" : "Science Curriculum") :
                  subject === "history" ? (isClass10 ? "Class 10 History" : isClass6 ? "Class 6 History" : isClass7 ? "Class 7 History" : "History Curriculum") : currentUnit.name}
               </div>
               <div className="td-unit-desc">
@@ -777,7 +782,7 @@ export default function TeacherDashboard() {
                  subject === "physics" ? "Higher Secondary Physics" :
                  subject === "chemistry" ? "Higher Secondary Chemistry" :
                  subject === "biology" ? "Higher Secondary Biology" :
-                 subject === "science" ? (isClass10 ? "CBSE Class 10 Science Curriculum" : isClass6 ? "CBSE Class 6 Science Curriculum" : "General Science Concepts") :
+                 subject === "science" ? (isClass10 ? "CBSE Class 10 Science Curriculum" : isClass6 ? "CBSE Class 6 Science Curriculum" : isClass7 ? "CBSE Class 7 Science Curriculum" : "General Science Concepts") :
                  subject === "history" ? (isClass10 ? "CBSE Class 10 History Curriculum" : isClass6 ? "CBSE Class 6 History Curriculum" : isClass7 ? "CBSE Class 7 History Curriculum" : "General History Concepts") : currentUnit.description}
               </div>
             </div>

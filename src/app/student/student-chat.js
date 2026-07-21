@@ -140,6 +140,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
     if (subj === "science" && isC6) return "science_class6";
     if (subj === "history" && isC6) return "history_class6";
     if (subj === "history" && isC7) return "history_class7";
+    if (subj === "science" && isC7) return "science_class7";
     return subj;
   }
 
@@ -166,6 +167,8 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
   } else if (isClass7) {
     if (currentSubject === "history") {
       subjectKey = "history_class7";
+    } else if (currentSubject === "science") {
+      subjectKey = "science_class7";
     }
   }
 
