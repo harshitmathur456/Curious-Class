@@ -1291,3 +1291,15 @@
   padding: 8px;
   color: var(--color-text-secondary);
 }
+
+/* Curious Corner Styling */
+.cc-news-card {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cc-news-card:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-bg-white) !important;
+  box-shadow: 0 4px 12px rgba(42, 122, 80, 0.08);
+  transform: translateY(-1px);
+}

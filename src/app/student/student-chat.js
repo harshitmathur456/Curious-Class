@@ -116,7 +116,7 @@ function getReasoningLevel(messages) {
 
 /* ─── Main Component ─────────────────────────────────────────── */
 
-export default function StudentChat({ subject = null }) {
+export default function StudentChat({ subject = null, isCuriousCorner = false }) {
   const [currentSubject, setCurrentSubject] = useState(subject);
   const router = useRouter();
   const [selectedClass, setSelectedClass] = useState("");
@@ -231,12 +231,40 @@ export default function StudentChat({ subject = null }) {
   const [pushedQuizzes, setPushedQuizzes] = useState([]);
   const [activeQuizTopic, setActiveQuizTopic] = useState("");
 
+  // Load tracked topics from localStorage or initialize with defaults on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("trackedTopics");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setTrackedTopics(parsed);
+            // Fetch news for each topic
+            parsed.forEach((topic) => {
+              fetchNewsForTopic(topic);
+            });
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse trackedTopics", e);
+        }
+      }
+      
+      // Default fallback topics
+      const defaultTopics = ["Space", "Artificial Intelligence", "Climate Change"];
+      setTrackedTopics(defaultTopics);
+      localStorage.setItem("trackedTopics", JSON.stringify(defaultTopics));
+      defaultTopics.forEach((topic) => {
+        fetchNewsForTopic(topic);
+      });
+    }
+  }, []);
+
   // Initialize/reset states when subject changes
   useEffect(() => {
     setActiveTopic("");
     setMessages([]);
-    setTrackedTopics([]);
-    setNews({});
     setInputValue("");
     setFollowUpIndex(0);
     setTopicInput("");
@@ -517,14 +545,22 @@ export default function StudentChat({ subject = null }) {
   function handleAddTopic() {
     const t = topicInput.trim();
     if (t && trackedTopics.length < 5 && !trackedTopics.includes(t)) {
-      setTrackedTopics([...trackedTopics, t]);
+      const newTopics = [...trackedTopics, t];
+      setTrackedTopics(newTopics);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("trackedTopics", JSON.stringify(newTopics));
+      }
       setTopicInput("");
       fetchNewsForTopic(t);
     }
   }
 
   function handleRemoveTopic(t) {
-    setTrackedTopics(trackedTopics.filter((x) => x !== t));
+    const newTopics = trackedTopics.filter((x) => x !== t);
+    setTrackedTopics(newTopics);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("trackedTopics", JSON.stringify(newTopics));
+    }
   }
 
   useEffect(() => {
@@ -662,7 +698,7 @@ export default function StudentChat({ subject = null }) {
   }
 
   return (
-    !currentSubject ? (
+    !currentSubject && !isCuriousCorner ? (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--color-bg)' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Welcome to CuriousClass</h1>
         <p style={{ fontSize: '1.2rem', marginBottom: '2.5rem', color: 'var(--color-text-secondary)' }}>What would you like to study today?</p>
@@ -741,6 +777,16 @@ export default function StudentChat({ subject = null }) {
             </div>
           </div>
 
+          {/* Explore Navigation */}
+          <div className="sc-subject-nav" style={{ marginTop: "var(--space-lg)" }}>
+            <div className="sc-subject-nav-label">Explore</div>
+            <div className="sc-subject-nav-links">
+              <Link href="/student/curious-corner" className={`sc-subject-link ${isCuriousCorner ? "sc-subject-link--active" : ""}`}>
+                📰 Curious Corner
+              </Link>
+            </div>
+          </div>
+
           {/* Today's Goal */}
           {activeTopic && (
             <div className="sc-goal-card">
@@ -752,53 +798,6 @@ export default function StudentChat({ subject = null }) {
               <div className="sc-goal-objective">{config.goal.objective}</div>
             </div>
           )}
-
-          {/* Track Topics (News) */}
-          <div className="sc-rs-section" style={{ marginTop: "var(--space-xl)", width: "100%" }}>
-            <h3 className="sc-rs-subtitle" style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", color: "var(--color-text-tertiary)", fontWeight: "600", marginBottom: "var(--space-sm)" }}>Track Topics (News)</h3>
-            <p className="sc-rs-desc" style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "var(--space-md)" }}>Add up to 5 topics to get live news</p>
-            <div className="sc-rs-input-group" style={{ display: "flex", gap: "8px", marginBottom: "var(--space-md)" }}>
-              <input 
-                type="text" 
-                placeholder="E.g., Space, AI..." 
-                value={topicInput}
-                onChange={(e) => setTopicInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddTopic();
-                }}
-                disabled={trackedTopics.length >= 5}
-                className="sc-rs-input"
-                style={{ flex: 1, padding: "8px 12px", border: "1px solid var(--color-border-light)", borderRadius: "8px", fontSize: "13px", outline: "none" }}
-              />
-              <button onClick={handleAddTopic} disabled={!topicInput.trim() || trackedTopics.length >= 5} className="sc-rs-add-btn" style={{ padding: "0 12px", background: "var(--color-primary)", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>+</button>
-            </div>
-            
-            <div className="sc-rs-tracked" style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
-              {trackedTopics.map(topic => (
-                <div key={topic} className="sc-rs-topic-card" style={{ background: "white", border: "1px solid var(--color-border-light)", borderRadius: "8px", padding: "var(--space-sm)" }}>
-                  <div className="sc-rs-topic-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                    <h4 style={{ margin: 0, fontSize: "13px", color: "var(--color-text-primary)", fontWeight: "600" }}>{topic}</h4>
-                    <button onClick={() => handleRemoveTopic(topic)} style={{ background: "none", border: "none", color: "var(--color-text-tertiary)", cursor: "pointer", fontSize: "16px" }}>×</button>
-                  </div>
-                  <div className="sc-rs-news-list" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {news[topic] ? (
-                      news[topic].length > 0 ? (
-                        news[topic].map((article, i) => (
-                          <a key={i} href={article.link} target="_blank" rel="noreferrer" className="sc-rs-news-item" style={{ fontSize: "12px", color: "var(--color-text-secondary)", textDecoration: "none", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            • {article.title}
-                          </a>
-                        ))
-                      ) : (
-                        <span className="sc-rs-no-news" style={{ fontSize: "12px", color: "var(--color-text-tertiary)", fontStyle: "italic" }}>No recent news found.</span>
-                      )
-                    ) : loadingNews ? (
-                      <span className="sc-rs-no-news" style={{ fontSize: "12px", color: "var(--color-text-tertiary)", fontStyle: "italic" }}>Loading...</span>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
 
@@ -813,12 +812,170 @@ export default function StudentChat({ subject = null }) {
         )}
       </aside>
 
-      <main className="sc-main" style={!activeTopic ? { padding: "var(--space-2xl)", overflowY: "auto" } : {}}>
+      <main className="sc-main" style={(!activeTopic || isCuriousCorner) ? { padding: "var(--space-2xl)", overflowY: "auto" } : {}}>
         <div className="sc-mobile-toggle" style={{ display: 'none', justifyContent: 'space-between', padding: '10px 20px', borderBottom: '1px solid #eee', background: 'white' }}>
           <button onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)} style={{ background: 'none', border: 'none', fontSize: '20px' }}>☰ Menu</button>
-          {activeTopic && <button onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)} style={{ background: 'none', border: 'none', fontSize: '20px' }}>📘 Hub</button>}
+          {activeTopic && !isCuriousCorner && <button onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)} style={{ background: 'none', border: 'none', fontSize: '20px' }}>📘 Hub</button>}
         </div>
-        {!activeTopic ? (
+        {isCuriousCorner ? (
+          <div className="sc-curious-corner-view" style={{ maxWidth: "800px", margin: "0 auto", width: "100%" }}>
+            <div className="sc-cc-header" style={{ marginBottom: "var(--space-2xl)", borderBottom: "1px solid var(--color-border-light)", paddingBottom: "var(--space-lg)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "var(--space-xs)" }}>
+                <span style={{ fontSize: "2rem" }}>🧠</span>
+                <h1 style={{ fontSize: "28px", fontWeight: "700", color: "var(--color-primary-dark)", margin: 0 }}>Curious Corner</h1>
+              </div>
+              <p style={{ fontSize: "14px", color: "var(--color-text-secondary)" }}>
+                Explore live news and fuel your curiosity. Track up to 5 topics to get real-time articles.
+              </p>
+            </div>
+
+            {/* Input Section */}
+            <div style={{ 
+              background: "white", 
+              border: "1px solid var(--color-border-light)", 
+              borderRadius: "12px", 
+              padding: "var(--space-lg)", 
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+              marginBottom: "var(--space-2xl)"
+            }}>
+              <h3 style={{ fontSize: "14px", fontWeight: "600", color: "var(--color-text-primary)", marginBottom: "var(--space-sm)" }}>
+                Add Topic to Track
+              </h3>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <input 
+                  type="text" 
+                  placeholder="E.g., Chandrayaan, Renewable Energy, Robotics..." 
+                  value={topicInput}
+                  onChange={(e) => setTopicInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleAddTopic();
+                  }}
+                  disabled={trackedTopics.length >= 5}
+                  style={{ 
+                    flex: 1, 
+                    padding: "10px 16px", 
+                    border: "1px solid var(--color-border-medium)", 
+                    borderRadius: "8px", 
+                    fontSize: "14px",
+                    background: trackedTopics.length >= 5 ? "#f5f5f5" : "white"
+                  }}
+                />
+                <button 
+                  onClick={handleAddTopic} 
+                  disabled={!topicInput.trim() || trackedTopics.length >= 5}
+                  style={{ 
+                    padding: "0 24px", 
+                    background: "var(--color-primary)", 
+                    color: "white", 
+                    border: "none", 
+                    borderRadius: "8px", 
+                    cursor: "pointer", 
+                    fontWeight: "600",
+                    transition: "all 0.2s",
+                    opacity: (!topicInput.trim() || trackedTopics.length >= 5) ? 0.6 : 1
+                  }}
+                >
+                  Add Topic
+                </button>
+              </div>
+              <p style={{ fontSize: "12px", color: "var(--color-text-tertiary)", marginTop: "8px" }}>
+                {trackedTopics.length}/5 topics tracked. {trackedTopics.length >= 5 && "Remove a topic to add a new one."}
+              </p>
+            </div>
+
+            {/* Topics Grid */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              {trackedTopics.map(topic => (
+                <div key={topic} style={{ 
+                  background: "white", 
+                  border: "1px solid var(--color-border-light)", 
+                  borderRadius: "12px", 
+                  padding: "var(--space-lg)", 
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", borderBottom: "1px solid #f5f5f5", paddingBottom: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "1.2rem" }}>🔍</span>
+                      <h2 style={{ margin: 0, fontSize: "18px", color: "var(--color-primary-dark)", fontWeight: "600" }}>{topic}</h2>
+                    </div>
+                    <button 
+                      onClick={() => handleRemoveTopic(topic)} 
+                      style={{ 
+                        background: "var(--color-red-bg)", 
+                        color: "var(--color-red-text)", 
+                        border: "none", 
+                        padding: "6px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer", 
+                        fontSize: "12px",
+                        fontWeight: "500"
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {news[topic] ? (
+                      news[topic].length > 0 ? (
+                        news[topic].map((article, i) => (
+                          <a 
+                            key={i} 
+                            href={article.link} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            style={{ 
+                              display: "block",
+                              padding: "12px",
+                              borderRadius: "8px",
+                              background: "#fafafa",
+                              border: "1px solid #f0f0f0",
+                              transition: "all 0.2s",
+                              textDecoration: "none"
+                            }}
+                            className="cc-news-card"
+                          >
+                            <div style={{ fontWeight: "600", fontSize: "14px", color: "var(--color-text-primary)", marginBottom: "4px" }}>
+                              {article.title}
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", color: "var(--color-text-tertiary)" }}>
+                              <span>Source: {article.source}</span>
+                              <span>{article.pubDate ? new Date(article.pubDate).toLocaleDateString() : ""}</span>
+                            </div>
+                          </a>
+                        ))
+                      ) : (
+                        <div style={{ textAlign: "center", padding: "20px", color: "var(--color-text-tertiary)", fontStyle: "italic" }}>
+                          No recent news found for this topic. Try another search.
+                        </div>
+                      )
+                    ) : loadingNews ? (
+                      <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                        <div className="sc-typing-dots">
+                          <span /><span /><span />
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: "center", padding: "20px", color: "var(--color-text-tertiary)", fontStyle: "italic" }}>
+                        Waiting to load...
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {trackedTopics.length === 0 && (
+                <div style={{ textAlign: "center", padding: "40px", background: "white", border: "1px dashed var(--color-border-medium)", borderRadius: "12px" }}>
+                  <span style={{ fontSize: "3rem" }}>📰</span>
+                  <h3 style={{ fontSize: "16px", color: "var(--color-text-primary)", marginTop: "12px", marginBottom: "8px" }}>No topics added yet</h3>
+                  <p style={{ fontSize: "14px", color: "var(--color-text-secondary)", maxWidth: "400px", margin: "0 auto" }}>
+                    Add your favorite topics above to start tracking latest news articles!
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : !activeTopic ? (
           <div className="sc-topic-select-view">
             <div className="sc-tsv-header">
               <h1>Select a Chapter</h1>
@@ -1128,7 +1285,7 @@ export default function StudentChat({ subject = null }) {
       </main>
 
       {/* ── Right Sidebar (Knowledge Hub) ── */}
-      {activeTopic && (
+      {activeTopic && !isCuriousCorner && (
         <aside className={`sc-right-sidebar ${isRightSidebarOpen ? 'mobile-open' : ''}`}>
           <button className="sc-mobile-toggle" onClick={() => setIsRightSidebarOpen(false)} style={{ position: 'absolute', right: '10px', top: '10px' }}>✕</button>
           <h2 className="sc-rs-title">Knowledge Hub</h2>
