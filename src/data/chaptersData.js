@@ -2690,5 +2690,362 @@ export const CHAPTERS_DATA = {
         ]
       }
     ]
+  },
+  history_class7: {
+    title: "History",
+    chapters: [
+      {
+        id: "tracing-changes",
+        name: "Introduction: Tracing Changes Through a Thousand Years",
+        objective: "Explore historical terminology, sources like cartography, manuscripts, and social groups over the medieval period (700-1750 AD).",
+        progress: [
+          { id: 1, label: "Maps and Cartography changes", status: "completed" },
+          { id: 2, label: "New and Old Terminologies", status: "active" },
+          { id: 3, label: "Historians and their Sources", status: "upcoming" }
+        ],
+        chips: ["Why did map orientations change?", "Who were the scribes?", "New social/political groups"],
+        initialQuestion: "Welcome to Class 7 History! Over a thousand years (from 700 to 1750 AD), maps of India changed dramatically. An early map by al-Idrisi actually showed South India at the top and Sri Lanka as an island above it! Why do you think geography and maps change so much over time?",
+        quizzes: [
+          {
+            question: "Who was al-Idrisi?",
+            options: ["A French cartographer", "An Arab geographer/cartographer", "A Chinese traveler", "An Indian merchant"],
+            answerIndex: 1,
+            explanation: "Al-Idrisi was an Arab geographer who made a famous world map in 1154, showing the Indian subcontinent."
+          },
+          {
+            question: "What is a cartographer?",
+            options: ["A person who makes maps", "A person who writes books", "A person who designs buildings", "A person who studies rocks"],
+            answerIndex: 0,
+            explanation: "A cartographer is a specialist who draws or produces maps."
+          },
+          {
+            question: "Why did paper become cheaper and more widely available in the 14th century?",
+            options: ["Because of plastic use", "It was imported from America", "Due to improvements in manufacturing and distribution", "No one wanted to write"],
+            answerIndex: 2,
+            explanation: "During the 13th and 14th centuries, paper became much cheaper and widely available, so people used it to write chronicles, holy texts, and letters."
+          },
+          {
+            question: "Scribes were people who copied manuscripts by hand. What was a major difficulty they faced?",
+            options: ["They did not have paper", "Reading the original handwriting and occasionally introducing changes in words", "They were not allowed to write", "They had to print using machines"],
+            answerIndex: 1,
+            explanation: "Since there were no printing presses, scribes copied manuscripts by hand, which made it hard to read different handwritings and led to small, accidental changes."
+          },
+          {
+            question: "What did the term 'Hindustan' mean to Minhaj-i-Siraj in the 13th century?",
+            options: ["The entire modern republic of India", "Only South India", "Areas of Punjab, Haryana, and the lands between Ganga and Yamuna", "The Himalayan region"],
+            answerIndex: 2,
+            explanation: "Minhaj-i-Siraj used 'Hindustan' in a political sense to mean lands that were part of the Delhi Sultan's dominions (mainly North India)."
+          }
+        ]
+      },
+      {
+        id: "kings-kingdoms",
+        name: "Kings and Kingdoms",
+        objective: "Understand the emergence of new dynasties, land grants, administrative structures, and temple-building (Rashtrakutas, Cholas, etc.).",
+        progress: [
+          { id: 1, label: "Emergence of New Dynasties", status: "completed" },
+          { id: 2, label: "Prashastis and Land Grants", status: "active" },
+          { id: 3, label: "The Cholas Administration", status: "upcoming" }
+        ],
+        chips: ["Who were the Samantas?", "Chola bronze sculptures", "Tripartite struggle"],
+        initialQuestion: "Welcome! Today we are looking at **Kings and Kingdoms** of medieval India. Powerful kings often built grand, tall stone temples. Why do you think medieval rulers spent so much wealth building temples instead of palaces or forts?",
+        quizzes: [
+          {
+            question: "What was the term used for subordinates or big landlords under kings in the 7th century?",
+            options: ["Rajas", "Samantas", "Scribes", "Sultans"],
+            answerIndex: 1,
+            explanation: "By the 7th century, kings acknowledged big landlords or warrior chiefs as Samantas, who brought gifts and military support."
+          },
+          {
+            question: "Which dynasty was founded by Dantidurga after defeating his Chalukya overlord?",
+            options: ["Chola", "Rashtrakuta", "Pala", "Gurjara-Pratihara"],
+            answerIndex: 1,
+            explanation: "Dantidurga was a Rashtrakuta chief who overthrew his Chalukya overlord in the mid-8th century and performed the 'Hiranya-garbha' ritual."
+          },
+          {
+            question: "What does 'Hiranya-garbha' literally mean?",
+            options: ["Golden Womb", "Golden Crown", "Iron Spear", "Royal Chariot"],
+            answerIndex: 0,
+            explanation: "Hiranya-garbha literally means the golden womb, a ritual performed to declare the transition of a non-Kshatriya chief into a Kshatriya."
+          },
+          {
+            question: "The 'Tripartite Struggle' was a long conflict over which wealthy city?",
+            options: ["Delhi", "Kanauj", "Madurai", "Thanjavur"],
+            answerIndex: 1,
+            explanation: "Rulers from the Gurjara-Pratihara, Rashtrakuta, and Pala dynasties fought for centuries to control Kanauj in the Ganga valley."
+          },
+          {
+            question: "Which Chola ruler was famous for building a powerful navy and raiding Southeast Asian kingdoms?",
+            options: ["Vijayalaya", "Rajaraja I", "Rajendra I", "Aditya I"],
+            answerIndex: 2,
+            explanation: "Rajendra I, son of Rajaraja I, expanded the navy, raided Sri Lanka and Southeast Asia, and developed the Ganga valley trade routes."
+          }
+        ]
+      },
+      {
+        id: "delhi-sultanate",
+        name: "Delhi: 12th to 15th Century",
+        objective: "Analyze the Delhi Sultanate dynasties (Tomaras, Chauhans, Khaljis, Tughlaqs) and administrative policies (Iqta system).",
+        progress: [
+          { id: 1, label: "Tomaras and Chauhan Rajputs", status: "completed" },
+          { id: 2, label: "Expansion under Khalji & Tughlaq", status: "active" },
+          { id: 3, label: "Iqta Administration System", status: "upcoming" }
+        ],
+        chips: ["Who was Raziyya?", "What is an Iqta?", "Garrison towns"],
+        initialQuestion: "Welcome! Today we are visiting **Delhi: 12th to 15th Century**. Did you know Delhi first became a capital under the Tomara Rajputs, and then grew into a massive empire under the Delhi Sultans? How do you think sultans defended their garrison towns from Mongol invasions?",
+        quizzes: [
+          {
+            question: "Who was the first woman ruler of the Delhi Sultanate?",
+            options: ["Rudramadevi", "Raziyya", "Didda", "Nur Jahan"],
+            answerIndex: 1,
+            explanation: "Raziyya, the daughter of Sultan Iltutmish, became sultan in 1236. She was removed in 1240 due to noble opposition."
+          },
+          {
+            question: "What is a 'Tarikh' or 'Tawarikh'?",
+            options: ["A type of coin", "Histories written in Persian by learned scribes and administrators", "A royal court dance", "A military rank"],
+            answerIndex: 1,
+            explanation: "Tawarikh (plural of Tarikh) are valuable histories written in Persian, the administrative language of the Delhi Sultanate."
+          },
+          {
+            question: "What was a 'garrison town'?",
+            options: ["A town for farming crops", "A fortified settlement with soldiers", "A market for luxury silks", "A harbor for warships"],
+            answerIndex: 1,
+            explanation: "A garrison town is a heavily fortified town occupied by soldiers to protect and control regions."
+          },
+          {
+            question: "What was the administrative land grant called under the Delhi Sultans?",
+            options: ["Mansab", "Iqta", "Zabt", "Samanta"],
+            answerIndex: 1,
+            explanation: "Sultans divided territories into land grants called Iqtas, managed by governors called Iqtadars or Muqtis."
+          },
+          {
+            question: "Which sultan constructed the Siri Fort and introduced market control price reforms?",
+            options: ["Balban", "Alauddin Khalji", "Muhammad Tughlaq", "Firoz Shah Tughlaq"],
+            answerIndex: 1,
+            explanation: "Alauddin Khalji built Siri garrison town and controlled prices of goods to maintain a large army against Mongol threats."
+          }
+        ]
+      },
+      {
+        id: "mughals",
+        name: "The Mughals (16th to 17th Century)",
+        objective: "Examine the Mughal Empire (Babur to Aurangzeb), Mansabdari system, revenue policies (Zabt), and architectural achievements.",
+        progress: [
+          { id: 1, label: "Mughal Military Campaigns", status: "completed" },
+          { id: 2, label: "Mansabdari and Jagirdari Systems", status: "active" },
+          { id: 3, label: "Akbar's Policies & Sulh-i Kul", status: "upcoming" }
+        ],
+        chips: ["Mansabdars and Jagirdars", "Akbar's Sulh-i Kul", "What was Zabt?"],
+        initialQuestion: "Welcome! Today we study **The Mughals (16th to 17th Century)**. Rulers like Akbar established a massive administration system called Mansabdari and promoted peace through 'Sulh-i kul' (universal peace). What do you think made the Mughals so successful at ruling such a diverse land like India?",
+        quizzes: [
+          {
+            question: "Who was the founder of the Mughal Empire in India?",
+            options: ["Humayun", "Akbar", "Babur", "Sher Shah Suri"],
+            answerIndex: 2,
+            explanation: "Babur founded the Mughal Empire by defeating Ibrahim Lodi at the First Battle of Panipat in 1526."
+          },
+          {
+            question: "Under the Mansabdari system, what did 'Zat' represent?",
+            options: ["The military rank and salary of a noble", "The number of horses kept", "A land measurement unit", "A tax on markets"],
+            answerIndex: 0,
+            explanation: "Zat was a numerical value that determined the rank, salary, and status of a Mansabdar in the imperial hierarchy."
+          },
+          {
+            question: "Where did Mansabdars collect revenue from?",
+            options: ["Direct cash payments", "Land assignments called Jagirs", "Custom duties at ports", "Forest products"],
+            answerIndex: 1,
+            explanation: "Mansabdars received salaries in the form of land assignments called Jagirs, from which their agents collected revenue."
+          },
+          {
+            question: "Who was Akbar's famous revenue minister who introduced the Zabt system?",
+            options: ["Birbal", "Todar Mal", "Abul Fazl", "Man Singh"],
+            answerIndex: 1,
+            explanation: "Todar Mal, Akbar's revenue minister, carried out crop surveys and introduced the Zabt system of taxation."
+          },
+          {
+            question: "What was the administrative concept of 'Sulh-i Kul' promoted by Akbar?",
+            options: ["Tax on non-Muslims", "Universal Peace and tolerance among different religions", "A military tactic", "A new religious book"],
+            answerIndex: 1,
+            explanation: "Sulh-i Kul was Akbar's vision of universal peace and tolerance, focusing on ethics, honesty, and justice rather than religious division."
+          }
+        ]
+      },
+      {
+        id: "tribes-nomads",
+        name: "Tribes, Nomads and Settled Communities",
+        objective: "Understand the lifestyles of tribal societies, nomadic pastoralists, and mobile traders like Banjaras in medieval India.",
+        progress: [
+          { id: 1, label: "Tribal Societies vs Caste Societies", status: "completed" },
+          { id: 2, label: "Nomads and Mobile Traders (Banjaras)", status: "active" },
+          { id: 3, label: "Case Studies: Gonds and Ahoms", status: "upcoming" }
+        ],
+        chips: ["Who were the Banjaras?", "Gond kingdom administration", "Ahom state and Paiks"],
+        initialQuestion: "Welcome! Today we study **Tribes, Nomads and Settled Communities**. While kings ruled big cities, tribal societies lived in forests and hills, and nomads moved with their herds. The Banjaras were mobile traders crucial for transporting grain for royal armies. How do you think nomadic life was different from city life?",
+        quizzes: [
+          {
+            question: "Which group of mobile traders transported grains for sultans and Mughal armies?",
+            options: ["Khokhars", "Banjaras", "Gonds", "Ahoms"],
+            answerIndex: 1,
+            explanation: "The Banjaras were the most important trader-nomads, traveling in caravans (tanda) to sell grains and goods."
+          },
+          {
+            question: "The Gond kingdoms were divided into administrative units called:",
+            options: ["Iqtas", "Chaurasis", "Jagirs", "Subas"],
+            answerIndex: 1,
+            explanation: "Gond kingdoms were divided into Garhs, each controlled by a Gond clan, further split into units of 84 villages called Chaurasi."
+          },
+          {
+            question: "From which country did the Ahoms migrate to the Brahmaputra valley in the 13th century?",
+            options: ["Modern Myanmar (Burma)", "Sri Lanka", "Iran", "Nepal"],
+            answerIndex: 0,
+            explanation: "The Ahoms migrated from modern Myanmar to the Brahmaputra valley and built a powerful state."
+          },
+          {
+            question: "In the Ahom state, what were the forced laborers called?",
+            options: ["Scribes", "Muqtis", "Paiks", "Mansabdars"],
+            answerIndex: 2,
+            explanation: "The Ahom state depended on forced labor, and those forced to work for the state were called Paiks."
+          },
+          {
+            question: "Which Gond queen fought bravely against the Mughal forces of Akbar led by Asaf Khan?",
+            options: ["Rani Durgavati", "Rani Lakshmibai", "Rudramadevi", "Rani Didda"],
+            answerIndex: 0,
+            explanation: "Rani Durgavati, the regent of Garha Katanga, refused to submit to the Mughals and died fighting heroically."
+          }
+        ]
+      },
+      {
+        id: "devotional-paths",
+        name: "Devotional Paths to the Divine",
+        objective: "Trace the rise of the Bhakti movement, Sufism, and popular saints (Kabir, Mirabai, Baba Guru Nanak) in medieval India.",
+        progress: [
+          { id: 1, label: "Nayanars and Alvars of South India", status: "completed" },
+          { id: 2, label: "Sufism and Islamic Mysticism", status: "active" },
+          { id: 3, label: "Kabir and Baba Guru Nanak Teachings", status: "upcoming" }
+        ],
+        chips: ["What is Bhakti?", "Sufi Khanqahs", "Teachings of Kabir"],
+        initialQuestion: "Welcome! Today we are exploring **Devotional Paths to the Divine**. During the medieval period, saints from all backgrounds rejected rigid rituals and preached love and direct devotion to God. Kabir wrote simple, powerful verses (dohes) that anyone could sing. Why do you think Bhakti and Sufi teachings became so popular among ordinary people?",
+        quizzes: [
+          {
+            question: "Who were the Nayanars?",
+            options: ["Devotees of Shiva", "Devotees of Vishnu", "Buddhist monks", "Jain scholars"],
+            answerIndex: 0,
+            explanation: "The Nayanars were Shiva devotees who traveled in South India preaching devotion to Lord Shiva."
+          },
+          {
+            question: "Who were the Alvars?",
+            options: ["Devotees of Shiva", "Devotees of Vishnu", "Sufi saints", "Yogis"],
+            answerIndex: 1,
+            explanation: "The Alvars were Vishnu devotees who composed hymns of love and devotion collected in the Divya Prabandham."
+          },
+          {
+            question: "What is a 'Khanqah'?",
+            options: ["A military weapon", "A Sufi hospice or assembly center", "A coin mint", "A tax record book"],
+            answerIndex: 1,
+            explanation: "Sufi masters held assemblies in hospices called Khanqahs, where disciples discussed spiritual matters."
+          },
+          {
+            question: "Where did Mirabai, the famous Bhakti saint, compose her devotional songs?",
+            options: ["Bengal", "Rajasthan and Gujarat", "Tamil Nadu", "Maharashtra"],
+            answerIndex: 1,
+            explanation: "Mirabai was a Rajput princess who became a disciple of Ravidas, composing emotional bhajans in Rajasthan/Gujarat."
+          },
+          {
+            question: "What is the holy book containing compilation of teachings of Baba Guru Nanak and other Bhakti saints?",
+            options: ["Gita", "Guru Granth Sahib", "Ramayana", "Quran"],
+            answerIndex: 1,
+            explanation: "The Guru Granth Sahib contains compiled teachings of Baba Guru Nanak, Guru Angad, Kabir, Ravidas, and Baba Farid."
+          }
+        ]
+      },
+      {
+        id: "regional-cultures",
+        name: "The Making of Regional Cultures",
+        objective: "Explore the development of regional languages (Malayalam, Bengali), literature, painting styles (Miniatures), and temple architecture (Jagannatha cult).",
+        progress: [
+          { id: 1, label: "Cheras and Malayalam Language", status: "completed" },
+          { id: 2, label: "The Jagannatha Cult of Orissa", status: "active" },
+          { id: 3, label: "Miniature Paintings & Bengali Literature", status: "upcoming" }
+        ],
+        chips: ["Cheras and Malayalam", "Miniature paintings", "Growth of Bengali"],
+        initialQuestion: "Welcome! Today we study **The Making of Regional Cultures**. We often identify people by the language they speak or the food they eat. But did you know that many regional languages and art styles, like Kathak dance or Miniature paintings, grew under royal patronage? How does art reflect a region's culture?",
+        quizzes: [
+          {
+            question: "Which kingdom introduced Malayalam language in its official inscriptions in the 9th century?",
+            options: ["Chola", "Chera", "Pandya", "Rashtrakuta"],
+            answerIndex: 1,
+            explanation: "The Chera kingdom of Mahodayapuram introduced Malayalam language and script in its official inscriptions."
+          },
+          {
+            question: "The famous temple of Jagannatha is located in which state?",
+            options: ["Kerala", "Puri, Odisha", "Tamil Nadu", "Gujarat"],
+            answerIndex: 1,
+            explanation: "The Jagannatha temple, dedicated to Lord Vishnu, is located in Puri, Odisha, and is a major pilgrimage center."
+          },
+          {
+            question: "What are 'Miniature' paintings?",
+            options: ["Paintings on giant stone walls", "Small-sized paintings done in water color on cloth or paper", "Paintings made using oil colors on canvas", "Glass engravings"],
+            answerIndex: 1,
+            explanation: "Miniatures are small-sized paintings, usually done in water color on paper or cloth, popular under Mughal and Rajput rulers."
+          },
+          {
+            question: "The classical dance form 'Kathak' is traditionally associated with which region?",
+            options: ["Kerala", "North India", "Odisha", "Tamil Nadu"],
+            answerIndex: 1,
+            explanation: "Kathak emerged in North India, starting as storyteller performances in temples, and evolved into a court dance."
+          },
+          {
+            question: "The text 'Lilatilakam' deals with grammar and poetics. What language mixture did it use?",
+            options: ["Prakrit and Hindi", "Mani-pravalam (Sanskrit and Tamil/Malayalam)", "Persian and Urdu", "Sanskrit and Prakrit"],
+            answerIndex: 1,
+            explanation: "Lilatilakam, written in the 14th century, deals with grammar and poetics and was written in Mani-pravalam ('diamonds and corals')."
+          }
+        ]
+      },
+      {
+        id: "political-formations",
+        name: "Eighteenth-Century Political Formations",
+        objective: "Analyze the decline of the Mughal Empire and the rise of new independent states (Marathas, Sikhs, Jats, Hyderabad, Awadh).",
+        progress: [
+          { id: 1, label: "Decline of the Mughal Empire", status: "completed" },
+          { id: 2, label: "Awadh, Bengal, and Hyderabad", status: "active" },
+          { id: 3, label: "Marathas, Sikhs, and Jats", status: "upcoming" }
+        ],
+        chips: ["Chauth and Sardeshmukhi", "Rise of the Khalsa", "Nawabs of Awadh/Bengal"],
+        initialQuestion: "Welcome! Today we look at **Eighteenth-Century Political Formations**. As the Mughal Empire declined in the 1700s, new independent kingdoms like the Marathas, the Sikhs, and regional Nawabs emerged. Shivaji built a powerful Maratha state using guerilla warfare. What challenges do you think new kingdoms faced when breaking away from a giant empire?",
+        quizzes: [
+          {
+            question: "Which Mughal emperor was imprisoned by his son Aurangzeb?",
+            options: ["Akbar", "Shah Jahan", "Jahangir", "Humayun"],
+            answerIndex: 1,
+            explanation: "Shah Jahan was imprisoned by Aurangzeb in Agra Fort for the remaining years of his life."
+          },
+          {
+            question: "Who was the founder of the Asaf Jahi dynasty in Hyderabad?",
+            options: ["Nizam-ul-Mulk Asaf Jah", "Saadat Khan", "Murshid Quli Khan", "Alivardi Khan"],
+            answerIndex: 0,
+            explanation: "Nizam-ul-Mulk Asaf Jah founded the Hyderabad state in 1724 as the Mughal control weakened."
+          },
+          {
+            question: "What were the land taxes 'Chauth' and 'Sardeshmukhi' collected by?",
+            options: ["Mughals", "Marathas", "Sikhs", "British"],
+            answerIndex: 1,
+            explanation: "The Marathas collected Chauth (25% of land revenue) and Sardeshmukhi (an additional 9-10%) from neighboring lands."
+          },
+          {
+            question: "Under whose leadership did the Sikhs organize themselves into a political state in late 17th century?",
+            options: ["Guru Nanak", "Guru Gobind Singh", "Banda Bahadur", "Ranjit Singh"],
+            answerIndex: 1,
+            explanation: "Guru Gobind Singh organized the Khalsa in 1699, leading to the rise of a sovereign Sikh state."
+          },
+          {
+            question: "Who was the ruler of Awadh who established independent administration in 1722?",
+            options: ["Saadat Khan Burhan-ul-Mulk", "Safdar Jang", "Shuja-ud-Daula", "Asaf-ud-Daula"],
+            answerIndex: 0,
+            explanation: "Saadat Khan was appointed governor of Awadh in 1722 and founded a prosperous, independent state."
+          }
+        ]
+      }
+    ]
   }
 };

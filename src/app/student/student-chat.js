@@ -133,11 +133,13 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
   function getSubjectKey(subj, cls) {
     const isC10 = cls && cls.includes("10");
     const isC6 = cls && cls.includes("6");
+    const isC7 = cls && cls.includes("7");
     if (subj === "mathematics" && isC10) return "mathematics_class10";
     if (subj === "science" && isC10) return "science_class10";
     if (subj === "history" && isC10) return "history_class10";
     if (subj === "science" && isC6) return "science_class6";
     if (subj === "history" && isC6) return "history_class6";
+    if (subj === "history" && isC7) return "history_class7";
     return subj;
   }
 
@@ -145,6 +147,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
 
   const isClass10 = selectedClass && selectedClass.includes("10");
   const isClass6 = selectedClass && selectedClass.includes("6");
+  const isClass7 = selectedClass && selectedClass.includes("7");
   let subjectKey = currentSubject;
   if (isClass10) {
     if (currentSubject === "mathematics") {
@@ -159,6 +162,10 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
       subjectKey = "science_class6";
     } else if (currentSubject === "history") {
       subjectKey = "history_class6";
+    }
+  } else if (isClass7) {
+    if (currentSubject === "history") {
+      subjectKey = "history_class7";
     }
   }
 
