@@ -18,6 +18,7 @@ export async function callGeminiWithFallback(body) {
 
   rawKeys.push(
     process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_FRESH,
     process.env.GEMINI_API_KEY_1,
     process.env.GEMINI_API_KEY_2,
     process.env.GEMINI_API_KEY_3,
@@ -31,7 +32,7 @@ export async function callGeminiWithFallback(body) {
   );
 
   if (keys.length > 0) {
-    const models = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    const models = ["gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
