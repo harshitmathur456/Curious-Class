@@ -1,46 +1,4 @@
-async function callGeminiWithFallback(body) {
-  const keys = [
-    process.env.GEMINI_API_KEY,
-    process.env.GEMINI_API_KEY_BACKUP,
-    process.env.GEMINI_API_KEY_3,
-    process.env.GEMINI_API_KEY_4,
-    process.env.GEMINI_API_KEY_5
-  ].filter(Boolean);
-
-  if (keys.length === 0) {
-    throw new Error("No Gemini API keys configured");
-  }
-
-  let lastError = null;
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const isBackup = i > 0;
-    try {
-      console.log(`[Explano API] Calling Gemini (Key index: ${i}, Backup: ${isBackup})`);
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        return await response.json();
-      } else {
-        const errorText = await response.text();
-        console.error(`[Explano API] Gemini error status (Key index: ${i}):`, response.status, errorText);
-        lastError = new Error(`Gemini API error: ${response.status} - ${errorText}`);
-      }
-    } catch (err) {
-      console.error(`[Explano API] Gemini network/fetch error (Key index: ${i}):`, err);
-      lastError = err;
-    }
-  }
-
-  throw lastError || new Error("Unknown error calling Gemini API");
-}
+import { callGeminiWithFallback } from "@/lib/gemini";
 
 export async function POST(request) {
   try {

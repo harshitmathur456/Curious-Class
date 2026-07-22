@@ -657,10 +657,15 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
       });
 
       if (!res.ok) {
-        throw new Error("Failed to fetch AI response");
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${res.status}: Failed to fetch AI response`);
       }
 
       const data = await res.json();
+      if (!data.text) {
+        throw new Error("No text returned in AI response");
+      }
+
       const aiMsg = {
         id: newMessages.length + 1,
         sender: "ai",
@@ -674,14 +679,14 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
       };
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
-      console.error("Error fetching Gemini response:", err);
+      console.error("Error fetching AI response:", err);
       // Fallback response
       const aiResponse = fallbackFollowUps[followUpIndex % fallbackFollowUps.length];
       const aiMsg = {
         id: newMessages.length + 1,
         sender: "ai",
         mode: aiResponse.mode,
-        text: `${aiResponse.text} *(Note: Gemini API key offline or request failed, using simulation)*`,
+        text: `${aiResponse.text} *(Note: AI service error: ${err.message || 'request failed'}, using simulation)*`,
         timestamp: new Date().toLocaleTimeString("en-US", {
           hour: "numeric",
           minute: "2-digit",

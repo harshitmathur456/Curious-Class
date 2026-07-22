@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { callGeminiWithFallback } from '@/lib/gemini';
 
 function getSupabaseClient() {
   return createClient(
@@ -7,45 +8,6 @@ function getSupabaseClient() {
   );
 }
 
-async function callGeminiWithFallback(body) {
-  const keys = [
-    process.env.GEMINI_API_KEY,
-    process.env.GEMINI_API_KEY_BACKUP,
-    process.env.GEMINI_API_KEY_3,
-    process.env.GEMINI_API_KEY_4,
-    process.env.GEMINI_API_KEY_5
-  ].filter(Boolean);
-
-  if (keys.length === 0) {
-    throw new Error("No Gemini API keys configured");
-  }
-
-  let lastError = null;
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        return await response.json();
-      } else {
-        const errorText = await response.text();
-        lastError = new Error(`Gemini API error: ${response.status} - ${errorText}`);
-      }
-    } catch (err) {
-      lastError = err;
-    }
-  }
-
-  throw lastError || new Error("Unknown error calling Gemini API");
-}
 
 // POST: Generate quiz with Gemini and save to Supabase
 export async function POST(request) {
@@ -89,9 +51,14 @@ Each question object in the array must follow this exact structure:
       const data = await callGeminiWithFallback(body);
       const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!responseText) {
-        throw new Error("Invalid response structure from Gemini");
+        throw new Error("Invalid response structure from AI API");
       }
-      quizQuestions = JSON.parse(responseText);
+      let cleanedText = responseText.trim();
+      if (cleanedText.startsWith("```")) {
+        cleanedText = cleanedText.replace(/^```(json)?\n?/, "").replace(/\n?```$/, "").trim();
+      }
+      const parsed = JSON.parse(cleanedText);
+      quizQuestions = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.quiz || Object.values(parsed)[0]);
     } catch (apiError) {
       console.warn("Gemini API failed, using fallback quiz generation:", apiError.message);
       // Fallback quiz generation
