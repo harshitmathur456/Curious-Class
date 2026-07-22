@@ -1,11 +1,11 @@
 /**
  * Resilient Multi-Provider AI Client.
- * 1. Tries Gemini API keys first (with fast timeout for zero-lag performance).
- * 2. If Gemini fails, immediately falls back to ultra-fast Groq API.
+ * 1. Tries Gemini API keys FIRST across all models and backup keys.
+ * 2. ONLY if all Gemini attempts fail, cascades to Groq API (llama-3.3-70b-versatile) as the LAST fallback.
  */
 
 export async function callGeminiWithFallback(body) {
-  // 1. Try Gemini API keys first
+  // STEP 1: Gemini API Primary Execution (Highest Priority)
   const rawKeys = [];
   
   for (const envKey in process.env) {
@@ -31,16 +31,16 @@ export async function callGeminiWithFallback(body) {
   );
 
   if (keys.length > 0) {
-    const models = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash"];
+    const models = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       for (const model of models) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s fast timeout to prevent lag
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout to give Gemini full chance to respond
 
         try {
-          console.log(`[AI Client] Attempting Gemini model "${model}" with key index ${i}...`);
+          console.log(`[AI Client] Priority 1: Attempting Gemini model "${model}" with key index ${i}...`);
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
           
           const response = await fetch(url, {
@@ -58,7 +58,7 @@ export async function callGeminiWithFallback(body) {
             const data = await response.json();
             const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
             if (text && text.trim()) {
-              console.log(`[AI Client] Successfully generated response via Gemini (${model}, key ${i})`);
+              console.log(`[AI Client] Successfully generated response via Gemini (${model}, key index ${i})`);
               return data;
             }
           }
@@ -67,21 +67,22 @@ export async function callGeminiWithFallback(body) {
           console.warn(`[Gemini API] Key index ${i} with model "${model}" failed (Status ${response.status}): ${errorText.slice(0, 150)}`);
 
           if (response.status === 401) {
-            break; // Move to next key immediately if unauthorized
+            break; // Stop trying invalid key and move to next key immediately
           }
         } catch (err) {
           clearTimeout(timeoutId);
-          console.warn(`[Gemini API] Error/Timeout on key index ${i}, model "${model}":`, err.name === 'AbortError' ? 'Timeout (3.5s)' : err.message);
+          console.warn(`[Gemini API] Error/Timeout on key index ${i}, model "${model}":`, err.name === 'AbortError' ? 'Timeout (5s)' : err.message);
         }
       }
     }
   }
 
-  // 2. Zero-lag Fallback to Groq API if Gemini keys fail or are invalid
-  console.log("[AI Client] Gemini attempt failed or offline. Cascading to Groq API fallback instantly...");
+  // STEP 2: Groq API Fallback (LAST Priority - Only used if ALL Gemini attempts fail)
+  console.log("[AI Client] All Gemini API attempts failed. Cascading to Groq API as LAST priority fallback...");
   const groqApiKey = (process.env.GROQ_API_KEY || "").trim();
   
   if (groqApiKey) {
+    // Priority order for Groq: llama-3.3-70b-versatile is top-tier (70B parameters) matching Gemini/GPT-4 quality
     const groqModels = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"];
     
     const systemText = body.systemInstruction?.parts?.map((p) => p.text).join('\n') || '';
@@ -103,11 +104,12 @@ export async function callGeminiWithFallback(body) {
 
     for (const groqModel of groqModels) {
       try {
-        console.log(`[AI Client] Attempting Groq fallback model "${groqModel}"...`);
+        console.log(`[AI Client] LAST Priority: Attempting Groq fallback model "${groqModel}"...`);
         const groqPayload = {
           model: groqModel,
           messages: messages,
           temperature: body.generationConfig?.temperature ?? 0.7,
+          max_tokens: 2048,
         };
 
         if (isJsonMode) {
@@ -151,5 +153,6 @@ export async function callGeminiWithFallback(body) {
 
   throw new Error("All AI API options (Gemini & Groq fallback) failed to generate content.");
 }
+
 
 
