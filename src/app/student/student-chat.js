@@ -653,6 +653,8 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
         body: JSON.stringify({
           messages: newMessages,
           activeTopic,
+          subject: subjectKey,
+          className: selectedClass,
         }),
       });
 
