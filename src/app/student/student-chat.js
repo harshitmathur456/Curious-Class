@@ -335,6 +335,55 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
   const [pushedQuizzes, setPushedQuizzes] = useState([]);
   const [activeQuizTopic, setActiveQuizTopic] = useState("");
 
+  // Persistent Chat History States
+  const [isChatHistoryView, setIsChatHistoryView] = useState(false);
+  const [savedHistories, setSavedHistories] = useState({});
+
+  // Helper to get student history localStorage key
+  function getStudentHistoryKey() {
+    if (typeof window === "undefined") return "curiousclass_chat_history_guest";
+    const sName = (localStorage.getItem("studentName") || "guest").trim().toLowerCase().replace(/\s+/g, "_");
+    const sRoll = (localStorage.getItem("rollNumber") || "0").trim().toLowerCase();
+    const cls = (localStorage.getItem("selectedClass") || "10").trim().toLowerCase().replace(/\s+/g, "_");
+    return `curiousclass_chat_history_${sName}_${sRoll}_${cls}`;
+  }
+
+  function getSavedChatHistories() {
+    if (typeof window === "undefined") return {};
+    try {
+      const key = getStudentHistoryKey();
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      console.error("Failed to parse saved chat histories", e);
+      return {};
+    }
+  }
+
+  function saveChatHistory(subjKey, topicName, messagesArr, subjTitle) {
+    if (typeof window === "undefined" || !topicName || !messagesArr || messagesArr.length === 0) return;
+    try {
+      const key = getStudentHistoryKey();
+      const all = getSavedChatHistories();
+      const compositeKey = `${subjKey}::${topicName}`;
+      const lastMsg = messagesArr[messagesArr.length - 1];
+
+      all[compositeKey] = {
+        subjectKey: subjKey,
+        subjectTitle: subjTitle || subjKey,
+        topic: topicName,
+        lastUpdated: new Date().toISOString(),
+        lastMessageText: lastMsg ? lastMsg.text : "",
+        lastSender: lastMsg ? lastMsg.sender : "ai",
+        messages: messagesArr,
+      };
+
+      localStorage.setItem(key, JSON.stringify(all));
+    } catch (e) {
+      console.error("Failed to save chat history", e);
+    }
+  }
+
   // Helper to store in-app navigation return state when jumping to 3D visualizer or Timeline
   const saveFeatureReturnState = () => {
     if (typeof window !== "undefined") {
@@ -390,10 +439,54 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
     }
   }, []);
 
+  // Save active conversation messages to persistent storage whenever messages update
+  useEffect(() => {
+    if (activeTopic && messages.length > 0) {
+      const title = CHAPTERS_DATA[subjectKey]?.title || currentSubject;
+      saveChatHistory(subjectKey, activeTopic, messages, title);
+    }
+  }, [messages, activeTopic, subjectKey, currentSubject]);
+
+  // Sync activeTopic from URL ?topic=... or sessionStorage return topic
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlTopic = params.get("topic");
+      const savedReturnTopic = sessionStorage.getItem("curiousclass_return_topic");
+      const targetTopic = urlTopic || savedReturnTopic;
+
+      if (targetTopic) {
+        const foundChapter = allChapters.find((c) => c.name === targetTopic);
+        if (foundChapter) {
+          setActiveTopic(targetTopic);
+          setIsChatHistoryView(false);
+
+          const histories = getSavedChatHistories();
+          const compositeKey = `${subjectKey}::${targetTopic}`;
+          const savedEntry = histories[compositeKey];
+
+          if (savedEntry && Array.isArray(savedEntry.messages) && savedEntry.messages.length > 0) {
+            setMessages(savedEntry.messages);
+          } else {
+            setMessages([
+              {
+                id: 1,
+                sender: "ai",
+                mode: "question",
+                text: foundChapter.initialQuestion,
+                timestamp: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
+              },
+            ]);
+          }
+        }
+        sessionStorage.removeItem("curiousclass_return_topic");
+        sessionStorage.removeItem("curiousclass_from_chat");
+      }
+    }
+  }, [subjectKey]);
+
   // Initialize/reset states when subject changes
   useEffect(() => {
-    setActiveTopic("");
-    setMessages([]);
     setInputValue("");
     setFollowUpIndex(0);
     setTopicInput("");
@@ -635,15 +728,27 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
     if (!chapter) return;
 
     setActiveTopic(topic);
-    setMessages([
-      {
-        id: 1,
-        sender: "ai",
-        mode: "question",
-        text: chapter.initialQuestion,
-        timestamp: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
-      }
-    ]);
+    setIsChatHistoryView(false);
+
+    const histories = getSavedChatHistories();
+    const compositeKey = `${subjectKey}::${topic}`;
+    const savedEntry = histories[compositeKey];
+
+    if (savedEntry && Array.isArray(savedEntry.messages) && savedEntry.messages.length > 0) {
+      setMessages(savedEntry.messages);
+    } else {
+      const initialMsgs = [
+        {
+          id: 1,
+          sender: "ai",
+          mode: "question",
+          text: chapter.initialQuestion,
+          timestamp: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
+        },
+      ];
+      setMessages(initialMsgs);
+      saveChatHistory(subjectKey, topic, initialMsgs, CHAPTERS_DATA[subjectKey]?.title || currentSubject);
+    }
     setInputValue("");
     setFollowUpIndex(0);
     setQuizActive(false);
@@ -917,6 +1022,17 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
           <div className="sc-subject-nav" style={{ marginTop: "var(--space-lg)" }}>
             <div className="sc-subject-nav-label">Explore</div>
             <div className="sc-subject-nav-links">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsChatHistoryView(true);
+                  setSavedHistories(getSavedChatHistories());
+                }}
+                className={`sc-subject-link ${isChatHistoryView ? "sc-subject-link--active" : ""}`}
+                style={{ background: "none", border: "none", width: "100%", textAlign: "left", cursor: "pointer" }}
+              >
+                💬 Chat History
+              </button>
               <Link href="/student/curious-corner" className={`sc-subject-link ${isCuriousCorner ? "sc-subject-link--active" : ""}`}>
                 📰 Curious Corner
               </Link>
@@ -1110,6 +1226,106 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
                 </div>
               )}
             </div>
+          </div>
+        ) : isChatHistoryView ? (
+          <div className="sc-chat-history-view" style={{ maxWidth: "800px", margin: "0 auto", padding: "var(--space-2xl)", width: "100%" }}>
+            <div style={{ marginBottom: "var(--space-2xl)", borderBottom: "1px solid var(--color-border-light)", paddingBottom: "var(--space-lg)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "var(--space-xs)" }}>
+                <span style={{ fontSize: "2rem" }}>💬</span>
+                <h1 style={{ fontSize: "26px", fontWeight: "600", color: "var(--color-primary-dark)", margin: 0 }}>Chat History</h1>
+              </div>
+              <p style={{ fontSize: "14px", color: "var(--color-text-secondary)", margin: "4px 0 0 0" }}>
+                View and resume your past Socratic dialogues with Explano.
+              </p>
+            </div>
+
+            {Object.keys(savedHistories).length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 20px", background: "white", border: "0.5px solid var(--color-border-light)", borderRadius: "12px" }}>
+                <span style={{ fontSize: "3rem", display: "block", marginBottom: "12px" }}>💬</span>
+                <h3 style={{ fontSize: "16px", color: "var(--color-text-primary)", marginBottom: "8px", fontWeight: "600" }}>No Chat History Yet</h3>
+                <p style={{ fontSize: "14px", color: "var(--color-text-secondary)", maxWidth: "420px", margin: "0 auto" }}>
+                  Start a conversation with Explano in any subject to automatically save your dialogue history here!
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {Object.entries(savedHistories)
+                  .sort(([, a], [, b]) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
+                  .map(([compositeKey, item]) => {
+                    const formattedDate = new Date(item.lastUpdated).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "short",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    });
+
+                    return (
+                      <div
+                        key={compositeKey}
+                        onClick={() => {
+                          const rawSubj = item.subjectKey ? item.subjectKey.split("_")[0] : "history";
+                          setCurrentSubject(rawSubj);
+                          setActiveTopic(item.topic);
+                          setMessages(item.messages || []);
+                          setIsChatHistoryView(false);
+                          setQuizActive(false);
+                        }}
+                        style={{
+                          background: "var(--color-bg-white)",
+                          border: "0.5px solid var(--color-border-light)",
+                          borderRadius: "12px",
+                          padding: "16px 20px",
+                          cursor: "pointer",
+                          transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "16px",
+                        }}
+                        className="sc-history-card"
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                            <span style={{
+                              fontSize: "11px",
+                              fontWeight: "600",
+                              background: "var(--color-bg-mint)",
+                              color: "var(--color-primary-dark)",
+                              border: "0.5px solid var(--color-bg-mint-border)",
+                              borderRadius: "20px",
+                              padding: "2px 10px",
+                              textTransform: "uppercase",
+                            }}>
+                              {item.subjectTitle || "Subject"}
+                            </span>
+                            <span style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}>
+                              • {formattedDate}
+                            </span>
+                          </div>
+                          <h3 style={{ fontSize: "16px", fontWeight: "600", color: "var(--color-text-primary)", margin: "0 0 6px 0" }}>
+                            {item.topic}
+                          </h3>
+                          <p style={{
+                            fontSize: "13px",
+                            color: "var(--color-text-secondary)",
+                            margin: 0,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}>
+                            <strong style={{ color: "var(--color-primary-dark)" }}>
+                              {item.lastSender === "user" ? "You: " : "Explano: "}
+                            </strong>
+                            {item.lastMessageText}
+                          </p>
+                        </div>
+                        <div style={{ fontSize: "18px", color: "var(--color-text-tertiary)" }}>→</div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
         ) : !activeTopic ? (
           <div className="sc-topic-select-view">

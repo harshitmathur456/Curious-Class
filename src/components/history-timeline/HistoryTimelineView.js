@@ -26,32 +26,16 @@ export default function HistoryTimelineView({ topic = "salt-march" }) {
 
   const handleGoBack = () => {
     if (typeof window !== "undefined") {
-      const fromChat = sessionStorage.getItem("curiousclass_from_chat");
-      const returnSubject = sessionStorage.getItem("curiousclass_return_subject");
+      const returnSubject = sessionStorage.getItem("curiousclass_return_subject") || "history";
       const returnTopic = sessionStorage.getItem("curiousclass_return_topic");
 
-      sessionStorage.removeItem("curiousclass_from_chat");
-
-      if (fromChat === "true" && window.history.length > 1) {
-        router.back();
-        return;
+      let path = returnSubject === "history" ? "/student" : `/student/${returnSubject}`;
+      if (returnTopic) {
+        path += `?topic=${encodeURIComponent(returnTopic)}`;
       }
-
-      if (returnSubject) {
-        let path = returnSubject === "history" ? "/student" : `/student/${returnSubject}`;
-        if (returnTopic) {
-          path += `?topic=${encodeURIComponent(returnTopic)}`;
-        }
-        router.push(path);
-        return;
-      }
-
-      if (window.history.length > 1 && document.referrer && document.referrer.includes(window.location.host)) {
-        router.back();
-        return;
-      }
+      router.push(path);
+      return;
     }
-
     router.push("/student");
   };
 
