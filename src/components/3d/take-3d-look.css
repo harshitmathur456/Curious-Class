@@ -1,0 +1,575 @@
+/* ─── CuriousClass: Take a 3D Look Design System Stylesheet ────────────────── */
+/* Strictly uses CuriousClass Design Tokens: No Tailwind, No Shadows, No Gradients */
+
+.look3d-page {
+  min-height: 100vh;
+  background-color: var(--color-bg-page, #FAFAFA);
+  color: var(--color-text-primary, #1A1A1A);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header Navigation ─────────────────────────────────────────────────── */
+.look3d-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--color-bg-white, #FFFFFF);
+  border-bottom: 0.5px solid var(--color-border-light, #E5E5E5);
+  padding: 12px 24px;
+}
+
+.look3d-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.look3d-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.look3d-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  border-radius: var(--radius-round, 50%);
+  background-color: var(--color-bg-mint, #EAF3DE);
+  color: var(--color-primary, #2A7A50);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium, 500);
+  border: 0.5px solid var(--color-bg-mint-border, #C0DD97);
+  transition: background-color 0.15s ease;
+}
+
+.look3d-back-btn:hover {
+  background-color: #d8e9c3;
+}
+
+.look3d-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.look3d-app-name {
+  font-size: 16px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary-dark, #27500A);
+  line-height: 1.2;
+}
+
+.look3d-app-sub {
+  font-size: 11px;
+  color: var(--color-text-tertiary, #999999);
+  font-weight: var(--font-weight-regular, 400);
+}
+
+.look3d-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.look3d-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-pill, 20px);
+  background-color: var(--color-bg-mint, #EAF3DE);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary-dark, #27500A);
+  border: 0.5px solid var(--color-bg-mint-border, #C0DD97);
+}
+
+.look3d-return-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-sm, 8px);
+  background-color: var(--color-primary, #2A7A50);
+  color: #FFFFFF;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: var(--font-weight-medium, 500);
+  border: none;
+  transition: background-color 0.15s ease;
+}
+
+.look3d-return-btn:hover {
+  background-color: var(--color-primary-dark, #27500A);
+}
+
+/* ─── Main Content Container ────────────────────────────────────────────── */
+.look3d-main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── Card Container (CuriousClass Flat Card) ───────────────────────────── */
+.look3d-card {
+  background-color: var(--color-bg-white, #FFFFFF);
+  border: 0.5px solid var(--color-border-light, #E5E5E5);
+  border-radius: var(--radius-lg, 16px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: none !important;
+}
+
+.look3d-banner-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.look3d-heading-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.look3d-tag {
+  font-size: 11px;
+  font-weight: var(--font-weight-medium, 500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary, #2A7A50);
+}
+
+.look3d-h1 {
+  font-size: 22px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary-dark, #27500A);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.look3d-equation-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-bg-mint, #EAF3DE);
+  color: var(--color-primary-dark, #27500A);
+  border: 0.5px solid var(--color-bg-mint-border, #C0DD97);
+  padding: 2px 10px;
+  border-radius: var(--radius-pill, 20px);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.look3d-subtext {
+  font-size: 13px;
+  color: var(--color-text-secondary, #666666);
+  font-weight: var(--font-weight-regular, 400);
+  max-width: 650px;
+  line-height: 1.4;
+}
+
+/* ─── Equation Input Field ──────────────────────────────────────────────── */
+.look3d-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 280px;
+}
+
+.look3d-input-label {
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-primary, #1A1A1A);
+}
+
+.look3d-input-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-bg-page, #FAFAFA);
+  border: 0.5px solid var(--color-border-medium, #D4D4D4);
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 12px;
+}
+
+.look3d-input-box:focus-within {
+  border-color: var(--color-primary, #2A7A50);
+  background-color: var(--color-bg-white, #FFFFFF);
+}
+
+.look3d-input-prefix {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary, #2A7A50);
+  font-family: monospace;
+}
+
+.look3d-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-primary, #1A1A1A);
+  font-family: monospace;
+}
+
+.look3d-input::placeholder {
+  color: var(--color-text-tertiary, #999999);
+}
+
+/* ─── Quick Example Pills ───────────────────────────────────────────────── */
+.look3d-samples-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--color-border-light, #E5E5E5);
+}
+
+.look3d-samples-label {
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-secondary, #666666);
+}
+
+.look3d-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill, 20px);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  border: 0.5px solid var(--color-border-medium, #D4D4D4);
+  background-color: var(--color-bg-white, #FFFFFF);
+  color: var(--color-text-primary, #1A1A1A);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.look3d-chip:hover {
+  background-color: var(--color-bg-mint, #EAF3DE);
+  border-color: var(--color-bg-mint-border, #C0DD97);
+  color: var(--color-primary-dark, #27500A);
+}
+
+.look3d-chip--active {
+  background-color: var(--color-bg-mint, #EAF3DE);
+  border-color: var(--color-primary, #2A7A50);
+  color: var(--color-primary-dark, #27500A);
+}
+
+/* ─── Controls Bar & Toggle Buttons ─────────────────────────────────────── */
+.look3d-controls-card {
+  background-color: var(--color-bg-white, #FFFFFF);
+  border: 0.5px solid var(--color-border-light, #E5E5E5);
+  border-radius: var(--radius-lg, 16px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: none !important;
+}
+
+.look3d-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Mode Switcher Group */
+.look3d-button-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--color-bg-sidebar, #F0F7F2);
+  padding: 4px;
+  border-radius: var(--radius-sm, 8px);
+  border: 0.5px solid var(--color-border-light, #E5E5E5);
+}
+
+.look3d-toggle-btn {
+  border-radius: var(--radius-sm, 8px);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  border: 0.5px solid transparent;
+  background-color: transparent;
+  color: var(--color-text-primary, #1A1A1A);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.look3d-toggle-btn:hover {
+  background-color: var(--color-bg-mint, #EAF3DE);
+  color: var(--color-primary-dark, #27500A);
+}
+
+.look3d-toggle-btn--active {
+  background-color: var(--color-primary, #2A7A50);
+  color: #FFFFFF !important;
+  border-color: var(--color-primary, #2A7A50);
+}
+
+/* Single Toggle Button */
+.look3d-action-btn {
+  border-radius: var(--radius-sm, 8px);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  border: 0.5px solid var(--color-border-medium, #D4D4D4);
+  background-color: var(--color-bg-white, #FFFFFF);
+  color: var(--color-text-primary, #1A1A1A);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.look3d-action-btn:hover {
+  background-color: var(--color-bg-mint, #EAF3DE);
+  border-color: var(--color-bg-mint-border, #C0DD97);
+}
+
+.look3d-action-btn--active {
+  background-color: var(--color-primary, #2A7A50);
+  color: #FFFFFF;
+  border-color: var(--color-primary, #2A7A50);
+}
+
+/* Fine tuning inputs */
+.look3d-control-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-bg-sidebar, #F0F7F2);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm, 8px);
+  border: 0.5px solid var(--color-border-light, #E5E5E5);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.look3d-num-input {
+  width: 52px;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  border: 0.5px solid var(--color-border-medium, #D4D4D4);
+  text-align: center;
+  outline: none;
+}
+
+.look3d-range-input {
+  accent-color: var(--color-primary, #2A7A50);
+  cursor: pointer;
+  width: 90px;
+}
+
+/* ─── Custom Theme Dropdown Component ───────────────────────────────────── */
+.look3d-select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.look3d-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background-color: var(--color-bg-white, #FFFFFF);
+  border: 0.5px solid var(--color-border-medium, #D4D4D4);
+  border-radius: var(--radius-sm, 8px);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-primary, #1A1A1A);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  cursor: pointer;
+  min-width: 150px;
+  transition: border-color 0.15s ease;
+}
+
+.look3d-select-trigger:hover,
+.look3d-select-trigger:focus-within {
+  border-color: var(--color-primary, #2A7A50);
+}
+
+.look3d-select-chevron {
+  color: var(--color-text-tertiary, #999999);
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.look3d-select-chevron--open {
+  transform: rotate(180deg);
+}
+
+.look3d-select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  background-color: var(--color-bg-white, #FFFFFF);
+  border: 0.5px solid var(--color-border-light, #E5E5E5);
+  border-radius: var(--radius-sm, 8px);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: none !important;
+}
+
+.look3d-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-primary, #1A1A1A);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.look3d-select-option:hover,
+.look3d-select-option--active {
+  background-color: var(--color-bg-mint, #EAF3DE);
+  color: var(--color-primary-dark, #27500A);
+}
+
+/* ─── Info Amber Banner ─────────────────────────────────────────────────── */
+.look3d-info-banner {
+  background-color: var(--color-amber-bg, #FAEEDA);
+  color: var(--color-amber-text, #633806);
+  border: 0.5px solid #F5E1BF;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Stat Card Readouts ────────────────────────────────────────────────── */
+.look3d-stat-card {
+  background-color: var(--color-bg-mint, #EAF3DE);
+  border: 0.5px solid var(--color-bg-mint-border, #C0DD97);
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.look3d-stat-label {
+  font-size: 11px;
+  color: var(--color-text-secondary, #666666);
+  font-weight: var(--font-weight-regular, 400);
+}
+
+.look3d-stat-value {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary-dark, #27500A);
+  font-family: monospace;
+}
+
+/* ─── Viewport Plot Cards ───────────────────────────────────────────────── */
+.look3d-viewport-card {
+  background-color: var(--color-bg-white, #FFFFFF);
+  border: 0.5px solid var(--color-border-light, #E5E5E5);
+  border-radius: var(--radius-lg, 16px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: none !important;
+}
+
+.look3d-viewport-card--fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
+  background-color: var(--color-bg-page, #FAFAFA) !important;
+  padding: 16px 24px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  overflow: hidden !important;
+}
+
+.look3d-viewport-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.look3d-viewport-title {
+  font-size: 15px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary-dark, #27500A);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.look3d-fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-bg-mint, #EAF3DE);
+  border: 0.5px solid var(--color-bg-mint-border, #C0DD97);
+  border-radius: var(--radius-pill, 20px);
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary-dark, #27500A);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.look3d-fullscreen-btn:hover {
+  background-color: var(--color-primary, #2A7A50);
+  border-color: var(--color-primary, #2A7A50);
+  color: #FFFFFF;
+}

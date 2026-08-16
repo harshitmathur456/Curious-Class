@@ -18,7 +18,8 @@ Each question object in the array must follow this exact structure:
   "options": ["Option A", "Option B", "Option C", "Option D"],
   "answerIndex": 0, // 0-3 indicating the index of the correct option
   "explanation": "Brief explanation of the correct answer."
-}`;
+}
+IMPORTANT: When writing any math equations, formulas, fractions, or symbols in questions, options, or explanations, always use standard LaTeX syntax enclosed in single dollar signs for inline math (e.g., $x^2 + 3x + 2 = 0$, $\\frac{a}{b}$, $\\sqrt{2}$, $\\pi$, $\\theta$).`;
 
     const body = {
       contents: [

@@ -1,13 +1,7 @@
-import { Inter } from "next/font/google";
+import "katex/dist/katex.min.css";
 import "./globals.css";
 import Script from "next/script";
 import LangToggleButton from "./LangToggle";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
 
 export const metadata = {
   title: "CuriousClass — AI-Powered Critical Thinking",
@@ -17,7 +11,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <body>
         {/* Hidden Google Translate mount point */}
         <div id="google_translate_element" style={{ display: "none" }} />

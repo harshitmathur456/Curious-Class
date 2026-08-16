@@ -3,8 +3,67 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { CHAPTERS_DATA } from "@/data/chaptersData";
+import MathText from "@/components/MathText";
+import { detectAnatomyKeyword, ANATOMY_MODELS } from "@/components/3d/anatomyRegistry";
 import "./student-chat.css";
+
+const AnatomyModelViewer = dynamic(() => import("@/components/3d/AnatomyModelViewer"), {
+  ssr: false,
+  loading: () => (
+    <div style={{ padding: "24px", textAlign: "center", color: "var(--color-primary, #2A7A50)", fontSize: "13px", fontWeight: 500 }}>
+      🧬 Loading 3D Model…
+    </div>
+  ),
+});
+
+const AnatomyComingSoon = dynamic(() => import("@/components/3d/AnatomyComingSoon"), {
+  ssr: false,
+});
+
+/**
+ * Detect if message text or active topic is related to History,
+ * returning the appropriate topic slug for the History Timeline feature.
+ */
+function detectHistoryTimeline(text, subject, activeTopic) {
+  const textLower = (text || "").toLowerCase();
+  const topicLower = (activeTopic || "").toLowerCase();
+
+  const isHistorySubject =
+    subject === "history" ||
+    topicLower.includes("salt") ||
+    topicLower.includes("revolt") ||
+    topicLower.includes("history") ||
+    topicLower.includes("cities") ||
+    topicLower.includes("empire") ||
+    topicLower.includes("trade");
+
+  const hasHistoryKeywords =
+    /\b(1857|1930|1757|1947|1920|1942|700|1750|2600|2500|322)\b/.test(textLower) ||
+    /\b(revolution|rebellion|rebel|movement|empire|dynasty|treaty|battle|war|independence|freedom|harappan|ashoka|gupta|mughal|sultanate|viceroy|british|colonial|history|timeline|century|bc|ad)\b/i.test(textLower);
+
+  if (isHistorySubject || hasHistoryKeywords) {
+    if (textLower.includes("1857") || textLower.includes("revolt") || textLower.includes("jhansi") || textLower.includes("mangal")) {
+      return "1857-revolt";
+    }
+    if (textLower.includes("harappa") || textLower.includes("indus") || textLower.includes("city") || textLower.includes("bath")) {
+      return "earliest-cities";
+    }
+    if (textLower.includes("ashoka") || textLower.includes("kalinga") || textLower.includes("maurya") || textLower.includes("dhamma")) {
+      return "kingdom-to-empire";
+    }
+    if (textLower.includes("medieval") || textLower.includes("mughal") || textLower.includes("sultanate") || textLower.includes("akbar")) {
+      return "tracing-changes";
+    }
+    if (textLower.includes("salt") || textLower.includes("dandi") || textLower.includes("gandhi")) {
+      return "salt-march";
+    }
+    return activeTopic || "salt-march";
+  }
+
+  return null;
+}
 
 /* ─── Icons (inline SVGs to avoid dependencies) ──────────────── */
 
@@ -68,6 +127,43 @@ function HistoryIcon() {
   );
 }
 
+function extractEquationFromText(text) {
+  if (!text) return "2x + 3";
+
+  // 1. Find all LaTeX $...$ matches
+  const latexMatches = text.match(/\$([^$]+)\$/g);
+  if (latexMatches) {
+    for (const rawMatch of latexMatches) {
+      let eq = rawMatch.replace(/\$/g, "").trim();
+      if (eq.toLowerCase().includes("source")) continue;
+
+      if (eq.includes("x") || eq.includes("y") || eq.includes("z") || eq.includes("=") || eq.includes("^") || eq.includes("+") || eq.includes("-") || eq.includes("\\frac") || eq.includes("\\sqrt")) {
+        if (eq.toLowerCase().startsWith("y =") || eq.toLowerCase().startsWith("z =")) {
+          eq = eq.substring(3).trim();
+        }
+        return eq;
+      }
+    }
+  }
+
+  // 2. Try finding algebraic pattern with x
+  const match = text.match(/([a-zA-Z0-9\^\s\+\-\*\/\(\)\=]{3,})/g);
+  if (match) {
+    for (const rawExpr of match) {
+      const clean = rawExpr.trim();
+      if ((clean.includes("x") || clean.includes("X")) && (clean.includes("+") || clean.includes("-") || clean.includes("^") || clean.includes("="))) {
+        let res = clean;
+        if (res.toLowerCase().startsWith("y =") || res.toLowerCase().startsWith("z =")) {
+          res = res.substring(3).trim();
+        }
+        return res;
+      }
+    }
+  }
+
+  return "2x + 3";
+}
+
 function PdfIconMini() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -116,8 +212,8 @@ function getReasoningLevel(messages) {
 
 /* ─── Main Component ─────────────────────────────────────────── */
 
-export default function StudentChat({ subject = null, isCuriousCorner = false }) {
-  const [currentSubject, setCurrentSubject] = useState(subject);
+export default function StudentChat({ subject = "history", isCuriousCorner = false }) {
+  const [currentSubject, setCurrentSubject] = useState(subject || "history");
   const router = useRouter();
   const [selectedClass, setSelectedClass] = useState("");
   const [activeTopic, setActiveTopic] = useState("");
@@ -141,15 +237,13 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
     if (subj === "history" && isC6) return "history_class6";
     if (subj === "history" && isC7) return "history_class7";
     if (subj === "science" && isC7) return "science_class7";
-    return subj;
+    return subj || "history";
   }
-
-
 
   const isClass10 = selectedClass && selectedClass.includes("10");
   const isClass6 = selectedClass && selectedClass.includes("6");
   const isClass7 = selectedClass && selectedClass.includes("7");
-  let subjectKey = currentSubject;
+  let subjectKey = currentSubject || "history";
   if (isClass10) {
     if (currentSubject === "mathematics") {
       subjectKey = "mathematics_class10";
@@ -159,7 +253,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
       subjectKey = "history_class10";
     }
   } else if (isClass6) {
-    if (subject === "science") {
+    if (currentSubject === "science") {
       subjectKey = "science_class6";
     } else if (currentSubject === "history") {
       subjectKey = "history_class6";
@@ -240,6 +334,31 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
   const [curriculumData, setCurriculumData] = useState({});
   const [pushedQuizzes, setPushedQuizzes] = useState([]);
   const [activeQuizTopic, setActiveQuizTopic] = useState("");
+
+  // Helper to store in-app navigation return state when jumping to 3D visualizer or Timeline
+  const saveFeatureReturnState = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("curiousclass_from_chat", "true");
+      sessionStorage.setItem("curiousclass_return_subject", currentSubject || "history");
+      sessionStorage.setItem("curiousclass_return_topic", activeTopic || "");
+      sessionStorage.setItem("curiousclass_chat_scroll_y", String(window.scrollY));
+    }
+  };
+
+  // Restore scroll position when returning from feature views
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedScroll = sessionStorage.getItem("curiousclass_chat_scroll_y");
+      if (savedScroll) {
+        const y = parseInt(savedScroll, 10);
+        if (!isNaN(y)) {
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: y, behavior: "instant" });
+          });
+        }
+      }
+    }
+  }, []);
 
   // Load tracked topics from localStorage or initialize with defaults on mount
   useEffect(() => {
@@ -1000,7 +1119,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
             </div>
             
             <div className="sc-tsv-grid">
-              {allChapters.map((chapter) => (
+              {allChapters.map((chapter, idx) => (
                   <button
                     key={chapter.id}
                     className="sc-tsv-card"
@@ -1008,6 +1127,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
                   >
                     <div className="sc-tsv-card-icon">📚</div>
                     <div className="sc-tsv-card-info">
+                      <span className="sc-tsv-chapter-eyebrow">Chapter {idx + 1}</span>
                       <h3>{chapter.name}</h3>
                       <p>{chapter.objective}</p>
                     </div>
@@ -1045,7 +1165,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
                   <span style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>Score: {quizScore}/{currentQuestionIndex}</span>
                 </div>
 
-                <h3 className="sc-quiz-question-text">{quizQuestions[currentQuestionIndex].question}</h3>
+                <h3 className="sc-quiz-question-text"><MathText text={quizQuestions[currentQuestionIndex].question} /></h3>
 
                 <div className="sc-quiz-options">
                   {quizQuestions[currentQuestionIndex].options.map((option, i) => {
@@ -1073,7 +1193,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
                         <div className="sc-quiz-option-indicator">
                           {String.fromCharCode(65 + i)}
                         </div>
-                        <span>{option}</span>
+                        <span><MathText text={option} /></span>
                       </button>
                     );
                   })}
@@ -1081,7 +1201,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
 
                 {answerSubmitted && (
                   <div className="sc-quiz-explanation">
-                    <strong>Explanation:</strong> {quizQuestions[currentQuestionIndex].explanation}
+                    <strong>Explanation:</strong> <MathText text={quizQuestions[currentQuestionIndex].explanation} />
                   </div>
                 )}
 
@@ -1214,11 +1334,90 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
                       <div className="sc-devils-label">Explano</div>
                     )}
                     <div className="sc-msg-bubble">
-                      <p dangerouslySetInnerHTML={{
-                        __html: msg.text
-                          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                          .replace(/\*(.*?)\*/g, "<em>$1</em>"),
-                      }} />
+                      <MathText text={msg.text} />
+                      {msg.sender === "ai" && (() => {
+                        const detectedEq = extractEquationFromText(msg.text);
+                        const hasEquation = detectedEq !== "2x + 3";
+                        const anatomyResult = detectAnatomyKeyword(msg.text);
+                        const historyTopicParam = detectHistoryTimeline(msg.text, currentSubject, activeTopic);
+
+                        return (
+                          <>
+                            {/* Conditional equation visualizer link */}
+                            {hasEquation && (
+                              <div style={{ marginTop: "12px", paddingTop: "8px", borderTop: "1px solid rgba(42, 122, 80, 0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <span style={{ fontSize: "11px", color: "var(--color-primary-dark, #1B5E39)", fontWeight: "600" }}>Visualize Equation in 3D & 2D:</span>
+                                <Link
+                                  href={`/student/3d-look?eq=${encodeURIComponent(detectedEq)}`}
+                                  onClick={saveFeatureReturnState}
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                    background: "var(--color-bg-mint, #EAF3DE)",
+                                    color: "var(--color-primary-dark, #27500A)",
+                                    border: "1px solid var(--color-primary, #2A7A50)",
+                                    borderRadius: "20px",
+                                    padding: "5px 12px",
+                                    fontSize: "12px",
+                                    fontWeight: "700",
+                                    textDecoration: "none",
+                                    boxShadow: "0 2px 6px rgba(42, 122, 80, 0.1)"
+                                  }}
+                                >
+                                  <span>🌐 Take a 3D Look</span>
+                                  <span style={{ fontSize: "11px", opacity: 0.8 }}>→</span>
+                                </Link>
+                              </div>
+                            )}
+
+                            {/* Conditional History Timeline button link */}
+                            {historyTopicParam && (
+                              <div style={{ marginTop: "12px", paddingTop: "8px", borderTop: "1px solid rgba(42, 122, 80, 0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <span style={{ fontSize: "11px", color: "var(--color-primary-dark, #1B5E39)", fontWeight: "600" }}>Chronological Event Timeline:</span>
+                                <Link
+                                  href={`/student/history-timeline?topic=${encodeURIComponent(historyTopicParam)}`}
+                                  onClick={saveFeatureReturnState}
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                    background: "var(--color-bg-mint, #EAF3DE)",
+                                    color: "var(--color-primary-dark, #27500A)",
+                                    border: "1px solid var(--color-primary, #2A7A50)",
+                                    borderRadius: "20px",
+                                    padding: "5px 12px",
+                                    fontSize: "12px",
+                                    fontWeight: "700",
+                                    textDecoration: "none",
+                                    boxShadow: "0 2px 6px rgba(42, 122, 80, 0.1)"
+                                  }}
+                                >
+                                  <span>📜 Let&apos;s take a look at a timeline of events</span>
+                                  <span style={{ fontSize: "11px", opacity: 0.8 }}>→</span>
+                                </Link>
+                              </div>
+                            )}
+
+                            {/* Inline anatomy 3D model viewer */}
+                            {anatomyResult && !anatomyResult.comingSoon && ANATOMY_MODELS[anatomyResult.key] && (
+                              <AnatomyModelViewer
+                                modelPath={ANATOMY_MODELS[anatomyResult.key].path}
+                                label={ANATOMY_MODELS[anatomyResult.key].label}
+                                icon={ANATOMY_MODELS[anatomyResult.key].icon}
+                              />
+                            )}
+
+                            {/* Coming soon placeholder for unsupported anatomy keywords */}
+                            {anatomyResult && anatomyResult.comingSoon && (
+                              <AnatomyComingSoon
+                                label={anatomyResult.label}
+                                icon={anatomyResult.icon}
+                              />
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                     <div className="sc-msg-time">{msg.timestamp}</div>
                   </div>
@@ -1253,7 +1452,7 @@ export default function StudentChat({ subject = null, isCuriousCorner = false })
                     className="sc-chip"
                     onClick={() => handleChipClick(chip)}
                   >
-                    {chip}
+                    <MathText text={chip} />
                   </button>
                 ))}
               </div>

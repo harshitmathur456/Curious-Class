@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function StudentPage() {
-  return <StudentChat />;
+  return <StudentChat subject="history" />;
 }

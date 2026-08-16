@@ -11,20 +11,20 @@ export const CHAPTERS_DATA = {
           { id: 2, label: "Irrationality Proofs", status: "active" },
           { id: 3, label: "Decimal Expansions", status: "upcoming" }
         ],
-        chips: ["Why is √2 irrational?", "Fundamental Theorem of Arithmetic", "Decimal patterns"],
+        chips: ["Why is $\\sqrt{2}$ irrational?", "Fundamental Theorem of Arithmetic", "Decimal patterns"],
         initialQuestion: "Welcome! Today we are exploring **Real Numbers**. Let's start with a puzzle: if you divide any number by another, you usually get a decimal that either stops (like 0.5) or repeats (like 0.333...). But what about numbers like $\\pi$ or $\\sqrt{2}$? Why do their decimals go on forever without ever repeating a pattern?",
         quizzes: [
           {
             question: "Which of the following is an irrational number?",
-            options: ["2.333...", "3.14159... (non-repeating)", "22/7", "sqrt(4)"],
+            options: ["2.333...", "3.14159... (non-repeating)", "$\\frac{22}{7}$", "$\\sqrt{4}$"],
             answerIndex: 1,
             explanation: "Irrational numbers have non-terminating, non-repeating decimal expansions. Fractions and terminating/repeating decimals are rational."
           },
           {
-            question: "If two positive integers a and b are written as a = x³y² and b = xy³, where x, y are prime numbers, then HCF(a, b) is:",
-            options: ["xy", "xy²", "x³y³", "x²y²"],
+            question: "If two positive integers $a$ and $b$ are written as $a = x^3 y^2$ and $b = x y^3$, where $x, y$ are prime numbers, then $\\text{HCF}(a, b)$ is:",
+            options: ["$xy$", "$xy^2$", "$x^3 y^3$", "$x^2 y^2$"],
             answerIndex: 1,
-            explanation: "To find the HCF, we take the lowest power of each common prime factor. For x it is x¹, and for y it is y². Thus HCF is xy²."
+            explanation: "To find the HCF, we take the lowest power of each common prime factor. For $x$ it is $x^1$, and for $y$ it is $y^2$. Thus HCF is $xy^2$."
           },
           {
             question: "The product of a non-zero rational and an irrational number is always:",
@@ -39,10 +39,10 @@ export const CHAPTERS_DATA = {
             explanation: "The theorem states that every composite number can be factored uniquely into prime numbers, except for the order of factors."
           },
           {
-            question: "The decimal expansion of 13/125 will terminate after how many decimal places?",
+            question: "The decimal expansion of $\\frac{13}{125}$ will terminate after how many decimal places?",
             options: ["1", "2", "3", "4"],
             answerIndex: 2,
-            explanation: "125 = 5³. Since the denominator can be expressed in the form 2^n * 5^m, the number of decimal places is max(n,m). Here it is 3."
+            explanation: "$125 = 5^3$. Since the denominator can be expressed in the form $2^n \\times 5^m$, the number of decimal places is $\\max(n,m)$. Here it is 3."
           }
         ]
       },
@@ -55,7 +55,7 @@ export const CHAPTERS_DATA = {
           { id: 2, label: "Relationship between Zeroes and Coefficients", status: "active" },
           { id: 3, label: "Division Algorithm", status: "upcoming" }
         ],
-        chips: ["What is a parabola?", "Relationship of alpha and beta", "Sum and product of zeroes"],
+        chips: ["What is a parabola?", "Relationship of $\\alpha$ and $\\beta$", "Sum and product of zeroes"],
         initialQuestion: "Welcome! Today we are exploring **Polynomials**. Think of a polynomial graph like a roller coaster track. The places where the track touches or crosses the ground are the 'zeroes' of the polynomial. Why do you think a quadratic polynomial (degree 2) can cross the ground at most two times?",
         quizzes: [
           {
@@ -65,28 +65,28 @@ export const CHAPTERS_DATA = {
             explanation: "The maximum number of zeroes of any polynomial is equal to its degree. Since a cubic polynomial has degree 3, it has at most 3 zeroes."
           },
           {
-            question: "If one zero of the quadratic polynomial x² + 3x + k is 2, then the value of k is:",
+            question: "If one zero of the quadratic polynomial $x^2 + 3x + k$ is 2, then the value of $k$ is:",
             options: ["10", "-10", "-7", "5"],
             answerIndex: 1,
-            explanation: "Substitute x = 2 into the polynomial: (2)² + 3(2) + k = 0 => 4 + 6 + k = 0 => k = -10."
+            explanation: "Substitute $x = 2$ into the polynomial: $(2)^2 + 3(2) + k = 0 \\implies 4 + 6 + k = 0 \\implies k = -10$."
           },
           {
-            question: "If alpha and beta are the zeroes of the polynomial 2x² - 5x + 7, then the value of alpha + beta is:",
-            options: ["5/2", "-5/2", "7/2", "-7/2"],
+            question: "If $\\alpha$ and $\\beta$ are the zeroes of the polynomial $2x^2 - 5x + 7$, then the value of $\\alpha + \\beta$ is:",
+            options: ["$\\frac{5}{2}$", "$-\\frac{5}{2}$", "$\\frac{7}{2}$", "$-\\frac{7}{2}$"],
             answerIndex: 0,
-            explanation: "For ax² + bx + c, the sum of zeroes is -b/a. Here, a = 2 and b = -5, so sum = -(-5)/2 = 5/2."
+            explanation: "For $ax^2 + bx + c$, the sum of zeroes is $-\\frac{b}{a}$. Here, $a = 2$ and $b = -5$, so sum = $-\\frac{-5}{2} = \\frac{5}{2}$."
           },
           {
-            question: "The shape of the graph of a quadratic polynomial ax² + bx + c is a:",
+            question: "The shape of the graph of a quadratic polynomial $ax^2 + bx + c$ is a:",
             options: ["Straight line", "Circle", "Parabola", "Ellipse"],
             answerIndex: 2,
             explanation: "The graph of a quadratic polynomial is always a symmetrical U-shaped curve called a parabola."
           },
           {
             question: "A quadratic polynomial whose sum of zeroes is -5 and product is 6 is:",
-            options: ["x² - 5x + 6", "x² + 5x + 6", "x² - 5x - 6", "x² + 5x - 6"],
+            options: ["$x^2 - 5x + 6$", "$x^2 + 5x + 6$", "$x^2 - 5x - 6$", "$x^2 + 5x - 6$"],
             answerIndex: 1,
-            explanation: "A quadratic polynomial is given by x² - (sum of zeroes)x + (product of zeroes). This gives x² - (-5)x + 6 = x² + 5x + 6."
+            explanation: "A quadratic polynomial is given by $x^2 - (\\text{sum})x + (\\text{product})$. This gives $x^2 - (-5)x + 6 = x^2 + 5x + 6$."
           }
         ]
       },
@@ -103,10 +103,10 @@ export const CHAPTERS_DATA = {
         initialQuestion: "Welcome! Today we are exploring **Pairs of Linear Equations in Two Variables**. Imagine two straight roads being built in a city. If their equations are $x + y = 5$ and $2x + 2y = 10$, will these roads ever cross each other, or are they actually the same road? How can we tell without drawing them?",
         quizzes: [
           {
-            question: "If the lines given by 3x + 2ky = 2 and 2x + 5y + 1 = 0 are parallel, then the value of k is:",
-            options: ["15/4", "9/8", "15/2", "3/4"],
+            question: "If the lines given by $3x + 2ky = 2$ and $2x + 5y + 1 = 0$ are parallel, then the value of $k$ is:",
+            options: ["$\\frac{15}{4}$", "$\\frac{9}{8}$", "$\\frac{15}{2}$", "$\\frac{3}{4}$"],
             answerIndex: 0,
-            explanation: "For parallel lines, a1/a2 = b1/b2 != c1/c2. Here, 3/2 = 2k/5 => 4k = 15 => k = 15/4."
+            explanation: "For parallel lines, $\\frac{a_1}{a_2} = \\frac{b_1}{b_2} \\ne \\frac{c_1}{c_2}$. Here, $\\frac{3}{2} = \\frac{2k}{5} \\implies 4k = 15 \\implies k = \\frac{15}{4}$."
           },
           {
             question: "A pair of linear equations which has no solution is called:",
@@ -115,16 +115,16 @@ export const CHAPTERS_DATA = {
             explanation: "If a pair of linear equations has no solution, it means the lines are parallel and never intersect, which makes them inconsistent."
           },
           {
-            question: "If x = a, y = b is the solution of the equations x - y = 2 and x + y = 4, then the values of a and b are:",
+            question: "If $x = a, y = b$ is the solution of the equations $x - y = 2$ and $x + y = 4$, then the values of $a$ and $b$ are:",
             options: ["3 and 1", "1 and 3", "5 and 3", "2 and 2"],
             answerIndex: 0,
-            explanation: "Adding the two equations: 2x = 6 => x = 3. Substituting x = 3 into x + y = 4 => y = 1. So a = 3, b = 1."
+            explanation: "Adding the two equations: $2x = 6 \\implies x = 3$. Substituting $x = 3$ into $x + y = 4 \\implies y = 1$. So $a = 3, b = 1$."
           },
           {
-            question: "If the equations ax + by = c and lx + my = n represent coincident lines, then:",
-            options: ["a/l = b/m != c/n", "a/l = b/m = c/n", "a/l != b/m", "a/l != c/n"],
+            question: "If the equations $ax + by = c$ and $lx + my = n$ represent coincident lines, then:",
+            options: ["$\\frac{a}{l} = \\frac{b}{m} \\ne \\frac{c}{n}$", "$\\frac{a}{l} = \\frac{b}{m} = \\frac{c}{n}$", "$\\frac{a}{l} \\ne \\frac{b}{m}$", "$\\frac{a}{l} \\ne \\frac{c}{n}$"],
             answerIndex: 1,
-            explanation: "Coincident lines lay exactly on top of each other. This occurs when all coefficients and constants are proportional (a/l = b/m = c/n)."
+            explanation: "Coincident lines lay exactly on top of each other. This occurs when all coefficients and constants are proportional ($\\frac{a}{l} = \\frac{b}{m} = \\frac{c}{n}$)."
           },
           {
             question: "The method of eliminating one variable by making coefficients equal is called:",
@@ -148,33 +148,33 @@ export const CHAPTERS_DATA = {
         quizzes: [
           {
             question: "The standard form of a quadratic equation is:",
-            options: ["ax² + bx + c = 0 (a != 0)", "ax² + bx + c > 0", "ax³ + bx² + cx + d = 0", "ax + b = 0"],
+            options: ["$ax^2 + bx + c = 0 \\ (a \\ne 0)$", "$ax^2 + bx + c > 0$", "$ax^3 + bx^2 + cx + d = 0$", "$ax + b = 0$"],
             answerIndex: 0,
-            explanation: "A quadratic equation has degree 2. Its standard form is ax² + bx + c = 0, where a, b, c are real numbers and a cannot be zero."
+            explanation: "A quadratic equation has degree 2. Its standard form is $ax^2 + bx + c = 0$, where $a, b, c$ are real numbers and $a$ cannot be zero."
           },
           {
-            question: "If the discriminant (b² - 4ac) of a quadratic equation is greater than zero, the roots are:",
+            question: "If the discriminant ($b^2 - 4ac$) of a quadratic equation is greater than zero, the roots are:",
             options: ["Real and equal", "Real and distinct", "No real roots", "Imaginary and equal"],
             answerIndex: 1,
-            explanation: "When D > 0, the quadratic formula yields two distinct real numbers as roots."
+            explanation: "When $D > 0$, the quadratic formula yields two distinct real numbers as roots."
           },
           {
-            question: "The roots of the quadratic equation x² - 9 = 0 are:",
-            options: ["3", "-3", "±3", "9"],
+            question: "The roots of the quadratic equation $x^2 - 9 = 0$ are:",
+            options: ["3", "-3", "$\\pm 3$", "9"],
             answerIndex: 2,
-            explanation: "x² - 9 = 0 => x² = 9 => x = ±3."
+            explanation: "$x^2 - 9 = 0 \\implies x^2 = 9 \\implies x = \\pm 3$."
           },
           {
-            question: "The discriminant of the equation 2x² - 4x + 3 = 0 is:",
+            question: "The discriminant of the equation $2x^2 - 4x + 3 = 0$ is:",
             options: ["8", "-8", "16", "-16"],
             answerIndex: 1,
-            explanation: "D = b² - 4ac. Here a = 2, b = -4, c = 3. D = (-4)² - 4(2)(3) = 16 - 24 = -8."
+            explanation: "$D = b^2 - 4ac$. Here $a = 2, b = -4, c = 3$. $D = (-4)^2 - 4(2)(3) = 16 - 24 = -8$."
           },
           {
-            question: "For a quadratic equation ax² + bx + c = 0, if the roots are equal, then:",
-            options: ["b² - 4ac = 0", "b² - 4ac > 0", "b² - 4ac < 0", "b² - 4ac != 0"],
+            question: "For a quadratic equation $ax^2 + bx + c = 0$, if the roots are equal, then:",
+            options: ["$b^2 - 4ac = 0$", "$b^2 - 4ac > 0$", "$b^2 - 4ac < 0$", "$b^2 - 4ac \\ne 0$"],
             answerIndex: 0,
-            explanation: "If the roots are equal, the term under the square root in the quadratic formula must be zero, so the discriminant D = b² - 4ac = 0."
+            explanation: "If the roots are equal, the term under the square root in the quadratic formula must be zero, so the discriminant $D = b^2 - 4ac = 0$."
           }
         ]
       },
@@ -191,34 +191,34 @@ export const CHAPTERS_DATA = {
         initialQuestion: "Welcome! Today we are exploring **Arithmetic Progressions (AP)**. Imagine you start saving ₹100 in the first week, and increase your weekly savings by ₹20 every week. By week 50, how much will you save in that week, and how can we quickly calculate your total savings without adding 50 numbers one by one?",
         quizzes: [
           {
-            question: "In an AP, if first term a = 3, common difference d = 2, then the 10th term is:",
+            question: "In an AP, if first term $a = 3$, common difference $d = 2$, then the 10th term is:",
             options: ["21", "23", "19", "17"],
             answerIndex: 0,
-            explanation: "a_n = a + (n-1)d. a_10 = 3 + (10-1)2 = 3 + 9(2) = 3 + 18 = 21."
+            explanation: "$a_n = a + (n-1)d$. $a_{10} = 3 + (10-1)2 = 3 + 18 = 21$."
           },
           {
-            question: "The common difference of the AP: 9, 5, 1, -3, ... is:",
+            question: "The common difference of the AP: $9, 5, 1, -3, \\dots$ is:",
             options: ["4", "-4", "3", "-3"],
             answerIndex: 1,
-            explanation: "The common difference is any term minus the preceding term. For example, 5 - 9 = -4."
+            explanation: "The common difference is any term minus the preceding term. For example, $5 - 9 = -4$."
           },
           {
-            question: "The sum of the first 10 terms of the AP: 2, 7, 12, ... is:",
+            question: "The sum of the first 10 terms of the AP: $2, 7, 12, \\dots$ is:",
             options: ["245", "250", "240", "255"],
             answerIndex: 0,
-            explanation: "S_n = (n/2)[2a + (n-1)d]. S_10 = (10/2)[2(2) + (10-1)5] = 5[4 + 45] = 5[49] = 245."
+            explanation: "$S_n = \\frac{n}{2}[2a + (n-1)d]$. $S_{10} = \\frac{10}{2}[2(2) + (10-1)5] = 5[4 + 45] = 5[49] = 245$."
           },
           {
-            question: "If the nth term of an AP is 3n + 1, then its 5th term is:",
+            question: "If the nth term of an AP is $3n + 1$, then its 5th term is:",
             options: ["15", "16", "17", "18"],
             answerIndex: 1,
-            explanation: "Substitute n = 5 into 3n + 1: 3(5) + 1 = 15 + 1 = 16."
+            explanation: "Substitute $n = 5$ into $3n + 1$: $3(5) + 1 = 15 + 1 = 16$."
           },
           {
-            question: "If first term of an AP is a and common difference is d, then the sum of n terms is:",
-            options: ["(n/2)[2a + (n-1)d]", "(n/2)[a + (n-1)d]", "n[2a + (n-1)d]", "(n/2)[2a + nd]"],
+            question: "If first term of an AP is $a$ and common difference is $d$, then the sum of $n$ terms is:",
+            options: ["$\\frac{n}{2}[2a + (n-1)d]$", "$\\frac{n}{2}[a + (n-1)d]$", "$n[2a + (n-1)d]$", "$\\frac{n}{2}[2a + nd]$"],
             answerIndex: 0,
-            explanation: "The standard formula for the sum of the first n terms of an arithmetic progression is S_n = (n/2)[2a + (n-1)d]."
+            explanation: "The standard formula for the sum of the first $n$ terms of an arithmetic progression is $S_n = \\frac{n}{2}[2a + (n-1)d]$."
           }
         ]
       },
@@ -241,10 +241,10 @@ export const CHAPTERS_DATA = {
             explanation: "All circles have the same shape but different sizes, which means they are similar. They are only congruent if their radii are equal."
           },
           {
-            question: "In triangle ABC, DE || BC, intersecting AB at D and AC at E. If AD/DB = 3/5 and AC = 5.6 cm, then AE is:",
+            question: "In triangle $ABC$, $DE \\parallel BC$, intersecting $AB$ at $D$ and $AC$ at $E$. If $\\frac{AD}{DB} = \\frac{3}{5}$ and $AC = 5.6\\text{ cm}$, then $AE$ is:",
             options: ["2.1 cm", "3.1 cm", "1.5 cm", "1.8 cm"],
             answerIndex: 0,
-            explanation: "By BPT, AD/DB = AE/EC => 3/5 = AE/(5.6 - AE) => 3(5.6 - AE) = 5AE => 16.8 - 3AE = 5AE => 8AE = 16.8 => AE = 2.1 cm."
+            explanation: "By BPT, $\\frac{AD}{DB} = \\frac{AE}{EC} \\implies \\frac{3}{5} = \\frac{AE}{5.6 - AE} \\implies 3(5.6 - AE) = 5AE \\implies 16.8 - 3AE = 5AE \\implies 8AE = 16.8 \\implies AE = 2.1\\text{ cm}$."
           },
           {
             question: "If two triangles are similar, their corresponding sides are:",
@@ -276,37 +276,37 @@ export const CHAPTERS_DATA = {
           { id: 3, label: "Area of Triangle using Coordinates", status: "upcoming" }
         ],
         chips: ["Distance formula origin", "How section formula works", "Finding midpoints"],
-        initialQuestion: "Welcome! Today we are exploring **Coordinate Geometry**. Imagine you are designing a GPS app. If a delivery boy is at point A(2, 3) and a house is at point B(5, 7), how does the distance formula relate to the famous Pythagoras theorem to find the straight-line distance?",
+        initialQuestion: "Welcome! Today we are exploring **Coordinate Geometry**. Imagine you are designing a GPS app. If a delivery boy is at point $A(2, 3)$ and a house is at point $B(5, 7)$, how does the distance formula relate to the famous Pythagoras theorem to find the straight-line distance?",
         quizzes: [
           {
-            question: "The distance of the point (3, 4) from the origin is:",
+            question: "The distance of the point $(3, 4)$ from the origin is:",
             options: ["3", "4", "5", "7"],
             answerIndex: 2,
-            explanation: "Distance from origin is sqrt(x² + y²). sqrt(3² + 4²) = sqrt(9 + 16) = sqrt(25) = 5."
+            explanation: "Distance from origin is $\\sqrt{x^2 + y^2}$. $\\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5$."
           },
           {
-            question: "The distance between points A(1, 2) and B(4, 6) is:",
+            question: "The distance between points $A(1, 2)$ and $B(4, 6)$ is:",
             options: ["3", "4", "5", "6"],
             answerIndex: 2,
-            explanation: "Distance = sqrt((x2 - x1)² + (y2 - y1)²). sqrt((4-1)² + (6-2)²) = sqrt(3² + 4²) = sqrt(9+16) = 5."
+            explanation: "Distance = $\\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$. $\\sqrt{(4-1)^2 + (6-2)^2} = \\sqrt{3^2 + 4^2} = \\sqrt{9+16} = 5$."
           },
           {
-            question: "The coordinates of the midpoint of a line segment joining A(2, 8) and B(4, 6) are:",
-            options: ["(3, 7)", "(6, 14)", "(3, 14)", "(6, 7)"],
+            question: "The coordinates of the midpoint of a line segment joining $A(2, 8)$ and $B(4, 6)$ are:",
+            options: ["$(3, 7)$", "$(6, 14)$", "$(3, 14)$", "$(6, 7)$"],
             answerIndex: 0,
-            explanation: "Midpoint = ((x1+x2)/2, (y1+y2)/2) = ((2+4)/2, (8+6)/2) = (6/2, 14/2) = (3, 7)."
+            explanation: "Midpoint = $\\left(\\frac{x_1+x_2}{2}, \\frac{y_1+y_2}{2}\\right) = \\left(\\frac{2+4}{2}, \\frac{8+6}{2}\\right) = (3, 7)$."
           },
           {
-            question: "The coordinates of the point dividing the segment joining (x1, y1) and (x2, y2) in ratio m1:m2 is:",
-            options: ["((m1x2+m2x1)/(m1+m2), (m1y2+m2y1)/(m1+m2))", "((m1x1+m2x2)/(m1+m2), (m1y1+m2y2)/(m1+m2))", "((m1x2-m2x1)/(m1-m2), (m1y2-m2y1)/(m1-m2))", "((m1+x2)/2, (m2+y2)/2)"],
+            question: "The coordinates of the point dividing the segment joining $(x_1, y_1)$ and $(x_2, y_2)$ in ratio $m_1:m_2$ is:",
+            options: ["$\\left(\\frac{m_1 x_2 + m_2 x_1}{m_1 + m_2}, \\frac{m_1 y_2 + m_2 y_1}{m_1 + m_2}\\right)$", "$\\left(\\frac{m_1 x_1 + m_2 x_2}{m_1 + m_2}, \\frac{m_1 y_1 + m_2 y_2}{m_1 + m_2}\\right)$", "$\\left(\\frac{m_1 x_2 - m_2 x_1}{m_1 - m_2}, \\frac{m_1 y_2 - m_2 y_1}{m_1 - m_2}\\right)$", "$\\left(\\frac{m_1 + x_2}{2}, \\frac{m_2 + y_2}{2}\\right)$"],
             answerIndex: 0,
-            explanation: "This is the section formula. The coordinates of the point dividing the segment joining points in ratio m1:m2 are given by ((m1x2+m2x1)/(m1+m2), (m1y2+m2y1)/(m1+m2))."
+            explanation: "This is the section formula. The coordinates of the point dividing the segment joining points in ratio $m_1:m_2$ are given by $\\left(\\frac{m_1 x_2 + m_2 x_1}{m_1 + m_2}, \\frac{m_1 y_2 + m_2 y_1}{m_1 + m_2}\\right)$."
           },
           {
-            question: "If points (1, 2), (0, 0), and (a, b) are collinear, then:",
-            options: ["a = 2b", "b = 2a", "a = b", "a + b = 0"],
+            question: "If points $(1, 2)$, $(0, 0)$, and $(a, b)$ are collinear, then:",
+            options: ["$a = 2b$", "$b = 2a$", "$a = b$", "$a + b = 0$"],
             answerIndex: 1,
-            explanation: "If collinear, slope between (0,0) and (1,2) must equal slope between (0,0) and (a,b) => (2-0)/(1-0) = (b-0)/(a-0) => 2/1 = b/a => b = 2a."
+            explanation: "If collinear, slope between $(0,0)$ and $(1,2)$ must equal slope between $(0,0)$ and $(a,b) \\implies \\frac{2-0}{1-0} = \\frac{b-0}{a-0} \\implies 2 = \\frac{b}{a} \\implies b = 2a$."
           }
         ]
       },
@@ -319,32 +319,32 @@ export const CHAPTERS_DATA = {
           { id: 2, label: "Ratios of Specific Angles", status: "active" },
           { id: 3, label: "Trigonometric Identities", status: "upcoming" }
         ],
-        chips: ["Why is sin(x) <= 1?", "What is tan(theta)?", "Deriving identity sin²x + cos²x = 1"],
-        initialQuestion: "Welcome! Today we are exploring **Trigonometry**. The word sounds fancy, but it is just about ratios in right-angled triangles. Why is the ratio of opposite side to hypotenuse (sine) always less than or equal to 1? What happens to this ratio as the angle gets closer to $90^\circ$?",
+        chips: ["Why is $\\sin(x) \\le 1$?", "What is $\\tan(\\theta)$?", "Deriving identity $\\sin^2 x + \\cos^2 x = 1$"],
+        initialQuestion: "Welcome! Today we are exploring **Trigonometry**. The word sounds fancy, but it is just about ratios in right-angled triangles. Why is the ratio of opposite side to hypotenuse (sine) always less than or equal to 1? What happens to this ratio as the angle gets closer to $90^\\circ$?",
         quizzes: [
           {
-            question: "The value of sin(30°) is:",
-            options: ["1/2", "sqrt(3)/2", "1/sqrt(2)", "1"],
+            question: "The value of $\\sin(30^\\circ)$ is:",
+            options: ["$\\frac{1}{2}$", "$\\frac{\\sqrt{3}}{2}$", "$\\frac{1}{\\sqrt{2}}$", "1"],
             answerIndex: 0,
-            explanation: "The sine of 30 degrees is 1/2. You can verify this from the standard trigonometric ratio table."
+            explanation: "The sine of 30 degrees is $\\frac{1}{2}$. You can verify this from the standard trigonometric ratio table."
           },
           {
-            question: "If cos(theta) = 4/5, then tan(theta) is:",
-            options: ["3/4", "4/3", "3/5", "5/3"],
+            question: "If $\\cos(\\theta) = \\frac{4}{5}$, then $\\tan(\\theta)$ is:",
+            options: ["$\\frac{3}{4}$", "$\\frac{4}{3}$", "$\\frac{3}{5}$", "$\\frac{5}{3}$"],
             answerIndex: 0,
-            explanation: "In a right triangle, cos = Adjacent/Hypotenuse = 4/5. Using Pythagoras, Opposite side = sqrt(5² - 4²) = 3. Thus tan = Opposite/Adjacent = 3/4."
+            explanation: "In a right triangle, $\\cos = \\frac{\\text{Adjacent}}{\\text{Hypotenuse}} = \\frac{4}{5}$. Using Pythagoras, Opposite side = $\\sqrt{5^2 - 4^2} = 3$. Thus $\\tan = \\frac{\\text{Opposite}}{\\text{Adjacent}} = \\frac{3}{4}$."
           },
           {
-            question: "The value of sin²(45°) + cos²(45°) is:",
-            options: ["0", "1/2", "1", "2"],
+            question: "The value of $\\sin^2(45^\\circ) + \\cos^2(45^\\circ)$ is:",
+            options: ["0", "$\\frac{1}{2}$", "1", "2"],
             answerIndex: 2,
-            explanation: "According to the fundamental identity sin²A + cos²A = 1, the value is always 1 for any angle A."
+            explanation: "According to the fundamental identity $\\sin^2 A + \\cos^2 A = 1$, the value is always 1 for any angle $A$."
           },
           {
-            question: "Which of the following is equal to sec²(theta) - tan²(theta)?",
+            question: "Which of the following is equal to $\\sec^2(\\theta) - \\tan^2(\\theta)$?",
             options: ["0", "1", "-1", "2"],
             answerIndex: 1,
-            explanation: "From the trigonometric identity 1 + tan²theta = sec²theta, it follows that sec²theta - tan²theta = 1."
+            explanation: "From the trigonometric identity $1 + \\tan^2\\theta = \\sec^2\\theta$, it follows that $\\sec^2\\theta - \\tan^2\\theta = 1$."
           },
           {
             question: "In a right triangle, tangent of an angle is defined as the ratio of:",
@@ -373,28 +373,28 @@ export const CHAPTERS_DATA = {
             explanation: "When we look up at an object, the angle between the horizontal line and our line of sight is called the angle of elevation."
           },
           {
-            question: "A tower stands vertically on the ground. From a point 15m away from its foot, the angle of elevation of its top is 60°. The height of the tower is:",
-            options: ["15*sqrt(3) m", "15/sqrt(3) m", "15 m", "30 m"],
+            question: "A tower stands vertically on the ground. From a point $15\\text{ m}$ away from its foot, the angle of elevation of its top is $60^\\circ$. The height of the tower is:",
+            options: ["$15\\sqrt{3}\\text{ m}$", "$\\frac{15}{\\sqrt{3}}\\text{ m}$", "$15\\text{ m}$", "$30\\text{ m}$"],
             answerIndex: 0,
-            explanation: "tan(60°) = height/distance => sqrt(3) = h/15 => h = 15*sqrt(3) m."
+            explanation: "$\\tan(60^\\circ) = \\frac{\\text{height}}{\\text{distance}} \\implies \\sqrt{3} = \\frac{h}{15} \\implies h = 15\\sqrt{3}\\text{ m}$."
           },
           {
-            question: "If a pole of height 6m casts a shadow of 2*sqrt(3) m long on the ground, then the angle of elevation of the sun is:",
-            options: ["30°", "45°", "60°", "90°"],
+            question: "If a pole of height $6\\text{ m}$ casts a shadow of $2\\sqrt{3}\\text{ m}$ long on the ground, then the angle of elevation of the sun is:",
+            options: ["$30^\\circ$", "$45^\\circ$", "$60^\\circ$", "$90^\\circ$"],
             answerIndex: 2,
-            explanation: "tan(theta) = height/shadow = 6 / (2*sqrt(3)) = 3 / sqrt(3) = sqrt(3). Since tan(60°) = sqrt(3), the angle is 60°."
+            explanation: "$\\tan(\\theta) = \\frac{\\text{height}}{\\text{shadow}} = \\frac{6}{2\\sqrt{3}} = \\frac{3}{\\sqrt{3}} = \\sqrt{3}$. Since $\\tan(60^\\circ) = \\sqrt{3}$, the angle is $60^\\circ$."
           },
           {
             question: "When the length of the shadow of a vertical pole is equal to its height, the angle of elevation of the sun is:",
-            options: ["30°", "45°", "60°", "90°"],
+            options: ["$30^\\circ$", "$45^\\circ$", "$60^\\circ$", "$90^\\circ$"],
             answerIndex: 1,
-            explanation: "tan(theta) = height/shadow = 1 (since they are equal). Since tan(45°) = 1, the angle of elevation is 45°."
+            explanation: "$\\tan(\\theta) = \\frac{\\text{height}}{\\text{shadow}} = 1$. Since $\\tan(45^\\circ) = 1$, the angle of elevation is $45^\\circ$."
           },
           {
-            question: "A ladder 10m long reaches a window 5m above the ground. The angle made by the ladder with the horizontal is:",
-            options: ["30°", "45°", "60°", "90°"],
+            question: "A ladder $10\\text{ m}$ long reaches a window $5\\text{ m}$ above the ground. The angle made by the ladder with the horizontal is:",
+            options: ["$30^\\circ$", "$45^\\circ$", "$60^\\circ$", "$90^\\circ$"],
             answerIndex: 0,
-            explanation: "sin(theta) = opposite/hypotenuse = 5/10 = 1/2. Since sin(30°) = 1/2, the angle is 30°."
+            explanation: "$\\sin(\\theta) = \\frac{\\text{opposite}}{\\text{hypotenuse}} = \\frac{5}{10} = \\frac{1}{2}$. Since $\\sin(30^\\circ) = \\frac{1}{2}$, the angle is $30^\\circ$."
           }
         ]
       },
@@ -408,7 +408,7 @@ export const CHAPTERS_DATA = {
           { id: 3, label: "Tangents from External Points Theorem", status: "upcoming" }
         ],
         chips: ["Radius perpendicular to tangent", "Tangents from external points", "Secant vs. Tangent"],
-        initialQuestion: "Welcome! Today we are exploring **Circles**. Imagine a bicycle wheel rolling on a flat road. The road touches the tire at exactly one point at any moment. Why does the spoke connecting this contact point to the center always make a perfect $90^\circ$ angle with the road?",
+        initialQuestion: "Welcome! Today we are exploring **Circles**. Imagine a bicycle wheel rolling on a flat road. The road touches the tire at exactly one point at any moment. Why does the spoke connecting this contact point to the center always make a perfect $90^\\circ$ angle with the road?",
         quizzes: [
           {
             question: "How many tangents can a circle have at a single point on the circle?",
@@ -429,16 +429,16 @@ export const CHAPTERS_DATA = {
             explanation: "A secant is a line that intersects a circle at two distinct points, whereas a tangent intersects at exactly one point."
           },
           {
-            question: "If a tangent PQ at a point P of a circle of radius 5 cm meets a line through the center O at a point Q so that OQ = 12 cm, then the length of PQ is:",
-            options: ["12 cm", "13 cm", "8.5 cm", "sqrt(119) cm"],
+            question: "If a tangent $PQ$ at a point $P$ of a circle of radius $5\\text{ cm}$ meets a line through the center $O$ at a point $Q$ so that $OQ = 12\\text{ cm}$, then the length of $PQ$ is:",
+            options: ["$12\\text{ cm}$", "$13\\text{ cm}$", "$8.5\\text{ cm}$", "$\\sqrt{119}\\text{ cm}$"],
             answerIndex: 3,
-            explanation: "The radius is perpendicular to the tangent, forming a right triangle OPQ. PQ = sqrt(OQ² - OP²) = sqrt(12² - 5²) = sqrt(144 - 25) = sqrt(119) cm."
+            explanation: "The radius is perpendicular to the tangent, forming a right triangle $OPQ$. $PQ = \\sqrt{OQ^2 - OP^2} = \\sqrt{12^2 - 5^2} = \\sqrt{144 - 25} = \\sqrt{119}\\text{ cm}$."
           },
           {
             question: "The angle between a tangent to a circle and the radius through the point of contact is:",
-            options: ["45°", "60°", "90°", "180°"],
+            options: ["$45^\\circ$", "$60^\\circ$", "$90^\\circ$", "$180^\\circ$"],
             answerIndex: 2,
-            explanation: "Theorem states that the tangent at any point of a circle is perpendicular (90°) to the radius through the point of contact."
+            explanation: "Theorem states that the tangent at any point of a circle is perpendicular ($90^\\circ$) to the radius through the point of contact."
           }
         ]
       },
@@ -452,37 +452,37 @@ export const CHAPTERS_DATA = {
           { id: 3, label: "Area of Segment of a Circle", status: "upcoming" }
         ],
         chips: ["What is a sector?", "Sector area formula", "Segment vs. Sector"],
-        initialQuestion: "Welcome! Today we are exploring **Areas Related to Circles**. Imagine you have a circular pizza of radius 14 cm. If you cut a slice with an angle of $60^\circ$ at the center, how can we use fractions to find the exact area of that pizza slice (sector)?",
+        initialQuestion: "Welcome! Today we are exploring **Areas Related to Circles**. Imagine you have a circular pizza of radius 14 cm. If you cut a slice with an angle of $60^\\circ$ at the center, how can we use fractions to find the exact area of that pizza slice (sector)?",
         quizzes: [
           {
-            question: "The area of a sector of angle theta (in degrees) of a circle of radius r is:",
-            options: ["(theta/360) * 2*pi*r", "(theta/360) * pi*r²", "(theta/180) * pi*r²", "(theta/360) * pi*r"],
+            question: "The area of a sector of angle $\\theta$ (in degrees) of a circle of radius $r$ is:",
+            options: ["$\\frac{\\theta}{360} \\times 2\\pi r$", "$\\frac{\\theta}{360} \\times \\pi r^2$", "$\\frac{\\theta}{180} \\times \\pi r^2$", "$\\frac{\\theta}{360} \\times \\pi r$"],
             answerIndex: 1,
-            explanation: "The area of a sector is a fraction of the total area of the circle, proportional to its angle theta: (theta/360) * pi*r²."
+            explanation: "The area of a sector is a fraction of the total area of the circle, proportional to its angle $\\theta$: $\\frac{\\theta}{360} \\times \\pi r^2$."
           },
           {
-            question: "The area of a circle of radius 7 cm is:",
-            options: ["154 cm²", "44 cm²", "22 cm²", "308 cm²"],
+            question: "The area of a circle of radius $7\\text{ cm}$ is:",
+            options: ["$154\\text{ cm}^2$", "$44\\text{ cm}^2$", "$22\\text{ cm}^2$", "$308\\text{ cm}^2$"],
             answerIndex: 0,
-            explanation: "Area = pi*r² = (22/7) * (7)² = 22 * 7 = 154 cm²."
+            explanation: "$\\text{Area} = \\pi r^2 = \\frac{22}{7} \\times 7^2 = 22 \\times 7 = 154\\text{ cm}^2$."
           },
           {
-            question: "The area of a quadrant of a circle of radius 2 cm is:",
-            options: ["pi/2 cm²", "pi cm²", "2*pi cm²", "4*pi cm²"],
+            question: "The area of a quadrant of a circle of radius $2\\text{ cm}$ is:",
+            options: ["$\\frac{\\pi}{2}\\text{ cm}^2$", "$\\pi\\text{ cm}^2$", "$2\\pi\\text{ cm}^2$", "$4\\pi\\text{ cm}^2$"],
             answerIndex: 1,
-            explanation: "A quadrant is a sector of angle 90° (1/4th of the circle). Area = (1/4) * pi * (2)² = pi cm²."
+            explanation: "A quadrant is a sector of angle $90^\\circ$ ($\\frac{1}{4}\\text{th}$ of the circle). $\\text{Area} = \\frac{1}{4} \\times \\pi \\times 2^2 = \\pi\\text{ cm}^2$."
           },
           {
             question: "If the perimeter and the area of a circle are numerically equal, then the radius of the circle is:",
-            options: ["2 units", "pi units", "4 units", "7 units"],
+            options: ["2 units", "$\\pi$ units", "4 units", "7 units"],
             answerIndex: 0,
-            explanation: "2*pi*r = pi*r² => 2r = r² => r = 2 units."
+            explanation: "$2\\pi r = \\pi r^2 \\implies 2r = r^2 \\implies r = 2\\text{ units}$."
           },
           {
-            question: "The length of an arc of a sector of angle theta (in degrees) of a circle of radius r is:",
-            options: ["(theta/360) * pi*r²", "(theta/360) * 2*pi*r", "(theta/180) * 2*pi*r", "(theta/360) * pi*r"],
+            question: "The length of an arc of a sector of angle $\\theta$ (in degrees) of a circle of radius $r$ is:",
+            options: ["$\\frac{\\theta}{360} \\times \\pi r^2$", "$\\frac{\\theta}{360} \\times 2\\pi r$", "$\\frac{\\theta}{180} \\times 2\\pi r$", "$\\frac{\\theta}{360} \\times \\pi r$"],
             answerIndex: 1,
-            explanation: "The length of an arc is a fraction of the total circumference of the circle, proportional to its angle theta: (theta/360) * 2*pi*r."
+            explanation: "The length of an arc is a fraction of the total circumference of the circle, proportional to its angle $\\theta$: $\\frac{\\theta}{360} \\times 2\\pi r$."
           }
         ]
       },
@@ -499,22 +499,22 @@ export const CHAPTERS_DATA = {
         initialQuestion: "Welcome! Today we are exploring **Surface Areas and Volumes**. Imagine you have a solid cylinder of ice cream and you melt it down to fill several conical ice cream cones. Does the total volume of ice cream change during this process? What about the total surface area?",
         quizzes: [
           {
-            question: "The total surface area of a cube of side a is:",
-            options: ["4a²", "6a²", "a³", "12a"],
+            question: "The total surface area of a cube of side $a$ is:",
+            options: ["$4a^2$", "$6a^2$", "$a^3$", "$12a$"],
             answerIndex: 1,
-            explanation: "A cube has 6 square faces, each of area a². Thus the total surface area is 6a²."
+            explanation: "A cube has 6 square faces, each of area $a^2$. Thus the total surface area is $6a^2$."
           },
           {
-            question: "If a solid sphere of radius r is melted and recast into a cylinder of radius r, then the height of the cylinder is:",
-            options: ["r", "2r", "4/3 r", "3/4 r"],
+            question: "If a solid sphere of radius $r$ is melted and recast into a cylinder of radius $r$, then the height of the cylinder is:",
+            options: ["$r$", "$2r$", "$\\frac{4}{3}r$", "$\\frac{3}{4}r$"],
             answerIndex: 2,
-            explanation: "Volume of sphere = Volume of cylinder => (4/3)*pi*r³ = pi*r²*h => h = (4/3)*r."
+            explanation: "$\\text{Volume of sphere} = \\text{Volume of cylinder} \\implies \\frac{4}{3}\\pi r^3 = \\pi r^2 h \\implies h = \\frac{4}{3}r$."
           },
           {
-            question: "The volume of a right circular cone of radius r and height h is:",
-            options: ["pi*r²*h", "(1/3)*pi*r²*h", "2*pi*r*h", "(4/3)*pi*r³"],
+            question: "The volume of a right circular cone of radius $r$ and height $h$ is:",
+            options: ["$\\pi r^2 h$", "$\\frac{1}{3}\\pi r^2 h$", "$2\\pi r h$", "$\\frac{4}{3}\\pi r^3$"],
             answerIndex: 1,
-            explanation: "The volume of a cone is exactly one-third the volume of a cylinder with the same base radius and height: (1/3)*pi*r²*h."
+            explanation: "The volume of a cone is exactly one-third the volume of a cylinder with the same base radius and height: $\\frac{1}{3}\\pi r^2 h$."
           },
           {
             question: "When we convert a solid from one shape to another, its total volume will:",
@@ -523,10 +523,10 @@ export const CHAPTERS_DATA = {
             explanation: "Re-shaping a solid does not add or remove material, so the total volume remains exactly the same (unaltered)."
           },
           {
-            question: "The curved surface area of a right circular cylinder of radius r and height h is:",
-            options: ["2*pi*r*h", "pi*r²*h", "2*pi*r*(r+h)", "pi*r*h"],
+            question: "The curved surface area of a right circular cylinder of radius $r$ and height $h$ is:",
+            options: ["$2\\pi r h$", "$\\pi r^2 h$", "$2\\pi r (r+h)$", "$\\pi r h$"],
             answerIndex: 0,
-            explanation: "The curved surface area of a cylinder is the circumference of the base multiplied by the height: 2*pi*r*h."
+            explanation: "The curved surface area of a cylinder is the circumference of the base multiplied by the height: $2\\pi r h$."
           }
         ]
       },
