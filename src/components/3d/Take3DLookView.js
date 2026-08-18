@@ -58,12 +58,9 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
   const is1Var = eqAnalysis.varCount < 2;
   const effectiveViewMode = viewMode;
 
-  // Dynamic Variable Input state (e.g. { n: 50 } or { x: 2, y: 2 })
+  // Dynamic Variable Input state
   const [varValues, setVarValues] = useState({});
-
-  // Derived helper for legacy inputX / inputY props on GraphViewers
-  const inputX = varValues.x !== undefined ? varValues.x : (varValues.n !== undefined ? varValues.n : 2);
-  const inputY = varValues.y !== undefined ? varValues.y : 2;
+  const [activeDriver, setActiveDriver] = useState(null);
 
   const indepVarLabel = useMemo(() => {
     if (!eqAnalysis || !eqAnalysis.variables || eqAnalysis.variables.length === 0) return "x";
@@ -79,64 +76,140 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
     return mainVar === "n" ? "aₙ" : "y";
   }, [eqAnalysis]);
 
+  const depVarRawName = useMemo(() => {
+    if (!eqAnalysis) return "y";
+    if (eqAnalysis.explicitTarget) return eqAnalysis.explicitTarget;
+    const mainVar = eqAnalysis.variables ? eqAnalysis.variables[0] : "x";
+    return mainVar === "n" ? "a_n" : "y";
+  }, [eqAnalysis]);
+
+  // Derived helper for legacy inputX / inputY props on GraphViewers
+  const inputX = varValues.x !== undefined ? varValues.x : (varValues.n !== undefined ? varValues.n : 2);
+  const inputY = varValues.y !== undefined ? varValues.y : (varValues.a_n !== undefined ? varValues.a_n : 2);
+
   // Sync default variable values whenever equation analysis updates
   useEffect(() => {
-    if (eqAnalysis && eqAnalysis.variables) {
+    if (eqAnalysis) {
       const initial = {};
-      eqAnalysis.variables.forEach((v) => {
-        if (v === "n") initial[v] = 50;
-        else if (v === "x") initial[v] = 2;
-        else if (v === "y") initial[v] = 2;
-        else initial[v] = 5;
-      });
+      const mainVar = eqAnalysis.variables ? eqAnalysis.variables[0] : "x";
+      const depName = eqAnalysis.explicitTarget || (mainVar === "n" ? "a_n" : "y");
+
+      if (mainVar === "n") {
+        initial["n"] = 50;
+        try {
+          const compiled = compile(cleanSingleExpression(eqAnalysis.cleanSides[0]));
+          initial[depName] = Math.round(compiled.evaluate({ n: 50, x: 50 }) * 1000) / 1000;
+        } catch (e) {
+          initial[depName] = 1080;
+        }
+      } else if (mainVar === "x") {
+        initial["x"] = 2;
+        if (eqAnalysis.variables.includes("y")) {
+          initial["y"] = 3;
+        } else if (depName) {
+          try {
+            const compiled = compile(cleanSingleExpression(eqAnalysis.cleanSides[0]));
+            initial[depName] = Math.round(compiled.evaluate({ x: 2 }) * 1000) / 1000;
+          } catch (e) {
+            initial[depName] = 7;
+          }
+        }
+      } else {
+        eqAnalysis.variables.forEach((v) => {
+          initial[v] = 5;
+        });
+      }
+
       setVarValues(initial);
+      setActiveDriver(mainVar);
     }
   }, [eqAnalysis]);
 
-  // Compute live output for readout card
+  /**
+   * Bi-Directional Variable Change Handler:
+   * Typing in independent var (n, x) -> calculates dependent var (a_n, y) forward
+   * Typing in dependent var (a_n, y) -> reverse solves for independent var (n, x) live!
+   */
+  const handleVariableChange = (vName, rawInput) => {
+    const val = rawInput === "" ? "" : Number(rawInput);
+    setActiveDriver(vName);
+
+    setVarValues((prev) => {
+      const updated = { ...prev, [vName]: val };
+      if (rawInput === "" || isNaN(Number(rawInput))) return updated;
+
+      const numVal = Number(rawInput);
+      const mainVar = eqAnalysis?.variables ? eqAnalysis.variables[0] : "x";
+      const depName = eqAnalysis?.explicitTarget || (mainVar === "n" ? "a_n" : "y");
+
+      // Forward evaluation
+      if (vName === mainVar && depName && eqAnalysis?.cleanSides?.[0]) {
+        try {
+          const compiled = compile(cleanSingleExpression(eqAnalysis.cleanSides[0]));
+          const computedDep = compiled.evaluate({ [mainVar]: numVal, x: numVal, n: numVal });
+          if (!isNaN(computedDep) && isFinite(computedDep)) {
+            updated[depName] = Math.round(computedDep * 1000) / 1000;
+          }
+        } catch (e) {}
+      }
+      // Reverse solving via root finding
+      else if (vName === depName && mainVar && eqAnalysis?.cleanSides?.[0]) {
+        try {
+          const cleanExpr = cleanSingleExpression(eqAnalysis.cleanSides[0]);
+          const compiled = compile(cleanExpr);
+          const g = (xVal) => compiled.evaluate({ [mainVar]: xVal, x: xVal, n: xVal }) - numVal;
+
+          let x0 = prev[mainVar] !== undefined && prev[mainVar] !== "" ? Number(prev[mainVar]) : 1;
+          let x1 = x0 === 0 ? 1 : x0 * 1.1;
+          let g0 = g(x0);
+          let g1 = g(x1);
+
+          if (Math.abs(g0) < 1e-7) {
+            updated[mainVar] = Math.round(x0 * 1000) / 1000;
+          } else {
+            for (let iter = 0; iter < 100; iter++) {
+              if (Math.abs(g1) < 1e-7) break;
+              const denom = g1 - g0;
+              if (Math.abs(denom) < 1e-12) break;
+              let xNext = x1 - (g1 * (x1 - x0)) / denom;
+              x0 = x1;
+              g0 = g1;
+              x1 = xNext;
+              g1 = g(x1);
+            }
+            if (!isNaN(x1) && isFinite(x1)) {
+              updated[mainVar] = Math.round(x1 * 1000) / 1000;
+            }
+          }
+        } catch (e) {}
+      }
+
+      return updated;
+    });
+  };
+
+  // Compute live output readout for stat card
   const liveOutput = useMemo(() => {
-    if (!eqAnalysis || !eqAnalysis.variables) return null;
-    const { explicitTarget, cleanSides, variables, hasEquals } = eqAnalysis;
+    if (!eqAnalysis) return null;
+    const mainVar = eqAnalysis.variables ? eqAnalysis.variables[0] : "x";
+    const depName = depVarRawName;
+    const formattedDepSymbol = depVarLabel;
 
-    const numericVars = {};
-    for (const v of variables) {
-      const rawVal = varValues[v];
-      if (rawVal === undefined || rawVal === "" || isNaN(Number(rawVal))) {
-        return null;
-      }
-      numericVars[v] = Number(rawVal);
-    }
+    const indepVal = varValues[mainVar];
+    const depVal = varValues[depName];
 
-    try {
-      if (explicitTarget) {
-        const cleanRHS = cleanSingleExpression(cleanSides[0]);
-        const compiled = compile(cleanRHS);
-        const val = compiled.evaluate(numericVars);
-        const rounded = typeof val === "number" ? Math.round(val * 1000) / 1000 : val;
-        const displaySymbol = explicitTarget.toLowerCase() === "a_n" ? "aₙ" : explicitTarget;
-        return { label: displaySymbol, formatted: `${displaySymbol} = ${rounded}` };
-      } else if (hasEquals && cleanSides.length >= 2) {
-        const cleanLHS = cleanSingleExpression(cleanSides[0]);
-        const cleanRHS = cleanSingleExpression(cleanSides[1]);
-        const lhsVal = compile(cleanLHS).evaluate(numericVars);
-        const rhsVal = compile(cleanRHS).evaluate(numericVars);
-        const rLHS = typeof lhsVal === "number" ? Math.round(lhsVal * 1000) / 1000 : lhsVal;
-        const rRHS = typeof rhsVal === "number" ? Math.round(rhsVal * 1000) / 1000 : rhsVal;
-        return { label: "LHS / RHS", formatted: `LHS = ${rLHS} | RHS = ${rRHS}` };
-      } else if (cleanSides[0]) {
-        const cleanExpr = cleanSingleExpression(cleanSides[0]);
-        const compiled = compile(cleanExpr);
-        const val = compiled.evaluate(numericVars);
-        const rounded = typeof val === "number" ? Math.round(val * 1000) / 1000 : val;
-        const mainVar = variables[0] || "x";
-        const targetSymbol = mainVar === "n" ? "aₙ" : "y";
-        return { label: targetSymbol, formatted: `${targetSymbol} = ${rounded}` };
-      }
-    } catch (err) {
-      return null;
+    if (activeDriver === depName) {
+      return {
+        label: "Derived Input",
+        formatted: `${mainVar} = ${indepVal !== undefined ? indepVal : "?"}`,
+      };
+    } else {
+      return {
+        label: "Computed Output",
+        formatted: `${formattedDepSymbol} = ${depVal !== undefined ? depVal : "?"}`,
+      };
     }
-    return null;
-  }, [eqAnalysis, varValues]);
+  }, [eqAnalysis, varValues, activeDriver, depVarLabel, depVarRawName]);
 
   // Handle Esc key to exit 3D fullscreen
   useEffect(() => {
@@ -324,7 +397,7 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
 
           {/* Row 2: Controls (Camera presets for all, Surface controls for 2+ vars) */}
           <div className="look3d-controls-row" style={{ paddingTop: "8px", borderTop: "0.5px solid var(--color-border-light, #E5E5E5)" }}>
-            {/* Dynamic Variable Input & Live Computed Output Box (Available for ALL equations) */}
+            {/* Dynamic Variable Input & Live Computed Output Box */}
             <div className="look3d-control-box" style={{
               backgroundColor: "var(--color-bg-white, #FFFFFF)",
               border: "0.5px solid var(--color-border-secondary, #CBD5E1)",
@@ -336,43 +409,60 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
               boxShadow: "none"
             }}>
               <span style={{ fontSize: "12px", fontWeight: "600", color: "var(--color-text-secondary, #64748B)" }}>
-                🎯 Variable Input:
+                🎯 Variable Inputs:
               </span>
 
-              {/* Input box for each variable present in the equation */}
-              {eqAnalysis && eqAnalysis.variables && eqAnalysis.variables.map((vName) => (
-                <div key={vName} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "var(--color-primary-dark, #27500A)", fontFamily: "monospace" }}>
-                    {vName}:
-                  </span>
-                  <input
-                    type="number"
-                    step="1"
-                    value={varValues[vName] !== undefined ? varValues[vName] : ""}
-                    onChange={(e) => {
-                      const val = e.target.value === "" ? "" : Number(e.target.value);
-                      setVarValues((prev) => ({ ...prev, [vName]: val }));
-                    }}
-                    style={{
-                      width: "56px",
-                      backgroundColor: "#FFFFFF",
-                      border: "0.5px solid var(--color-border-secondary, #CBD5E1)",
-                      borderRadius: "8px",
-                      padding: "4px 8px",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      fontFamily: "Inter, Poppins, sans-serif",
-                      color: "var(--color-text-primary, #1A1A1A)",
-                      textAlign: "center",
-                      outline: "none",
-                      boxShadow: "none"
-                    }}
-                  />
-                </div>
-              ))}
+              {/* Render editable input boxes for ALL variables in the pair */}
+              {(() => {
+                const mainVar = eqAnalysis?.variables ? eqAnalysis.variables[0] : "x";
+                const depName = depVarRawName;
+
+                const displayVars = [...(eqAnalysis?.variables || [])];
+                if (depName && !displayVars.includes(depName)) {
+                  displayVars.push(depName);
+                }
+
+                return displayVars.map((vName) => {
+                  const formattedLabel = vName === "a_n" ? "aₙ" : vName;
+                  const isDerived = activeDriver && activeDriver !== vName;
+
+                  return (
+                    <div key={vName} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <span style={{
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        color: isDerived ? "var(--color-primary, #2A7A50)" : "var(--color-primary-dark, #27500A)",
+                        fontFamily: "monospace"
+                      }}>
+                        {formattedLabel}:
+                      </span>
+                      <input
+                        type="number"
+                        step="any"
+                        value={varValues[vName] !== undefined ? varValues[vName] : ""}
+                        onChange={(e) => handleVariableChange(vName, e.target.value)}
+                        style={{
+                          width: "60px",
+                          backgroundColor: isDerived ? "var(--color-bg-mint, #EAF3DE)" : "#FFFFFF",
+                          border: isDerived ? "1px solid var(--color-primary, #2A7A50)" : "0.5px solid var(--color-border-secondary, #CBD5E1)",
+                          borderRadius: "8px",
+                          padding: "4px 8px",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          fontFamily: "Inter, Poppins, sans-serif",
+                          color: isDerived ? "var(--color-primary-dark, #27500A)" : "var(--color-text-primary, #1A1A1A)",
+                          textAlign: "center",
+                          outline: "none",
+                          boxShadow: "none"
+                        }}
+                      />
+                    </div>
+                  );
+                });
+              })()}
             </div>
 
-            {/* Live Computed Output Stat Card */}
+            {/* Live Computed / Derived Output Stat Card */}
             {liveOutput && (
               <div style={{
                 display: "inline-flex",
@@ -384,7 +474,7 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
                 padding: "6px 14px"
               }}>
                 <span style={{ fontSize: "11px", fontWeight: "600", color: "var(--color-primary-dark, #27500A)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  Computed Output:
+                  {liveOutput.label}:
                 </span>
                 <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--color-primary-dark, #27500A)", fontFamily: "monospace" }}>
                   {liveOutput.formatted}
