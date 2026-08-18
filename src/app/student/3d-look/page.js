@@ -1,4 +1,4 @@
-import Take3DLookView from "@/components/3d/Take3DLookView";
+import ClientTake3DLookWrapper from "@/components/3d/ClientTake3DLookWrapper";
 
 export const metadata = {
   title: "Take a 3D Look — CuriousClass",
@@ -9,5 +9,5 @@ export default async function Take3DLookPage({ searchParams }) {
   const params = await searchParams;
   const initialEquation = params?.eq || "2x + 3";
 
-  return <Take3DLookView initialEquation={initialEquation} />;
+  return <ClientTake3DLookWrapper initialEquation={initialEquation} />;
 }
