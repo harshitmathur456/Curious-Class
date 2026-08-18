@@ -80,12 +80,30 @@ export async function callGeminiWithFallback(body) {
 
   // STEP 2: Groq API Fallback (LAST Priority - Only used if ALL Gemini attempts fail)
   console.log("[AI Client] All Gemini API attempts failed. Cascading to Groq API as LAST priority fallback...");
-  const groqApiKey = (process.env.GROQ_API_KEY || "").trim();
-  
-  if (groqApiKey) {
-    // Priority order for Groq: llama-3.3-70b-versatile is top-tier (70B parameters) matching Gemini/GPT-4 quality
-    const groqModels = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"];
-    
+  const rawGroqKeys = [];
+  for (const envKey in process.env) {
+    if (envKey.startsWith('GROQ_API_KEY') || envKey.startsWith('GROQ_KEY')) {
+      if (process.env[envKey]) {
+        rawGroqKeys.push(process.env[envKey].trim());
+      }
+    }
+  }
+
+  rawGroqKeys.push(
+    process.env.GROQ_API_KEY,
+    process.env.GROQ_API_KEY_1,
+    process.env.GROQ_API_KEY_2,
+    process.env.GROQ_API_KEY_FRESH,
+    process.env.GROQ_API_KEY_BACKUP
+  );
+
+  const groqKeys = [...new Set(rawGroqKeys)].filter(
+    (key) => key && key.length > 5 && !key.includes('your_groq_api_key_here')
+  );
+
+  if (groqKeys.length > 0) {
+    const groqModels = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192", "gemma2-9b-it"];
+
     const systemText = body.systemInstruction?.parts?.map((p) => p.text).join('\n') || '';
     const messages = [];
 
@@ -103,51 +121,63 @@ export async function callGeminiWithFallback(body) {
 
     const isJsonMode = body.generationConfig?.responseMimeType === "application/json";
 
-    for (const groqModel of groqModels) {
-      try {
-        console.log(`[AI Client] LAST Priority: Attempting Groq fallback model "${groqModel}"...`);
-        const groqPayload = {
-          model: groqModel,
-          messages: messages,
-          temperature: body.generationConfig?.temperature ?? 0.7,
-          max_tokens: 2048,
-        };
+    for (let k = 0; k < groqKeys.length; k++) {
+      const groqKey = groqKeys[k];
+      for (const groqModel of groqModels) {
+        try {
+          console.log(`[AI Client] Attempting Groq model "${groqModel}" with key index ${k}...`);
+          const groqPayload = {
+            model: groqModel,
+            messages: messages,
+            temperature: body.generationConfig?.temperature ?? 0.7,
+            max_tokens: 2048,
+          };
 
-        if (isJsonMode) {
-          groqPayload.response_format = { type: "json_object" };
-        }
-
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${groqApiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(groqPayload),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const responseText = data.choices?.[0]?.message?.content;
-          
-          if (responseText && responseText.trim()) {
-            console.log(`[AI Client] Successfully generated fallback response via Groq (${groqModel})`);
-            return {
-              candidates: [
-                {
-                  content: {
-                    parts: [{ text: responseText.trim() }]
-                  }
-                }
-              ]
-            };
+          if (isJsonMode) {
+            groqPayload.response_format = { type: "json_object" };
           }
-        } else {
-          const errorText = await response.text().catch(() => "");
-          console.warn(`[Groq API] Model "${groqModel}" failed (Status ${response.status}): ${errorText.slice(0, 150)}`);
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${groqKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(groqPayload),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (response.ok) {
+            const data = await response.json();
+            const responseText = data.choices?.[0]?.message?.content;
+
+            if (responseText && responseText.trim()) {
+              console.log(`[AI Client] Successfully generated fallback response via Groq (${groqModel}, key index ${k})`);
+              return {
+                candidates: [
+                  {
+                    content: {
+                      parts: [{ text: responseText.trim() }]
+                    }
+                  }
+                ]
+              };
+            }
+          } else {
+            const errorText = await response.text().catch(() => "");
+            console.warn(`[Groq API] Key index ${k} with model "${groqModel}" failed (Status ${response.status}): ${errorText.slice(0, 150)}`);
+            if (response.status === 401) {
+              break;
+            }
+          }
+        } catch (err) {
+          console.error(`[Groq API] Error on model "${groqModel}" with key index ${k}:`, err.message);
         }
-      } catch (err) {
-        console.error(`[Groq API] Network error on model "${groqModel}":`, err.message);
       }
     }
   }
