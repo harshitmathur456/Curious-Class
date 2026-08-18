@@ -282,57 +282,57 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
                   />
                   <span style={{ color: "var(--color-primary, #2A7A50)", fontFamily: "monospace" }}>{ampScale.toFixed(1)}x</span>
                 </div>
-
-                {/* Custom Restyled Theme Selector Dropdown */}
-                <div className="look3d-control-box" style={{ padding: "4px 8px" }}>
-                  <span style={{ color: "var(--color-text-secondary, #666)" }}>Theme:</span>
-                  <div className="look3d-select-wrapper" ref={themeRef}>
-                    <button
-                      type="button"
-                      onClick={() => setIsThemeOpen((prev) => !prev)}
-                      className="look3d-select-trigger"
-                    >
-                      <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <span>{currentTheme.icon}</span>
-                        <span>{currentTheme.label}</span>
-                      </span>
-                      <svg
-                        className={`look3d-select-chevron ${isThemeOpen ? "look3d-select-chevron--open" : ""}`}
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </button>
-
-                    {isThemeOpen && (
-                      <div className="look3d-select-menu">
-                        {themeOptions.map((opt) => (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => {
-                              setColorPalette(opt.id);
-                              setIsThemeOpen(false);
-                            }}
-                            className={`look3d-select-option ${colorPalette === opt.id ? "look3d-select-option--active" : ""}`}
-                          >
-                            <span>{opt.icon}</span>
-                            <span>{opt.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
               </>
             )}
+
+            {/* Custom Restyled Theme Selector Dropdown (Available for both 1-var and 2-var) */}
+            <div className="look3d-control-box" style={{ padding: "4px 8px" }}>
+              <span style={{ color: "var(--color-text-secondary, #666)" }}>Theme:</span>
+              <div className="look3d-select-wrapper" ref={themeRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsThemeOpen((prev) => !prev)}
+                  className="look3d-select-trigger"
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>{currentTheme.icon}</span>
+                    <span>{currentTheme.label}</span>
+                  </span>
+                  <svg
+                    className={`look3d-select-chevron ${isThemeOpen ? "look3d-select-chevron--open" : ""}`}
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+
+                {isThemeOpen && (
+                  <div className="look3d-select-menu">
+                    {themeOptions.map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setColorPalette(opt.id);
+                          setIsThemeOpen(false);
+                        }}
+                        className={`look3d-select-option ${colorPalette === opt.id ? "look3d-select-option--active" : ""}`}
+                      >
+                        <span>{opt.icon}</span>
+                        <span>{opt.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Camera Presets (available in all modes) */}
             <div className="look3d-button-group">

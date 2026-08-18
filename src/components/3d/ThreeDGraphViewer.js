@@ -11,42 +11,65 @@ import { cleanSingleExpression, cleanExpression, analyzeEquation } from "./Graph
 
 function computeGradientColor(ratio, palette = "curious") {
   const c = new THREE.Color();
+  const clampedRatio = Math.max(0, Math.min(1, ratio));
   switch (palette) {
     case "neon":
-      if (ratio < 0.5) c.setHSL(0.78 - ratio * 0.4, 1.0, 0.5);
-      else c.setHSL(0.58 - (ratio - 0.5) * 0.4, 1.0, 0.5);
+      if (clampedRatio < 0.5) c.setHSL(0.78 - clampedRatio * 0.4, 1.0, 0.5);
+      else c.setHSL(0.58 - (clampedRatio - 0.5) * 0.4, 1.0, 0.5);
       break;
     case "volcano":
-      c.setHSL(0.0 + ratio * 0.16, 1.0, 0.25 + ratio * 0.55);
+      c.setHSL(0.0 + clampedRatio * 0.16, 1.0, 0.25 + clampedRatio * 0.55);
       break;
     case "ocean":
-      c.setHSL(0.65 - ratio * 0.2, 0.9, 0.3 + ratio * 0.4);
+      c.setHSL(0.65 - clampedRatio * 0.2, 0.9, 0.3 + clampedRatio * 0.4);
       break;
     case "rainbow":
-      c.setHSL((1.0 - ratio) * 0.65, 0.95, 0.5);
+      c.setHSL((1.0 - clampedRatio) * 0.65, 0.95, 0.5);
+      break;
+    case "emerald":
+      c.setHSL(0.42 - clampedRatio * 0.1, 0.85, 0.35 + clampedRatio * 0.3);
       break;
     case "curious":
-    case "emerald":
     default:
-      if (ratio < 0.5) {
-        c.setHSL(0.38 - ratio * 0.08, 0.75, 0.28 + ratio * 0.35);
+      if (clampedRatio < 0.5) {
+        c.setHSL(0.38 - clampedRatio * 0.08, 0.75, 0.28 + clampedRatio * 0.35);
       } else {
-        c.setHSL(0.34 - (ratio - 0.5) * 0.08, 0.70, 0.45 + (ratio - 0.5) * 0.30);
+        c.setHSL(0.34 - (clampedRatio - 0.5) * 0.08, 0.70, 0.45 + (clampedRatio - 0.5) * 0.30);
       }
       break;
   }
   return c;
 }
 
+function getPaletteThemeColors(palette = "curious") {
+  switch (palette) {
+    case "neon":
+      return { main: "#c084fc", sec: "#38bdf8" };
+    case "volcano":
+      return { main: "#f97316", sec: "#ef4444" };
+    case "ocean":
+      return { main: "#38bdf8", sec: "#06b6d4" };
+    case "rainbow":
+      return { main: "#ec4899", sec: "#eab308" };
+    case "emerald":
+      return { main: "#10b981", sec: "#34d399" };
+    case "curious":
+    default:
+      return { main: "#22c55e", sec: "#ef4444" };
+  }
+}
+
 /* ================================================================
    LinePlot2DIn3D — Renders single-variable equations as lines
-   in the X-Y plane within the 3D WebGL canvas.
+   in the X-Y plane within the 3D WebGL canvas, with theme color
+   support and smooth hover-point inspection raycasting.
    ================================================================ */
 
-function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
+function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious", onHoverPoint, onClickPoint }) {
   const analysis = useMemo(() => analyzeEquation(equation), [equation]);
+  const themeColors = useMemo(() => getPaletteThemeColors(colorPalette), [colorPalette]);
 
-  const plotData = useMemo(() => {
+  const { plotData, evalNode } = useMemo(() => {
     const numPoints = 300;
     const step = (range * 2) / numPoints;
 
@@ -58,7 +81,7 @@ function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
         side2Compiled = parse(analysis.cleanSides[1]).compile();
       } catch (e) {
         console.error("[LinePlot2DIn3D] Parse error:", e);
-        return { lines: [], intersection: null };
+        return { plotData: { lines: [], intersection: null }, evalNode: null };
       }
 
       const pts1 = [];
@@ -75,7 +98,6 @@ function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
         if (isNaN(y1) || !isFinite(y1)) y1 = 0;
         if (isNaN(y2) || !isFinite(y2)) y2 = 0;
 
-        // Clamp to prevent extreme values
         y1 = Math.max(-range * 2, Math.min(range * 2, y1));
         y2 = Math.max(-range * 2, Math.min(range * 2, y2));
 
@@ -112,20 +134,23 @@ function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
       }
 
       return {
-        lines: [
-          { points: pts1, color: "#22c55e", label: `y = ${analysis.sides[0]}` },
-          { points: pts2, color: "#ef4444", label: `y = ${analysis.sides[1]}`, dashed: true },
-        ],
-        intersection,
+        plotData: {
+          lines: [
+            { points: pts1, color: themeColors.main, label: `y = ${analysis.sides[0]}` },
+            { points: pts2, color: themeColors.sec, label: `y = ${analysis.sides[1]}`, dashed: true },
+          ],
+          intersection,
+        },
+        evalNode: side1Compiled,
       };
     } else {
-      // Single expression: e.g. 2x + 3 → plot one line
+      // Single expression: e.g. x^2 - 4 or 2x + 3 → plot line with theme color gradient
       let compiled;
       try {
         compiled = parse(analysis.cleanSides[0] || cleanSingleExpression(equation)).compile();
       } catch (e) {
         console.error("[LinePlot2DIn3D] Parse error:", e);
-        return { lines: [], intersection: null };
+        return { plotData: { lines: [], intersection: null }, evalNode: null };
       }
 
       const pts = [];
@@ -139,14 +164,70 @@ function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
       }
 
       return {
-        lines: [{ points: pts, color: "#22c55e", label: equation.includes("=") ? equation : `y = ${equation}` }],
-        intersection: null,
+        plotData: {
+          lines: [{
+            points: pts,
+            color: themeColors.main,
+            label: equation.includes("=") ? equation : `y = ${equation}`
+          }],
+          intersection: null,
+        },
+        evalNode: compiled,
       };
     }
-  }, [equation, range, analysis]);
+  }, [equation, range, analysis, themeColors]);
 
   return (
     <group>
+      {/* Invisible Raycast Surface for Cursor Hover / Point Inspection in 2D Planar Mode */}
+      <mesh
+        visible={false}
+        onPointerMove={(e) => {
+          e.stopPropagation();
+          if (!evalNode) return;
+          const rawX = e.point.x;
+          if (isNaN(rawX)) return;
+          const clampedX = Math.max(-range, Math.min(range, rawX));
+          let valY = 0;
+          try {
+            valY = evalNode.evaluate({ x: clampedX });
+          } catch (err) {
+            valY = 0;
+          }
+          if (isNaN(valY) || !isFinite(valY)) valY = 0;
+          valY = Math.max(-range * 2, Math.min(range * 2, valY));
+
+          if (onHoverPoint) {
+            onHoverPoint({ x: clampedX, y: valY, z: 0 });
+          }
+        }}
+        onPointerOut={() => {
+          if (onHoverPoint) onHoverPoint(null);
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!evalNode) return;
+          const rawX = e.point.x;
+          if (isNaN(rawX)) return;
+          const clampedX = Math.max(-range, Math.min(range, rawX));
+          let valY = 0;
+          try {
+            valY = evalNode.evaluate({ x: clampedX });
+          } catch (err) {
+            valY = 0;
+          }
+          if (isNaN(valY) || !isFinite(valY)) valY = 0;
+          valY = Math.max(-range * 2, Math.min(range * 2, valY));
+
+          if (onClickPoint) {
+            onClickPoint({ x: clampedX, y: valY, z: 0 });
+          }
+        }}
+      >
+        <planeGeometry args={[range * 3, range * 3]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+
       {plotData.lines.map((line, idx) => (
         <group key={idx}>
           <line>
@@ -168,7 +249,7 @@ function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
             )}
           </line>
 
-          {/* Thicker tube for visibility */}
+          {/* Thicker tube for visibility with theme color */}
           <mesh>
             <tubeGeometry args={[
               new THREE.CatmullRomCurve3(line.points.filter((_, i) => i % 3 === 0)),
@@ -177,10 +258,10 @@ function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
             <meshStandardMaterial
               color={line.color}
               emissive={line.color}
-              emissiveIntensity={0.4}
+              emissiveIntensity={0.5}
               transparent
-              opacity={line.dashed ? 0.6 : 0.85}
-              roughness={0.3}
+              opacity={line.dashed ? 0.65 : 0.9}
+              roughness={0.2}
             />
           </mesh>
 
@@ -263,8 +344,7 @@ function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
   );
 }
 
-
-/* ---------------- Animated Surface Geometry Mesh (unchanged) ---------------- */
+/* ---------------- Animated Surface Geometry Mesh ---------------- */
 
 function SurfaceMesh({
   equation,
@@ -424,8 +504,13 @@ function PinpointMarker({ point, label, color = "#2A7A50", isTarget = false, is2
   if (!point) return null;
   const { x, y, z } = point;
 
+  const posX = x;
+  const posY = is2DMode ? y : z;
+  const posZ = is2DMode ? 0.15 : y;
+  const dropY = is2DMode ? -y : -z;
+
   return (
-    <group position={[x, z, y]}>
+    <group position={[posX, posY, posZ]}>
       <mesh>
         <sphereGeometry args={[isTarget ? 0.35 : 0.25, 32, 32]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} />
@@ -442,7 +527,7 @@ function PinpointMarker({ point, label, color = "#2A7A50", isTarget = false, is2
           onUpdate={(geo) =>
             geo.setFromPoints([
               new THREE.Vector3(0, 0, 0),
-              new THREE.Vector3(0, -z, 0),
+              new THREE.Vector3(0, dropY, 0),
             ])
           }
         />
@@ -567,7 +652,6 @@ function CameraPresetHandler({ preset, range, is2DMode = false }) {
     if (!preset) return;
 
     if (is2DMode && preset === "iso") {
-      // Default 2D-friendly camera: slightly tilted to show depth perspective but mostly X-Y facing
       camera.position.set(0, range * 0.4, range * 2.2);
       camera.lookAt(0, 0, 0);
       return;
@@ -581,7 +665,6 @@ function CameraPresetHandler({ preset, range, is2DMode = false }) {
         camera.position.set(0, 0, range * 2.5);
         break;
       case "front2d":
-        // Flat X-Y plane view (for single-var)
         camera.position.set(0, range * 0.15, range * 2.5);
         break;
       case "iso":
@@ -684,6 +767,8 @@ export default function ThreeDGraphViewer({
             equation={equation}
             range={range}
             colorPalette={colorPalette}
+            onHoverPoint={setHoverPoint}
+            onClickPoint={setPinnedPoint}
           />
         ) : (
           <SurfaceMesh
@@ -708,7 +793,7 @@ export default function ThreeDGraphViewer({
           />
         )}
 
-        {!is2DMode && hoverPoint && (
+        {hoverPoint && (
           <PinpointMarker
             point={hoverPoint}
             label="Hover Cursor"
@@ -717,7 +802,7 @@ export default function ThreeDGraphViewer({
           />
         )}
 
-        {!is2DMode && pinnedPoint && (
+        {pinnedPoint && (
           <PinpointMarker
             point={pinnedPoint}
             label="Pinned Point"
@@ -735,8 +820,8 @@ export default function ThreeDGraphViewer({
         />
       </Canvas>
 
-      {/* Coordinate Inspector Overlay — only in surface mode */}
-      {!is2DMode && (hoverPoint || pinnedPoint) && (
+      {/* Coordinate Inspector Overlay — available in both 2D and 3D mode */}
+      {(hoverPoint || pinnedPoint) && (
         <div
           style={{
             position: "absolute",
@@ -752,6 +837,7 @@ export default function ThreeDGraphViewer({
             display: "flex",
             flexDirection: "column",
             gap: "4px",
+            zIndex: 10,
           }}
         >
           <span style={{ fontSize: "11px", fontWeight: 500, color: "var(--color-primary-dark, #27500A)" }}>
@@ -759,12 +845,12 @@ export default function ThreeDGraphViewer({
           </span>
           {hoverPoint && (
             <div style={{ fontFamily: "monospace", fontSize: "12px", color: "var(--color-text-secondary, #666)" }}>
-              Hover: X: <span style={{ color: "#d97706", fontWeight: 500 }}>{hoverPoint.x.toFixed(2)}</span> | Y: <span style={{ color: "#2563eb", fontWeight: 500 }}>{hoverPoint.y.toFixed(2)}</span> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{hoverPoint.z.toFixed(2)}</span>
+              Hover: X: <span style={{ color: "#d97706", fontWeight: 500 }}>{hoverPoint.x.toFixed(2)}</span> | Y: <span style={{ color: "#2563eb", fontWeight: 500 }}>{hoverPoint.y.toFixed(2)}</span>{!is2DMode && <> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{hoverPoint.z.toFixed(2)}</span></>}
             </div>
           )}
           {pinnedPoint && (
             <div style={{ fontFamily: "monospace", fontSize: "12px", color: "var(--color-text-secondary, #666)", paddingTop: "4px", borderTop: "0.5px solid #C0DD97" }}>
-              Pinned: X: <span style={{ color: "#d97706", fontWeight: 500 }}>{pinnedPoint.x.toFixed(2)}</span> | Y: <span style={{ color: "#2563eb", fontWeight: 500 }}>{pinnedPoint.y.toFixed(2)}</span> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{pinnedPoint.z.toFixed(2)}</span>
+              Pinned: X: <span style={{ color: "#d97706", fontWeight: 500 }}>{pinnedPoint.x.toFixed(2)}</span> | Y: <span style={{ color: "#2563eb", fontWeight: 500 }}>{pinnedPoint.y.toFixed(2)}</span>{!is2DMode && <> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{pinnedPoint.z.toFixed(2)}</span></>}
             </div>
           )}
         </div>
@@ -792,7 +878,7 @@ export default function ThreeDGraphViewer({
       >
         <span>
           {is2DMode
-            ? "💡 Drag to rotate view • Scroll to zoom • Single-variable lines rendered in X-Y plane"
+            ? "💡 Move cursor over canvas to inspect (X, Y) points • Click to pin coordinate • Drag to rotate 360°"
             : "💡 Drag to rotate 360° • Scroll to zoom • Click surface to pin coordinate"
           }
         </span>
