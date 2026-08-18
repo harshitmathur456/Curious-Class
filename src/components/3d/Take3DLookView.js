@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ThreeDGraphViewer from "./ThreeDGraphViewer";
@@ -48,7 +48,14 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
   // Fullscreen state for 3D Interactive Surface Model
   const [is3DFullscreen, setIs3DFullscreen] = useState(false);
 
-  const eqAnalysis = useMemo(() => analyzeEquation(equation), [equation]);
+  const eqAnalysis = useMemo(() => {
+    try {
+      return analyzeEquation(equation);
+    } catch (e) {
+      console.error("[Take3DLookView] analyzeEquation error:", e);
+      return { raw: equation, clean: equation, variables: ["x"], varCount: 1, hasEquals: false, sides: [equation], cleanSides: [equation], isSingleVariableEquation: false };
+    }
+  }, [equation]);
   const is1Var = eqAnalysis.varCount < 2;
   const effectiveViewMode = is1Var ? "2D" : viewMode;
 
