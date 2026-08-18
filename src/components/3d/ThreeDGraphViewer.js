@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Grid, Text, Html } from "@react-three/drei";
 import { parse } from "mathjs";
-import { cleanExpression } from "./GraphViewer2D";
+import { cleanExpression, analyzeEquation } from "./GraphViewer2D";
 
 /* ---------------- Color Palette Generators ---------------- */
 
@@ -399,6 +399,22 @@ export default function ThreeDGraphViewer({
       return { x: Number(inputX) || 0, y: Number(inputY) || 0, z: 0 };
     }
   }, [equation, inputX, inputY, ampScale]);
+
+  const analysis = useMemo(() => analyzeEquation(equation), [equation]);
+
+  if (analysis.varCount < 2) {
+    return (
+      <div style={{ padding: "40px 20px", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "0.5px solid var(--color-border-medium, #D4D4D4)", height: is3DFullscreen ? "calc(100vh - 85px)" : "350px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📈</div>
+        <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1E293B", marginBottom: "6px" }}>
+          Single-Variable Equation: <span style={{ color: "#2A7A50", fontFamily: "monospace" }}>{equation}</span>
+        </h3>
+        <p style={{ fontSize: "13px", color: "#64748B", maxWidth: "500px", lineHeight: "1.6", margin: "0 auto" }}>
+          This equation contains only 1 variable ({analysis.variables.join(", ") || "x"}). 3D surface visualization is designed for 2-variable functions (e.g. z = f(x,y)). Please refer to the 2D Line Plot below for line intersection solving.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ position: "relative", height: is3DFullscreen ? "calc(100vh - 85px)" : "550px", width: "100%", borderRadius: is3DFullscreen ? "0px" : "12px", overflow: "hidden", border: "0.5px solid var(--color-border-medium, #D4D4D4)", background: "#182232", cursor: "crosshair", boxShadow: "none" }}>

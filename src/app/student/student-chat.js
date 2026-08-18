@@ -148,25 +148,18 @@ function extractEquationFromText(text) {
       if (eq.toLowerCase().includes("source")) continue;
 
       if (eq.includes("x") || eq.includes("y") || eq.includes("z") || eq.includes("=") || eq.includes("^") || eq.includes("+") || eq.includes("-") || eq.includes("\\frac") || eq.includes("\\sqrt")) {
-        if (eq.toLowerCase().startsWith("y =") || eq.toLowerCase().startsWith("z =")) {
-          eq = eq.substring(3).trim();
-        }
         return eq;
       }
     }
   }
 
-  // 2. Try finding algebraic pattern with x
+  // 2. Try finding algebraic pattern with x, y, or z
   const match = text.match(/([a-zA-Z0-9\^\s\+\-\*\/\(\)\=]{3,})/g);
   if (match) {
     for (const rawExpr of match) {
       const clean = rawExpr.trim();
-      if ((clean.includes("x") || clean.includes("X")) && (clean.includes("+") || clean.includes("-") || clean.includes("^") || clean.includes("="))) {
-        let res = clean;
-        if (res.toLowerCase().startsWith("y =") || res.toLowerCase().startsWith("z =")) {
-          res = res.substring(3).trim();
-        }
-        return res;
+      if ((clean.includes("x") || clean.includes("X") || clean.includes("y") || clean.includes("z")) && (clean.includes("+") || clean.includes("-") || clean.includes("^") || clean.includes("="))) {
+        return clean;
       }
     }
   }
