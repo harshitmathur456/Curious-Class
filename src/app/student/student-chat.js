@@ -109,6 +109,16 @@ function MicIcon() {
   );
 }
 
+function LogOutIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+  );
+}
+
 function FlagIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -225,6 +235,15 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
 
     }
   }, []);
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("studentName");
+      localStorage.removeItem("rollNumber");
+      localStorage.removeItem("selectedClass");
+    }
+    router.push("/");
+  };
 
   function getSubjectKey(subj, cls) {
     const isC10 = cls && cls.includes("10");
@@ -1053,15 +1072,26 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
         </div>
 
 
-        {activeTopic && (
-          <div className="sc-active-chapter-box">
-            <div className="sc-ac-label">Active Chapter</div>
-            <div className="sc-ac-name">{activeTopic}</div>
-            <button className="sc-change-chapter-btn" onClick={() => setActiveTopic("")}>
-              ← Change Chapter
-            </button>
-          </div>
-        )}
+        <div className="sc-sidebar-bottom">
+          {activeTopic && (
+            <div className="sc-active-chapter-box">
+              <div className="sc-ac-label">Active Chapter</div>
+              <div className="sc-ac-name">{activeTopic}</div>
+              <button className="sc-change-chapter-btn" onClick={() => setActiveTopic("")}>
+                ← Change Chapter
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="sc-logout-btn"
+            onClick={handleLogout}
+          >
+            <LogOutIcon />
+            <span>Logout</span>
+          </button>
+        </div>
       </aside>
 
       <main className="sc-main" style={(!activeTopic || isCuriousCorner) ? { padding: "var(--space-2xl)", overflowY: "auto" } : {}}>

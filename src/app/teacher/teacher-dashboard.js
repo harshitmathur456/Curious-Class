@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { currentUnit } from "@/data/mockData";
 import { CHAPTERS_DATA } from "@/data/chaptersData";
 import "./teacher-dashboard.css";
@@ -171,11 +172,21 @@ export default function TeacherDashboard() {
     }
   }
 
+  const router = useRouter();
   const [activeNav, setActiveNav] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [expandedAlerts, setExpandedAlerts] = useState({});
   const [selectedTopic, setSelectedTopic] = useState("");
   const [curriculumData, setCurriculumData] = useState({});
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("teacherName");
+      localStorage.removeItem("teacherSubject");
+      localStorage.removeItem("selectedClass");
+    }
+    router.push("/");
+  };
   
   // Dynamic student data
   const [studentRoster, setStudentRoster] = useState([]);
@@ -644,7 +655,7 @@ export default function TeacherDashboard() {
             <HelpIcon />
             <span>Help</span>
           </button>
-          <button className="td-nav-link" id="nav-logout">
+          <button className="td-nav-link" id="nav-logout" onClick={handleLogout}>
             <LogOutIcon />
             <span>Logout</span>
           </button>
