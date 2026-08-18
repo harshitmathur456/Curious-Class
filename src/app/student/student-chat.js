@@ -138,8 +138,8 @@ function HistoryIcon() {
   );
 }
 
-function extractEquationFromText(text) {
-  if (!text) return "2x + 3";
+function extractExplicitEquation(text) {
+  if (!text) return null;
 
   // Pre-split text by any arrow delimiter to isolate the first step
   const arrowRegex = /⇒|=>|->|-->|\\Rightarrow|\\Longrightarrow|\\implies|\\to|\\longrightarrow|\\iff|&Rightarrow;?|&rArr;?|&rarr;?|;?\s*Rightarrow\s*;?|;?\s*Longrightarrow\s*;?|;?\s*implies\s*;?/i;
@@ -151,40 +151,78 @@ function extractEquationFromText(text) {
     for (const rawMatch of latexMatches) {
       let candidate = rawMatch.replace(/[\$\\]/g, "").trim();
       candidate = sanitizeEquationString(candidate);
-      if (candidate.toLowerCase().includes("source")) continue;
-
-      if (/[xyzX]/.test(candidate) && /[\+\-\*\/\^\=]/.test(candidate)) {
+      if (candidate && candidate.length >= 3 && /[xyzX0-9]/.test(candidate) && /[\+\-\*\/\^\=]/.test(candidate)) {
         return candidate;
       }
     }
   }
 
-  // 2. Find equations containing '=' by scanning around '='
+  // 2. Find explicit equation containing '=' sign by scanning around '='
   const eqIdx = firstSegment.indexOf("=");
   if (eqIdx !== -1) {
-    // Scan backwards from '=' to find LHS start
     const leftPart = firstSegment.slice(0, eqIdx);
     const lhsMatch = leftPart.match(/(?:[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\^]{1,40})$/);
     let lhs = lhsMatch ? lhsMatch[0] : leftPart;
 
-    // Scan forwards from '=' to find RHS end
     const rightPart = firstSegment.slice(eqIdx + 1);
     const rhsMatch = rightPart.match(/^(?:[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\^]{1,40})/);
     let rhs = rhsMatch ? rhsMatch[0] : rightPart;
 
-    // Trim trailing prose words / sentence punctuation from RHS (e.g., "2x-3, where x..." -> "2x-3")
     rhs = rhs.replace(/\s+\b(where|in|step|and|so|which|for|when|with|as)\b.*$/i, "");
     rhs = rhs.replace(/[,\.:;!\?].*$/, "");
 
     const rawCandidate = `${lhs} = ${rhs}`;
     const sanitized = sanitizeEquationString(rawCandidate);
-    if (sanitized.length >= 3 && /[a-zA-Z0-9]/.test(sanitized)) {
+    if (sanitized && sanitized.length >= 3 && /[a-zA-Z0-9]/.test(sanitized)) {
       return sanitized;
     }
   }
 
-  // 3. Fallback: sanitize the firstSegment directly
-  return sanitizeEquationString(firstSegment);
+  return null;
+}
+
+function extractWordProblemPattern(text) {
+  if (!text || typeof text !== "string") return null;
+
+  // Check for starting value (a)
+  let startVal = null;
+  const startMatch = text.match(/(?:start|starts|starting|saved|saves|first\s+week|first\s+term|initial|a\s*=)\s*(?:saving|with|amount|of|is|=|value)?\s*[₹$]?\s*(\d+(?:\.\d+)?)/i);
+  if (startMatch) {
+    startVal = startMatch[1];
+  }
+
+  // Check for common difference / rate of increase (d)
+  let diffVal = null;
+  const diffMatch = text.match(/(?:increase|increases|increasing|increment|add|adds|by|d\s*=)\s*(?:your|weekly|monthly|savings|amount)?\s*[₹$]?\s*(\d+(?:\.\d+)?)\s*(?:every|each|per|a)?\s*(?:week|day|month|year)?/i);
+  if (diffMatch) {
+    diffVal = diffMatch[1];
+  }
+
+  // MUST independently validate BOTH a AND d exist
+  if (startVal !== null && diffVal !== null && startVal !== diffVal) {
+    return `a_n = ${startVal} + (n-1) * ${diffVal}`;
+  }
+
+  return null;
+}
+
+function extractEquationFromText(text) {
+  if (!text) return null;
+
+  // (a) Try explicit equation first
+  const explicitEq = extractExplicitEquation(text);
+  if (explicitEq) {
+    return explicitEq;
+  }
+
+  // (b) Try AP word problem pattern next
+  const apPattern = extractWordProblemPattern(text);
+  if (apPattern) {
+    return apPattern;
+  }
+
+  // (c) If neither matches, return null — NO FALLBACK TO RAW SENTENCE TEXT!
+  return null;
 }
 
 function PdfIconMini() {
@@ -1595,7 +1633,7 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
                       <MathText text={msg.text} />
                       {msg.sender === "ai" && (() => {
                         const detectedEq = extractEquationFromText(msg.text);
-                        const hasEquation = detectedEq !== "2x + 3";
+                        const hasEquation = Boolean(detectedEq);
                         const anatomyResult = detectAnatomyKeyword(msg.text);
                         const historyTopicParam = detectHistoryTimeline(msg.text, currentSubject, activeTopic);
 
