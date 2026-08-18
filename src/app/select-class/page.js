@@ -88,9 +88,17 @@ function ClassSelectionForm() {
 
   const TEACHER_PASSWORD = "Teacher@123";
 
-  // Initialize CAPTCHA
+  // Initialize CAPTCHA and load saved details
   useEffect(() => {
     setCaptcha(generateCaptcha());
+    if (typeof window !== "undefined") {
+      const savedStudentName = localStorage.getItem("studentName") || "";
+      const savedRollNumber = localStorage.getItem("rollNumber") || "";
+      const savedTeacherName = localStorage.getItem("teacherName") || "";
+      if (savedStudentName) setStudentName(savedStudentName);
+      if (savedRollNumber) setRollNumber(savedRollNumber);
+      if (savedTeacherName) setTeacherName(savedTeacherName);
+    }
   }, []);
 
   const classes = Array.from({ length: 10 }, (_, i) => {
@@ -132,12 +140,21 @@ function ClassSelectionForm() {
     setIsVerifying(true);
     const isCorrect = parseInt(userAnswer.trim(), 10) === captcha.answer;
 
+    const savedStudentName = typeof window !== "undefined" ? localStorage.getItem("studentName") || "" : "";
+    const savedRollNumber = typeof window !== "undefined" ? localStorage.getItem("rollNumber") || "" : "";
+    const savedTeacherName = typeof window !== "undefined" ? localStorage.getItem("teacherName") || "" : "";
+
+    const name = role === "student" ? (studentName.trim() || savedStudentName) : (teacherName.trim() || savedTeacherName);
+    const roll_number = role === "student" ? (rollNumber.trim() || savedRollNumber) : null;
+
     // Log to API in the background (fire-and-forget) so it doesn't block the UI
     fetch("/api/captcha", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         role: role,
+        name: name || null,
+        roll_number: roll_number || null,
         captcha_answer: userAnswer.trim(),
         is_correct: isCorrect,
       }),

@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { role, captcha_answer, is_correct } = body;
+    const { role, name, roll_number, captcha_answer, is_correct } = body;
 
     if (!role || !captcha_answer) {
       return Response.json(
@@ -24,6 +24,8 @@ export async function POST(request) {
         role,
         captcha_answer: String(captcha_answer),
         is_correct: !!is_correct,
+        name: name || null,
+        roll_number: roll_number || null,
         ip_address: request.headers.get('x-forwarded-for') || 'unknown',
         user_agent: request.headers.get('user-agent') || 'unknown',
       })
