@@ -918,13 +918,12 @@ export default function StudentChat({ subject = "history", isCuriousCorner = fal
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
       console.error("Error fetching AI response:", err);
-      // Fallback response
       const aiResponse = fallbackFollowUps[followUpIndex % fallbackFollowUps.length];
       const aiMsg = {
         id: newMessages.length + 1,
         sender: "ai",
         mode: aiResponse.mode,
-        text: `${aiResponse.text} *(Note: AI service error: ${err.message || 'request failed'}, using simulation)*`,
+        text: aiResponse.text,
         timestamp: new Date().toLocaleTimeString("en-US", {
           hour: "numeric",
           minute: "2-digit",

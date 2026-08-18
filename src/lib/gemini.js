@@ -32,13 +32,13 @@ export async function callGeminiWithFallback(body) {
   );
 
   if (keys.length > 0) {
-    const models = ["gemini-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"];
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       for (const model of models) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout to give Gemini full chance to respond
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout for API response
 
         try {
           console.log(`[AI Client] Priority 1: Attempting Gemini model "${model}" with key index ${i}...`);
