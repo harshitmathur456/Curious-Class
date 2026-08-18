@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { CHAPTERS_DATA } from "@/data/chaptersData";
 import MathText from "@/components/MathText";
 import { detectAnatomyKeyword, ANATOMY_MODELS } from "@/components/3d/anatomyRegistry";
+import { sanitizeEquationString } from "@/components/3d/GraphViewer2D";
 import "./student-chat.css";
 
 const AnatomyModelViewer = dynamic(() => import("@/components/3d/AnatomyModelViewer"), {
@@ -140,26 +141,39 @@ function HistoryIcon() {
 function extractEquationFromText(text) {
   if (!text) return "2x + 3";
 
-  // 1. Find all LaTeX $...$ matches
-  const latexMatches = text.match(/\$([^$]+)\$/g);
+  // 1. Check for LaTeX math delimiters first ($...$ or \(...\))
+  const latexMatches = text.match(/\$([^$]+)\$/g) || text.match(/\\\((.*?)\\\)/g);
   if (latexMatches) {
     for (const rawMatch of latexMatches) {
-      let eq = rawMatch.replace(/\$/g, "").trim();
-      if (eq.toLowerCase().includes("source")) continue;
+      let candidate = rawMatch.replace(/[\$\(\)\\]/g, "").trim();
+      candidate = sanitizeEquationString(candidate);
+      if (candidate.toLowerCase().includes("source")) continue;
 
-      if (eq.includes("x") || eq.includes("y") || eq.includes("z") || eq.includes("=") || eq.includes("^") || eq.includes("+") || eq.includes("-") || eq.includes("\\frac") || eq.includes("\\sqrt")) {
-        return eq;
+      if (candidate.includes("x") || candidate.includes("y") || candidate.includes("z") || candidate.includes("X") || candidate.includes("=") || candidate.includes("+") || candidate.includes("-")) {
+        return candidate;
       }
     }
   }
 
-  // 2. Try finding algebraic pattern with x, y, or z
+  // 2. Look for equation with '=' sign first (e.g. x + 5 = 2x - 3)
+  const eqMatch = text.match(/([a-zA-Z0-9\s\+\-\*\/\^\(\)]{1,35}\s*=\s*[a-zA-Z0-9\s\+\-\*\/\^\(\)]{1,35})/g);
+  if (eqMatch) {
+    for (const rawExpr of eqMatch) {
+      const sanitized = sanitizeEquationString(rawExpr);
+      if (sanitized.length >= 3 && (sanitized.includes("x") || sanitized.includes("X") || sanitized.includes("y") || sanitized.includes("z"))) {
+        return sanitized;
+      }
+    }
+  }
+
+  // 3. Fallback to general algebraic pattern
   const match = text.match(/([a-zA-Z0-9\^\s\+\-\*\/\(\)\=]{3,})/g);
   if (match) {
     for (const rawExpr of match) {
-      const clean = rawExpr.trim();
-      if ((clean.includes("x") || clean.includes("X") || clean.includes("y") || clean.includes("z")) && (clean.includes("+") || clean.includes("-") || clean.includes("^") || clean.includes("="))) {
-        return clean;
+      const sanitized = sanitizeEquationString(rawExpr);
+      if ((sanitized.includes("x") || sanitized.includes("X") || sanitized.includes("y") || sanitized.includes("z")) && 
+          (sanitized.includes("+") || sanitized.includes("-") || sanitized.includes("^") || sanitized.includes("="))) {
+        return sanitized;
       }
     }
   }

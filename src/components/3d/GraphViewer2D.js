@@ -52,10 +52,83 @@ export function cleanSingleExpression(exprStr) {
 }
 
 /**
+ * Sanitize an extracted or raw equation string to be 100% clean math:
+ * - Trims leading/trailing sentence punctuation (parens, brackets, dashes, arrows, etc.)
+ * - Stops at equation chaining symbols (like ⇒, =>, ->) to take only the first equation
+ * - Fixes unmatched leading/trailing parens (e.g. "(x + 5 = 2x - 3" -> "x + 5 = 2x - 3")
+ * - Cleans LaTeX delimiters ($...$, \(...\))
+ */
+export function sanitizeEquationString(raw) {
+  if (!raw || typeof raw !== "string") return "2x + 3";
+
+  let str = raw.trim();
+
+  // 1. Strip LaTeX wrapper delimiters ($...$, \(...\), \[...\])
+  str = str.replace(/^\$+|\$+$|^\\\(|\\\)$|^\\\[|\\\]$/g, "").trim();
+
+  // 2. Stop at arrow separators (⇒, =>, ->, -->, \Rightarrow, etc.) and take ONLY the first equation
+  str = str.split(/⇒|=>|->|-->|\\Rightarrow|\\to|\\longrightarrow/)[0].trim();
+
+  // 3. Strip trailing punctuation like '.', ',', ';', ':', '!', '?', '—', '--', '-', etc.
+  str = str.replace(/[\.,;:!\?—–-]+\s*$/g, "").trim();
+
+  // 4. Strip leading sentence noise / prefixes like "we get", "is", "equation", ":", "=", etc.
+  str = str.replace(/^[\s:;=—–-]+/g, "").trim();
+
+  // 5. Handle unmatched outer parens/brackets
+  while (str.startsWith("(") || str.startsWith("[") || str.startsWith("{")) {
+    const openChar = str[0];
+    const closeChar = openChar === "(" ? ")" : openChar === "[" ? "]" : "}";
+    
+    let depth = 0;
+    let hasMatchingEnd = false;
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === openChar) depth++;
+      else if (str[i] === closeChar) {
+        depth--;
+        if (depth === 0 && i === str.length - 1) {
+          hasMatchingEnd = true;
+        }
+      }
+    }
+
+    const openCount = (str.match(new RegExp("\\" + openChar, "g")) || []).length;
+    const closeCount = (str.match(new RegExp("\\" + closeChar, "g")) || []).length;
+
+    if (openCount > closeCount) {
+      str = str.slice(1).trim();
+    } else if (hasMatchingEnd) {
+      str = str.slice(1, -1).trim();
+    } else {
+      break;
+    }
+  }
+
+  // Check trailing unclosed parens/brackets
+  while (str.endsWith(")") || str.endsWith("]") || str.endsWith("}")) {
+    const closeChar = str[str.length - 1];
+    const openChar = closeChar === ")" ? "(" : closeChar === "]" ? "[" : "{";
+    const openCount = (str.match(new RegExp("\\" + openChar, "g")) || []).length;
+    const closeCount = (str.match(new RegExp("\\" + closeChar, "g")) || []).length;
+    if (closeCount > openCount) {
+      str = str.slice(0, -1).trim();
+    } else {
+      break;
+    }
+  }
+
+  // 6. Clean stray leading/trailing operators or dashes
+  str = str.replace(/^[\s\+=\*\/—–-]+|[\s\+=\*\/—–-]+$/g, "").trim();
+
+  return str || "2x + 3";
+}
+
+/**
  * Analyze an equation string to detect variables, sides, and equation type
  */
 export function analyzeEquation(rawEq) {
-  if (!rawEq) {
+  const sanitizedRaw = sanitizeEquationString(rawEq);
+  if (!sanitizedRaw) {
     return {
       raw: "2x + 3",
       clean: "2*x + 3",
@@ -68,7 +141,7 @@ export function analyzeEquation(rawEq) {
     };
   }
 
-  let str = String(rawEq).trim().replace(/[\$\`]/g, "");
+  let str = String(sanitizedRaw).trim().replace(/[\$\`]/g, "");
 
   // Detect '='
   const hasEquals = str.includes("=") && !str.includes("==");

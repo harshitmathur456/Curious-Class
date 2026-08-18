@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ThreeDGraphViewer from "./ThreeDGraphViewer";
-import GraphViewer2D, { analyzeEquation } from "./GraphViewer2D";
+import GraphViewer2D, { analyzeEquation, sanitizeEquationString } from "./GraphViewer2D";
 import MathText from "../MathText";
 import "./take-3d-look.css";
 
@@ -19,16 +19,18 @@ const sampleEquations = [
 ];
 
 const themeOptions = [
-  { id: "curious", label: "Curious Forest", icon: "🌲" },
+  { id: "curious", label: "Curious Emerald", icon: "🟢" },
+  { id: "emerald", label: "Emerald Mint", icon: "🌱" },
+  { id: "rainbow", label: "Rainbow Spectrum", icon: "🌈" },
   { id: "neon", label: "Neon Cyber", icon: "⚡" },
-  { id: "rainbow", label: "Rainbow", icon: "🌈" },
   { id: "volcano", label: "Volcano Heat", icon: "🌋" },
   { id: "ocean", label: "Deep Ocean", icon: "🌊" },
 ];
 
 export default function Take3DLookView({ initialEquation = "2x + 3" }) {
   const router = useRouter();
-  const [equation, setEquation] = useState(initialEquation || "2x + 3");
+  const cleanInitial = useMemo(() => sanitizeEquationString(initialEquation), [initialEquation]);
+  const [equation, setEquation] = useState(cleanInitial || "2x + 3");
   const [viewMode, setViewMode] = useState("BOTH"); // BOTH, 3D, 2D
   const [wireframe, setWireframe] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
@@ -72,8 +74,8 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
 
   // Sync equation when navigated from a different chat message
   useEffect(() => {
-    if (initialEquation && initialEquation !== "2x + 3") {
-      setEquation(initialEquation);
+    if (initialEquation) {
+      setEquation(sanitizeEquationString(initialEquation));
     }
   }, [initialEquation]);
 
