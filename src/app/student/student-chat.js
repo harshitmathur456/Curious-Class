@@ -141,8 +141,12 @@ function HistoryIcon() {
 function extractEquationFromText(text) {
   if (!text) return "2x + 3";
 
+  // Pre-split text by any arrow delimiter to isolate the first step
+  const arrowRegex = /⇒|=>|->|-->|\\Rightarrow|\\Longrightarrow|\\implies|\\to|\\longrightarrow|\\iff|&Rightarrow;?|&rArr;?|&rarr;?|;?\s*Rightarrow\s*;?|;?\s*Longrightarrow\s*;?|;?\s*implies\s*;?/i;
+  const firstSegment = text.split(arrowRegex)[0];
+
   // 1. Check for LaTeX math delimiters first ($...$ or \(...\))
-  const latexMatches = text.match(/\$([^$]+)\$/g) || text.match(/\\\((.*?)\\\)/g);
+  const latexMatches = firstSegment.match(/\$([^$]+)\$/g) || firstSegment.match(/\\\((.*?)\\\)/g);
   if (latexMatches) {
     for (const rawMatch of latexMatches) {
       let candidate = rawMatch.replace(/[\$\\]/g, "").trim();
@@ -156,8 +160,6 @@ function extractEquationFromText(text) {
   }
 
   // 2. Find equations containing '=' by scanning around '='
-  // Split text by arrows first to isolate the first equation step
-  const firstSegment = text.split(/⇒|=>|->|-->|\\Rightarrow|\\to/)[0];
   const eqIdx = firstSegment.indexOf("=");
   if (eqIdx !== -1) {
     // Scan backwards from '=' to find LHS start
@@ -181,20 +183,8 @@ function extractEquationFromText(text) {
     }
   }
 
-  // 3. Fallback: match algebraic expression without '='
-  const match = text.match(/([a-zA-Z0-9\^\s\+\-\*\/\(\)]{3,40})/g);
-  if (match) {
-    for (const rawExpr of match) {
-      const sanitized = sanitizeEquationString(rawExpr);
-      if (/[xyzX]/.test(sanitized) && /[\+\-\*\/\^]/.test(sanitized) && sanitized.length >= 3) {
-        if (!/\b(the|is|and|or|are|we|get|can|you|this|that|with|from)\b/i.test(sanitized)) {
-          return sanitized;
-        }
-      }
-    }
-  }
-
-  return "2x + 3";
+  // 3. Fallback: sanitize the firstSegment directly
+  return sanitizeEquationString(firstSegment);
 }
 
 function PdfIconMini() {

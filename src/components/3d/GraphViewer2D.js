@@ -66,16 +66,30 @@ export function sanitizeEquationString(raw) {
   // 1. Strip LaTeX wrapper delimiters ($...$, \(...\), \[...\])
   str = str.replace(/^\$+|\$+$|^\\\(|\\\)$|^\\\[|\\\]$/g, "").trim();
 
-  // 2. Stop at arrow separators (⇒, =>, ->, -->, \Rightarrow, etc.) and take ONLY the first equation
-  str = str.split(/⇒|=>|->|-->|\\Rightarrow|\\to|\\longrightarrow/)[0].trim();
+  // 2. Stop at arrow delimiters (Unicode, ASCII, LaTeX commands, HTML entities, and literal word variants):
+  // e.g. ⇒, =>, ->, -->, \Rightarrow, \Longrightarrow, \implies, \to, \longrightarrow, \iff,
+  // ;Rightarrow;, &Rightarrow;, Rightarrow, rArr, rarr, etc.
+  const arrowRegex = /⇒|=>|->|-->|\\Rightarrow|\\Longrightarrow|\\implies|\\to|\\longrightarrow|\\iff|&Rightarrow;?|&rArr;?|&rarr;?|;?\s*Rightarrow\s*;?|;?\s*Longrightarrow\s*;?|;?\s*implies\s*;?/i;
+  
+  if (arrowRegex.test(str)) {
+    str = str.split(arrowRegex)[0].trim();
+  }
 
-  // 3. Strip trailing prose clauses e.g. ", where x represents...", " where x is...", " in step 1", etc.
+  // 3. Strip any remaining LaTeX commands (anything starting with \ like \text{...}, \quad, \left, \right, etc.)
+  str = str.replace(/\\(text|quad|qquad|left|right|displaystyle|begin|end|frac|sqrt|cdot|times|degree|bold|mathrm)\b/gi, "");
+  str = str.replace(/\\([a-zA-Z]+)/g, ""); // strip any remaining backslash LaTeX command words
+
+  // 4. Strip stray HTML entities or stray semicolon words (like &nbsp;, ;Rightarrow;, ;etc)
+  str = str.replace(/&[a-zA-Z0-9#]+;/g, "");
+  str = str.replace(/;[a-zA-Z0-9_]+;?/g, "");
+
+  // 5. Strip trailing prose clauses e.g. ", where x represents...", " where x is...", " in step 1", etc.
   str = str.replace(/,?\s+\b(where|in|step|and|so|which|for|when|with|as|given|assuming|let)\b.*$/i, "").trim();
 
-  // 4. Strip trailing sentence punctuation like '.', ',', ';', ':', '!', '?', '—', '--', '-', etc.
-  str = str.replace(/[\.,;:!\?—–-]+\s*$/g, "").trim();
+  // 6. Strip trailing punctuation like '.', ',', ';', ':', '!', '?', '—', '--', '-', etc.
+  str = str.replace(/[\.,;:!\?—–\-]+\s*$/g, "").trim();
 
-  // 5. Strip leading sentence prose words (e.g. "...we get x+5=2x-3" -> "x+5=2x-3")
+  // 7. Strip leading sentence prose words (e.g. "...we get x+5=2x-3" -> "x+5=2x-3")
   const mathFunctions = new Set(["sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "log", "ln", "log10", "exp", "sqrt", "cbrt", "abs", "floor", "ceil", "round", "min", "max", "pi", "f", "g", "h"]);
   
   // Loop to strip any leading words that are not math functions or single variables
@@ -88,7 +102,7 @@ export function sanitizeEquationString(raw) {
   // Also clean if str starts with non-alphanumeric punctuation except '(' or '-'
   str = str.replace(/^[^\w\(\+\-]+/g, "").trim();
 
-  // 6. Handle unmatched outer parens/brackets
+  // 8. Handle unmatched outer parens/brackets
   while (str.startsWith("(") || str.startsWith("[") || str.startsWith("{")) {
     const openChar = str[0];
     const closeChar = openChar === "(" ? ")" : openChar === "[" ? "]" : "}";
@@ -131,7 +145,7 @@ export function sanitizeEquationString(raw) {
   }
 
   // Strip trailing punctuation again e.g. after paren removal
-  str = str.replace(/[\.,;:!\?—–-]+\s*$/g, "").trim();
+  str = str.replace(/[\.,;:!\?—–\-]+\s*$/g, "").trim();
 
   // Strip leading words again in case parens removal exposed a word e.g. "(Solving x+5..."
   while (/^[a-zA-Z]{2,}\s+/.test(str)) {
@@ -140,8 +154,8 @@ export function sanitizeEquationString(raw) {
     str = str.replace(/^[a-zA-Z]{2,}\s+/, "").trim();
   }
 
-  // 7. Clean stray leading/trailing operators or dashes
-  str = str.replace(/^[\s\+=\*\/—–-]+|[\s\+=\*\/—–-]+$/g, "").trim();
+  // 9. Clean stray leading/trailing operators, semicolons, or dashes
+  str = str.replace(/^[\s\+=\*\/—–;\-]+|[\s\+=\*\/—–;\-]+$/g, "").trim();
 
   return str || "2x + 3";
 }
