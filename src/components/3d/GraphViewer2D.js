@@ -69,13 +69,26 @@ export function sanitizeEquationString(raw) {
   // 2. Stop at arrow separators (⇒, =>, ->, -->, \Rightarrow, etc.) and take ONLY the first equation
   str = str.split(/⇒|=>|->|-->|\\Rightarrow|\\to|\\longrightarrow/)[0].trim();
 
-  // 3. Strip trailing punctuation like '.', ',', ';', ':', '!', '?', '—', '--', '-', etc.
+  // 3. Strip trailing prose clauses e.g. ", where x represents...", " where x is...", " in step 1", etc.
+  str = str.replace(/,?\s+\b(where|in|step|and|so|which|for|when|with|as|given|assuming|let)\b.*$/i, "").trim();
+
+  // 4. Strip trailing sentence punctuation like '.', ',', ';', ':', '!', '?', '—', '--', '-', etc.
   str = str.replace(/[\.,;:!\?—–-]+\s*$/g, "").trim();
 
-  // 4. Strip leading sentence noise / prefixes like "we get", "is", "equation", ":", "=", etc.
-  str = str.replace(/^[\s:;=—–-]+/g, "").trim();
+  // 5. Strip leading sentence prose words (e.g. "...we get x+5=2x-3" -> "x+5=2x-3")
+  const mathFunctions = new Set(["sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "log", "ln", "log10", "exp", "sqrt", "cbrt", "abs", "floor", "ceil", "round", "min", "max", "pi", "f", "g", "h"]);
+  
+  // Loop to strip any leading words that are not math functions or single variables
+  while (/^[a-zA-Z]{2,}\s+/.test(str)) {
+    const firstWord = str.match(/^[a-zA-Z]{2,}/)[0];
+    if (mathFunctions.has(firstWord.toLowerCase())) break;
+    str = str.replace(/^[a-zA-Z]{2,}\s+/, "").trim();
+  }
 
-  // 5. Handle unmatched outer parens/brackets
+  // Also clean if str starts with non-alphanumeric punctuation except '(' or '-'
+  str = str.replace(/^[^\w\(\+\-]+/g, "").trim();
+
+  // 6. Handle unmatched outer parens/brackets
   while (str.startsWith("(") || str.startsWith("[") || str.startsWith("{")) {
     const openChar = str[0];
     const closeChar = openChar === "(" ? ")" : openChar === "[" ? "]" : "}";
@@ -117,7 +130,17 @@ export function sanitizeEquationString(raw) {
     }
   }
 
-  // 6. Clean stray leading/trailing operators or dashes
+  // Strip trailing punctuation again e.g. after paren removal
+  str = str.replace(/[\.,;:!\?—–-]+\s*$/g, "").trim();
+
+  // Strip leading words again in case parens removal exposed a word e.g. "(Solving x+5..."
+  while (/^[a-zA-Z]{2,}\s+/.test(str)) {
+    const firstWord = str.match(/^[a-zA-Z]{2,}/)[0];
+    if (mathFunctions.has(firstWord.toLowerCase())) break;
+    str = str.replace(/^[a-zA-Z]{2,}\s+/, "").trim();
+  }
+
+  // 7. Clean stray leading/trailing operators or dashes
   str = str.replace(/^[\s\+=\*\/—–-]+|[\s\+=\*\/—–-]+$/g, "").trim();
 
   return str || "2x + 3";

@@ -145,35 +145,51 @@ function extractEquationFromText(text) {
   const latexMatches = text.match(/\$([^$]+)\$/g) || text.match(/\\\((.*?)\\\)/g);
   if (latexMatches) {
     for (const rawMatch of latexMatches) {
-      let candidate = rawMatch.replace(/[\$\(\)\\]/g, "").trim();
+      let candidate = rawMatch.replace(/[\$\\]/g, "").trim();
       candidate = sanitizeEquationString(candidate);
       if (candidate.toLowerCase().includes("source")) continue;
 
-      if (candidate.includes("x") || candidate.includes("y") || candidate.includes("z") || candidate.includes("X") || candidate.includes("=") || candidate.includes("+") || candidate.includes("-")) {
+      if (/[xyzX]/.test(candidate) && /[\+\-\*\/\^\=]/.test(candidate)) {
         return candidate;
       }
     }
   }
 
-  // 2. Look for equation with '=' sign first (e.g. x + 5 = 2x - 3)
-  const eqMatch = text.match(/([a-zA-Z0-9\s\+\-\*\/\^\(\)]{1,35}\s*=\s*[a-zA-Z0-9\s\+\-\*\/\^\(\)]{1,35})/g);
-  if (eqMatch) {
-    for (const rawExpr of eqMatch) {
-      const sanitized = sanitizeEquationString(rawExpr);
-      if (sanitized.length >= 3 && (sanitized.includes("x") || sanitized.includes("X") || sanitized.includes("y") || sanitized.includes("z"))) {
-        return sanitized;
-      }
+  // 2. Find equations containing '=' by scanning around '='
+  // Split text by arrows first to isolate the first equation step
+  const firstSegment = text.split(/⇒|=>|->|-->|\\Rightarrow|\\to/)[0];
+  const eqIdx = firstSegment.indexOf("=");
+  if (eqIdx !== -1) {
+    // Scan backwards from '=' to find LHS start
+    const leftPart = firstSegment.slice(0, eqIdx);
+    const lhsMatch = leftPart.match(/(?:[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\^]{1,40})$/);
+    let lhs = lhsMatch ? lhsMatch[0] : leftPart;
+
+    // Scan forwards from '=' to find RHS end
+    const rightPart = firstSegment.slice(eqIdx + 1);
+    const rhsMatch = rightPart.match(/^(?:[a-zA-Z0-9\s\+\-\*\/\^\(\)\.\^]{1,40})/);
+    let rhs = rhsMatch ? rhsMatch[0] : rightPart;
+
+    // Trim trailing prose words / sentence punctuation from RHS (e.g., "2x-3, where x..." -> "2x-3")
+    rhs = rhs.replace(/\s+\b(where|in|step|and|so|which|for|when|with|as)\b.*$/i, "");
+    rhs = rhs.replace(/[,\.:;!\?].*$/, "");
+
+    const rawCandidate = `${lhs} = ${rhs}`;
+    const sanitized = sanitizeEquationString(rawCandidate);
+    if (sanitized.length >= 3 && /[a-zA-Z0-9]/.test(sanitized)) {
+      return sanitized;
     }
   }
 
-  // 3. Fallback to general algebraic pattern
-  const match = text.match(/([a-zA-Z0-9\^\s\+\-\*\/\(\)\=]{3,})/g);
+  // 3. Fallback: match algebraic expression without '='
+  const match = text.match(/([a-zA-Z0-9\^\s\+\-\*\/\(\)]{3,40})/g);
   if (match) {
     for (const rawExpr of match) {
       const sanitized = sanitizeEquationString(rawExpr);
-      if ((sanitized.includes("x") || sanitized.includes("X") || sanitized.includes("y") || sanitized.includes("z")) && 
-          (sanitized.includes("+") || sanitized.includes("-") || sanitized.includes("^") || sanitized.includes("="))) {
-        return sanitized;
+      if (/[xyzX]/.test(sanitized) && /[\+\-\*\/\^]/.test(sanitized) && sanitized.length >= 3) {
+        if (!/\b(the|is|and|or|are|we|get|can|you|this|that|with|from)\b/i.test(sanitized)) {
+          return sanitized;
+        }
       }
     }
   }
