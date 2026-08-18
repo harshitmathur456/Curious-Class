@@ -102,7 +102,7 @@ export async function callGeminiWithFallback(body) {
   );
 
   if (groqKeys.length > 0) {
-    const groqModels = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192", "gemma2-9b-it"];
+    const groqModels = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.6-27b", "groq/compound"];
 
     const systemText = body.systemInstruction?.parts?.map((p) => p.text).join('\n') || '';
     const messages = [];
@@ -157,12 +157,15 @@ export async function callGeminiWithFallback(body) {
             const responseText = data.choices?.[0]?.message?.content;
 
             if (responseText && responseText.trim()) {
+              let cleanText = responseText.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+              if (!cleanText) cleanText = responseText.trim();
+
               console.log(`[AI Client] Successfully generated fallback response via Groq (${groqModel}, key index ${k})`);
               return {
                 candidates: [
                   {
                     content: {
-                      parts: [{ text: responseText.trim() }]
+                      parts: [{ text: cleanText }]
                     }
                   }
                 ]
