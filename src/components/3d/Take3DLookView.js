@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { compile } from "mathjs";
 import ThreeDGraphViewer from "./ThreeDGraphViewer";
-import GraphViewer2D, { analyzeEquation, sanitizeEquationString } from "./GraphViewer2D";
+import GraphViewer2D, { analyzeEquation, sanitizeEquationString, cleanSingleExpression } from "./GraphViewer2D";
 import MathText from "../MathText";
 import "./take-3d-look.css";
 
@@ -43,10 +44,6 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
   const [isThemeOpen, setIsThemeOpen] = useState(false);
   const themeRef = useRef(null);
 
-  // Coordinate inspector inputs
-  const [inputX, setInputX] = useState(2);
-  const [inputY, setInputY] = useState(2);
-
   // Fullscreen state for 3D Interactive Surface Model
   const [is3DFullscreen, setIs3DFullscreen] = useState(false);
 
@@ -60,6 +57,72 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
   }, [equation]);
   const is1Var = eqAnalysis.varCount < 2;
   const effectiveViewMode = viewMode;
+
+  // Dynamic Variable Input state (e.g. { n: 50 } or { x: 2, y: 2 })
+  const [varValues, setVarValues] = useState({});
+
+  // Derived helper for legacy inputX / inputY props on GraphViewers
+  const inputX = varValues.x !== undefined ? varValues.x : (varValues.n !== undefined ? varValues.n : 2);
+  const inputY = varValues.y !== undefined ? varValues.y : 2;
+
+  // Sync default variable values whenever equation analysis updates
+  useEffect(() => {
+    if (eqAnalysis && eqAnalysis.variables) {
+      const initial = {};
+      eqAnalysis.variables.forEach((v) => {
+        if (v === "n") initial[v] = 50;
+        else if (v === "x") initial[v] = 2;
+        else if (v === "y") initial[v] = 2;
+        else initial[v] = 5;
+      });
+      setVarValues(initial);
+    }
+  }, [eqAnalysis]);
+
+  // Compute live output for readout card
+  const liveOutput = useMemo(() => {
+    if (!eqAnalysis || !eqAnalysis.variables) return null;
+    const { explicitTarget, cleanSides, variables, hasEquals } = eqAnalysis;
+
+    const numericVars = {};
+    for (const v of variables) {
+      const rawVal = varValues[v];
+      if (rawVal === undefined || rawVal === "" || isNaN(Number(rawVal))) {
+        return null;
+      }
+      numericVars[v] = Number(rawVal);
+    }
+
+    try {
+      if (explicitTarget) {
+        const cleanRHS = cleanSingleExpression(cleanSides[0]);
+        const compiled = compile(cleanRHS);
+        const val = compiled.evaluate(numericVars);
+        const rounded = typeof val === "number" ? Math.round(val * 1000) / 1000 : val;
+        const displaySymbol = explicitTarget.toLowerCase() === "a_n" ? "aₙ" : explicitTarget;
+        return { label: displaySymbol, formatted: `${displaySymbol} = ${rounded}` };
+      } else if (hasEquals && cleanSides.length >= 2) {
+        const cleanLHS = cleanSingleExpression(cleanSides[0]);
+        const cleanRHS = cleanSingleExpression(cleanSides[1]);
+        const lhsVal = compile(cleanLHS).evaluate(numericVars);
+        const rhsVal = compile(cleanRHS).evaluate(numericVars);
+        const rLHS = typeof lhsVal === "number" ? Math.round(lhsVal * 1000) / 1000 : lhsVal;
+        const rRHS = typeof rhsVal === "number" ? Math.round(rhsVal * 1000) / 1000 : rhsVal;
+        return { label: "LHS / RHS", formatted: `LHS = ${rLHS} | RHS = ${rRHS}` };
+      } else if (cleanSides[0]) {
+        const cleanExpr = cleanSingleExpression(cleanSides[0]);
+        const compiled = compile(cleanExpr);
+        const val = compiled.evaluate(numericVars);
+        const rounded = typeof val === "number" ? Math.round(val * 1000) / 1000 : val;
+        const mainVar = variables[0] || "x";
+        const targetSymbol = mainVar === "n" ? "aₙ" : "y";
+        return { label: targetSymbol, formatted: `${targetSymbol} = ${rounded}` };
+      }
+    } catch (err) {
+      return null;
+    }
+    return null;
+  }, [eqAnalysis, varValues]);
 
   // Handle Esc key to exit 3D fullscreen
   useEffect(() => {
@@ -247,44 +310,89 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
 
           {/* Row 2: Controls (Camera presets for all, Surface controls for 2+ vars) */}
           <div className="look3d-controls-row" style={{ paddingTop: "8px", borderTop: "0.5px solid var(--color-border-light, #E5E5E5)" }}>
-            {!is1Var && (
-              <>
-                {/* Coordinate Input Box */}
-                <div className="look3d-control-box">
-                  <span>🎯 Coordinate Input:</span>
-                  <span style={{ color: "#d97706" }}>X:</span>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={inputX}
-                    onChange={(e) => setInputX(e.target.value)}
-                    className="look3d-num-input"
-                  />
-                  <span style={{ color: "#2563eb", marginLeft: "4px" }}>Y:</span>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={inputY}
-                    onChange={(e) => setInputY(e.target.value)}
-                    className="look3d-num-input"
-                  />
-                </div>
+            {/* Dynamic Variable Input & Live Computed Output Box (Available for ALL equations) */}
+            <div className="look3d-control-box" style={{
+              backgroundColor: "var(--color-bg-white, #FFFFFF)",
+              border: "0.5px solid var(--color-border-secondary, #CBD5E1)",
+              borderRadius: "8px",
+              padding: "6px 12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              boxShadow: "none"
+            }}>
+              <span style={{ fontSize: "12px", fontWeight: "600", color: "var(--color-text-secondary, #64748B)" }}>
+                🎯 Variable Input:
+              </span>
 
-                {/* Height Scale Slider */}
-                <div className="look3d-control-box">
-                  <span>Height Scale:</span>
+              {/* Input box for each variable present in the equation */}
+              {eqAnalysis && eqAnalysis.variables && eqAnalysis.variables.map((vName) => (
+                <div key={vName} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "600", color: "var(--color-primary-dark, #27500A)", fontFamily: "monospace" }}>
+                    {vName}:
+                  </span>
                   <input
-                    type="range"
-                    min="0.2"
-                    max="3.0"
-                    step="0.1"
-                    value={ampScale}
-                    onChange={(e) => setAmpScale(Number(e.target.value))}
-                    className="look3d-range-input"
+                    type="number"
+                    step="1"
+                    value={varValues[vName] !== undefined ? varValues[vName] : ""}
+                    onChange={(e) => {
+                      const val = e.target.value === "" ? "" : Number(e.target.value);
+                      setVarValues((prev) => ({ ...prev, [vName]: val }));
+                    }}
+                    style={{
+                      width: "56px",
+                      backgroundColor: "#FFFFFF",
+                      border: "0.5px solid var(--color-border-secondary, #CBD5E1)",
+                      borderRadius: "8px",
+                      padding: "4px 8px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      fontFamily: "Inter, Poppins, sans-serif",
+                      color: "var(--color-text-primary, #1A1A1A)",
+                      textAlign: "center",
+                      outline: "none",
+                      boxShadow: "none"
+                    }}
                   />
-                  <span style={{ color: "var(--color-primary, #2A7A50)", fontFamily: "monospace" }}>{ampScale.toFixed(1)}x</span>
                 </div>
-              </>
+              ))}
+            </div>
+
+            {/* Live Computed Output Stat Card */}
+            {liveOutput && (
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                backgroundColor: "var(--color-bg-mint, #EAF3DE)",
+                border: "1px solid var(--color-primary, #2A7A50)",
+                borderRadius: "10px",
+                padding: "6px 14px"
+              }}>
+                <span style={{ fontSize: "11px", fontWeight: "600", color: "var(--color-primary-dark, #27500A)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  Computed Output:
+                </span>
+                <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--color-primary-dark, #27500A)", fontFamily: "monospace" }}>
+                  {liveOutput.formatted}
+                </span>
+              </div>
+            )}
+
+            {!is1Var && (
+              /* Height Scale Slider */
+              <div className="look3d-control-box">
+                <span>Height Scale:</span>
+                <input
+                  type="range"
+                  min="0.2"
+                  max="3.0"
+                  step="0.1"
+                  value={ampScale}
+                  onChange={(e) => setAmpScale(Number(e.target.value))}
+                  className="look3d-range-input"
+                />
+                <span style={{ color: "var(--color-primary, #2A7A50)", fontFamily: "monospace" }}>{ampScale.toFixed(1)}x</span>
+              </div>
             )}
 
             {/* Custom Restyled Theme Selector Dropdown (Available for both 1-var and 2-var) */}

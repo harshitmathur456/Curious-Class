@@ -184,15 +184,18 @@ export function analyzeEquation(rawEq) {
   const hasEquals = str.includes("=") && !str.includes("==");
   let rawSides = hasEquals ? str.split("=").map((s) => s.trim()) : [str];
 
-  // If explicit function prefix like "y = 2x + 3" or "z = x^2 + y^2"
+  // If explicit function prefix like "y = 2x + 3", "z = x^2 + y^2", "a_n = 100 + (n-1)*20"
   if (hasEquals && rawSides.length === 2) {
-    const leftLower = rawSides[0].toLowerCase();
-    if (["y", "z", "f(x)", "f(x,y)", "z(x,y)", "g(x)"].includes(leftLower)) {
+    const leftLower = rawSides[0].toLowerCase().trim();
+    if (
+      ["y", "z", "f(x)", "f(x,y)", "z(x,y)", "g(x)", "a_n", "an", "a(n)"].includes(leftLower) ||
+      /^[a-zA-Z]_[a-zA-Z0-9]+$/i.test(rawSides[0].trim())
+    ) {
       const innerAnalysis = analyzeEquation(rawSides[1]);
       return {
         ...innerAnalysis,
         raw: rawEq,
-        explicitTarget: leftLower,
+        explicitTarget: rawSides[0].trim(),
       };
     }
   }
