@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Grid, Text, Html } from "@react-three/drei";
 import { parse } from "mathjs";
-import { cleanExpression, analyzeEquation } from "./GraphViewer2D";
+import { cleanSingleExpression, cleanExpression, analyzeEquation } from "./GraphViewer2D";
 
 /* ---------------- Color Palette Generators ---------------- */
 
@@ -38,7 +38,233 @@ function computeGradientColor(ratio, palette = "curious") {
   return c;
 }
 
-/* ---------------- Animated Surface Geometry Mesh ---------------- */
+/* ================================================================
+   LinePlot2DIn3D — Renders single-variable equations as lines
+   in the X-Y plane within the 3D WebGL canvas.
+   ================================================================ */
+
+function LinePlot2DIn3D({ equation, range = 10, colorPalette = "curious" }) {
+  const analysis = useMemo(() => analyzeEquation(equation), [equation]);
+
+  const plotData = useMemo(() => {
+    const numPoints = 300;
+    const step = (range * 2) / numPoints;
+
+    if (analysis.isSingleVariableEquation && analysis.cleanSides.length >= 2) {
+      // Two-sided equation: e.g. x+5 = 2x-3 → plot both sides
+      let side1Compiled, side2Compiled;
+      try {
+        side1Compiled = parse(analysis.cleanSides[0]).compile();
+        side2Compiled = parse(analysis.cleanSides[1]).compile();
+      } catch (e) {
+        console.error("[LinePlot2DIn3D] Parse error:", e);
+        return { lines: [], intersection: null };
+      }
+
+      const pts1 = [];
+      const pts2 = [];
+      let bestDiff = Infinity;
+      let intersectionX = null;
+
+      for (let i = 0; i <= numPoints; i++) {
+        const xVal = -range + i * step;
+        let y1 = 0, y2 = 0;
+        try { y1 = side1Compiled.evaluate({ x: xVal }); } catch (e) { y1 = 0; }
+        try { y2 = side2Compiled.evaluate({ x: xVal }); } catch (e) { y2 = 0; }
+
+        if (isNaN(y1) || !isFinite(y1)) y1 = 0;
+        if (isNaN(y2) || !isFinite(y2)) y2 = 0;
+
+        // Clamp to prevent extreme values
+        y1 = Math.max(-range * 2, Math.min(range * 2, y1));
+        y2 = Math.max(-range * 2, Math.min(range * 2, y2));
+
+        pts1.push(new THREE.Vector3(xVal, y1, 0));
+        pts2.push(new THREE.Vector3(xVal, y2, 0));
+
+        const diff = Math.abs(y1 - y2);
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          intersectionX = xVal;
+        }
+      }
+
+      // Refine intersection with bisection
+      let intersection = null;
+      if (intersectionX !== null && bestDiff < 2) {
+        let lo = intersectionX - step;
+        let hi = intersectionX + step;
+        for (let iter = 0; iter < 50; iter++) {
+          const mid = (lo + hi) / 2;
+          let y1Lo, y2Lo, y1Mid, y2Mid;
+          try { y1Lo = side1Compiled.evaluate({ x: lo }); } catch (e) { y1Lo = 0; }
+          try { y2Lo = side2Compiled.evaluate({ x: lo }); } catch (e) { y2Lo = 0; }
+          try { y1Mid = side1Compiled.evaluate({ x: mid }); } catch (e) { y1Mid = 0; }
+          try { y2Mid = side2Compiled.evaluate({ x: mid }); } catch (e) { y2Mid = 0; }
+          const diffLo = y1Lo - y2Lo;
+          const diffMid = y1Mid - y2Mid;
+          if (diffLo * diffMid <= 0) { hi = mid; } else { lo = mid; }
+        }
+        const solX = (lo + hi) / 2;
+        let solY;
+        try { solY = side1Compiled.evaluate({ x: solX }); } catch (e) { solY = 0; }
+        intersection = { x: Math.round(solX * 1000) / 1000, y: Math.round(solY * 1000) / 1000 };
+      }
+
+      return {
+        lines: [
+          { points: pts1, color: "#22c55e", label: `y = ${analysis.sides[0]}` },
+          { points: pts2, color: "#ef4444", label: `y = ${analysis.sides[1]}`, dashed: true },
+        ],
+        intersection,
+      };
+    } else {
+      // Single expression: e.g. 2x + 3 → plot one line
+      let compiled;
+      try {
+        compiled = parse(analysis.cleanSides[0] || cleanSingleExpression(equation)).compile();
+      } catch (e) {
+        console.error("[LinePlot2DIn3D] Parse error:", e);
+        return { lines: [], intersection: null };
+      }
+
+      const pts = [];
+      for (let i = 0; i <= numPoints; i++) {
+        const xVal = -range + i * step;
+        let yVal = 0;
+        try { yVal = compiled.evaluate({ x: xVal }); } catch (e) { yVal = 0; }
+        if (isNaN(yVal) || !isFinite(yVal)) yVal = 0;
+        yVal = Math.max(-range * 2, Math.min(range * 2, yVal));
+        pts.push(new THREE.Vector3(xVal, yVal, 0));
+      }
+
+      return {
+        lines: [{ points: pts, color: "#22c55e", label: equation.includes("=") ? equation : `y = ${equation}` }],
+        intersection: null,
+      };
+    }
+  }, [equation, range, analysis]);
+
+  return (
+    <group>
+      {plotData.lines.map((line, idx) => (
+        <group key={idx}>
+          <line>
+            <bufferGeometry
+              attach="geometry"
+              onUpdate={(geo) => geo.setFromPoints(line.points)}
+            />
+            {line.dashed ? (
+              <lineDashedMaterial
+                color={line.color}
+                linewidth={1}
+                dashSize={0.5}
+                gapSize={0.25}
+                transparent
+                opacity={0.95}
+              />
+            ) : (
+              <lineBasicMaterial color={line.color} linewidth={2} transparent opacity={0.95} />
+            )}
+          </line>
+
+          {/* Thicker tube for visibility */}
+          <mesh>
+            <tubeGeometry args={[
+              new THREE.CatmullRomCurve3(line.points.filter((_, i) => i % 3 === 0)),
+              200, 0.08, 8, false
+            ]} />
+            <meshStandardMaterial
+              color={line.color}
+              emissive={line.color}
+              emissiveIntensity={0.4}
+              transparent
+              opacity={line.dashed ? 0.6 : 0.85}
+              roughness={0.3}
+            />
+          </mesh>
+
+          {/* Line label */}
+          <Html
+            position={[line.points[Math.floor(line.points.length * 0.85)]?.x || range * 0.7, (line.points[Math.floor(line.points.length * 0.85)]?.y || 0) + 0.8, 0.3]}
+            center
+            distanceFactor={22}
+          >
+            <div style={{
+              background: "rgba(15, 23, 42, 0.88)",
+              color: line.color,
+              padding: "3px 10px",
+              borderRadius: "8px",
+              fontSize: "11px",
+              fontWeight: "700",
+              fontFamily: "monospace",
+              border: `1px solid ${line.color}40`,
+              whiteSpace: "nowrap",
+              backdropFilter: "blur(4px)",
+            }}>
+              {line.label}
+            </div>
+          </Html>
+        </group>
+      ))}
+
+      {/* Intersection / Solution Point */}
+      {plotData.intersection && (
+        <group position={[plotData.intersection.x, plotData.intersection.y, 0]}>
+          {/* Glowing sphere */}
+          <mesh>
+            <sphereGeometry args={[0.28, 32, 32]} />
+            <meshStandardMaterial
+              color="#f59e0b"
+              emissive="#f59e0b"
+              emissiveIntensity={1.2}
+            />
+          </mesh>
+          {/* Outer ring */}
+          <mesh rotation={[0, 0, 0]}>
+            <ringGeometry args={[0.4, 0.55, 32]} />
+            <meshBasicMaterial color="#f59e0b" side={THREE.DoubleSide} transparent opacity={0.5} />
+          </mesh>
+          {/* Drop line to X-axis */}
+          <line>
+            <bufferGeometry
+              attach="geometry"
+              onUpdate={(geo) =>
+                geo.setFromPoints([
+                  new THREE.Vector3(0, 0, 0),
+                  new THREE.Vector3(0, -plotData.intersection.y, 0),
+                ])
+              }
+            />
+            <lineDashedMaterial color="#f59e0b" dashSize={0.3} gapSize={0.15} transparent opacity={0.5} />
+          </line>
+          {/* Label */}
+          <Html position={[0, 1.2, 0.3]} center distanceFactor={20}>
+            <div style={{
+              background: "rgba(245, 158, 11, 0.15)",
+              color: "#fbbf24",
+              padding: "5px 12px",
+              borderRadius: "10px",
+              fontSize: "12px",
+              fontWeight: "800",
+              fontFamily: "monospace",
+              border: "1px solid rgba(245, 158, 11, 0.4)",
+              whiteSpace: "nowrap",
+              backdropFilter: "blur(6px)",
+              textAlign: "center",
+            }}>
+              <div style={{ fontSize: "10px", opacity: 0.8, marginBottom: "2px" }}>⭐ Solution</div>
+              <div>x = {plotData.intersection.x} → ({plotData.intersection.x}, {plotData.intersection.y})</div>
+            </div>
+          </Html>
+        </group>
+      )}
+    </group>
+  );
+}
+
+
+/* ---------------- Animated Surface Geometry Mesh (unchanged) ---------------- */
 
 function SurfaceMesh({
   equation,
@@ -194,7 +420,7 @@ function SurfaceMesh({
 
 /* ---------------- 3D Pinpoint Marker ---------------- */
 
-function PinpointMarker({ point, label, color = "#2A7A50", isTarget = false }) {
+function PinpointMarker({ point, label, color = "#2A7A50", isTarget = false, is2DMode = false }) {
   if (!point) return null;
   const { x, y, z } = point;
 
@@ -227,7 +453,10 @@ function PinpointMarker({ point, label, color = "#2A7A50", isTarget = false }) {
         <div className="pointer-events-none whitespace-nowrap rounded-lg bg-slate-900/90 px-3 py-1.5 text-xs font-mono font-bold text-white shadow-2xl border border-emerald-500/50 backdrop-blur flex flex-col gap-0.5">
           <div className="text-[10px] text-emerald-400 font-semibold uppercase">{label}</div>
           <div>
-            X: <span className="text-red-400">{x.toFixed(2)}</span> | Y: <span className="text-blue-400">{y.toFixed(2)}</span> | Z: <span className="text-emerald-400">{z.toFixed(2)}</span>
+            X: <span className="text-red-400">{x.toFixed(2)}</span> | Y: <span className="text-blue-400">{y.toFixed(2)}</span>
+            {!is2DMode && (
+              <> | Z: <span className="text-emerald-400">{z.toFixed(2)}</span></>
+            )}
           </div>
         </div>
       </Html>
@@ -235,9 +464,9 @@ function PinpointMarker({ point, label, color = "#2A7A50", isTarget = false }) {
   );
 }
 
-/* ---------------- 3D Axes ---------------- */
+/* ---------------- 3D Axes — with showZAxis prop ---------------- */
 
-function Axes3D({ range = 10 }) {
+function Axes3D({ range = 10, showZAxis = true, is2DMode = false }) {
   const ticks = useMemo(() => {
     const arr = [];
     const step = range <= 5 ? 2 : 5;
@@ -259,7 +488,7 @@ function Axes3D({ range = 10 }) {
         position={[0, -0.01, 0]}
       />
 
-      {/* X Axis Red */}
+      {/* X Axis Red — always shown */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[range * 2, 0.06, 0.06]} />
         <meshBasicMaterial color="#ef4444" />
@@ -280,34 +509,38 @@ function Axes3D({ range = 10 }) {
         </group>
       ))}
 
-      {/* Z Height Axis Green */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[0.06, range * 2, 0.06]} />
-        <meshBasicMaterial color="#22c55e" />
-      </mesh>
-      <Text position={[0, range + 0.8, 0]} fontSize={0.7} color="#22c55e" fontWeight="bold">
-        +Z (Height)
-      </Text>
-
-      {ticks.map((t) => (
-        <group key={`z-tick-${t}`} position={[0, t, 0]}>
+      {/* Z Height Axis Green — conditionally shown */}
+      {showZAxis && (
+        <>
           <mesh position={[0, 0, 0]}>
-            <boxGeometry args={[0.25, 0.04, 0.25]} />
-            <meshBasicMaterial color="#4ade80" />
+            <boxGeometry args={[0.06, range * 2, 0.06]} />
+            <meshBasicMaterial color="#22c55e" />
           </mesh>
-          <Text position={[0.4, 0, 0]} fontSize={0.4} color="#4ade80">
-            {t}
+          <Text position={[0, range + 0.8, 0]} fontSize={0.7} color="#22c55e" fontWeight="bold">
+            +Z (Height)
           </Text>
-        </group>
-      ))}
 
-      {/* Y Axis Blue */}
+          {ticks.map((t) => (
+            <group key={`z-tick-${t}`} position={[0, t, 0]}>
+              <mesh position={[0, 0, 0]}>
+                <boxGeometry args={[0.25, 0.04, 0.25]} />
+                <meshBasicMaterial color="#4ade80" />
+              </mesh>
+              <Text position={[0.4, 0, 0]} fontSize={0.4} color="#4ade80">
+                {t}
+              </Text>
+            </group>
+          ))}
+        </>
+      )}
+
+      {/* Y Axis Blue — always shown, relabeled in 2D mode */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[0.06, 0.06, range * 2]} />
         <meshBasicMaterial color="#3b82f6" />
       </mesh>
       <Text position={[0, 0, range + 0.8]} fontSize={0.7} color="#3b82f6" fontWeight="bold">
-        +Y
+        {is2DMode ? "+Y (Output)" : "+Y"}
       </Text>
 
       {ticks.map((t) => (
@@ -327,11 +560,19 @@ function Axes3D({ range = 10 }) {
 
 /* ---------------- Camera Controller ---------------- */
 
-function CameraPresetHandler({ preset, range }) {
+function CameraPresetHandler({ preset, range, is2DMode = false }) {
   const { camera } = useThree();
 
   useEffect(() => {
     if (!preset) return;
+
+    if (is2DMode && preset === "iso") {
+      // Default 2D-friendly camera: slightly tilted to show depth perspective but mostly X-Y facing
+      camera.position.set(0, range * 0.4, range * 2.2);
+      camera.lookAt(0, 0, 0);
+      return;
+    }
+
     switch (preset) {
       case "top":
         camera.position.set(0, range * 2.5, 0.001);
@@ -339,18 +580,24 @@ function CameraPresetHandler({ preset, range }) {
       case "front":
         camera.position.set(0, 0, range * 2.5);
         break;
+      case "front2d":
+        // Flat X-Y plane view (for single-var)
+        camera.position.set(0, range * 0.15, range * 2.5);
+        break;
       case "iso":
       default:
         camera.position.set(range * 1.5, range * 1.2, range * 1.8);
         break;
     }
     camera.lookAt(0, 0, 0);
-  }, [preset, range, camera]);
+  }, [preset, range, camera, is2DMode]);
 
   return null;
 }
 
-/* ---------------- Main 3D Graph Component ---------------- */
+/* ================================================================
+   Main 3D Graph Component
+   ================================================================ */
 
 export default function ThreeDGraphViewer({
   equation = "2x + 3",
@@ -370,9 +617,19 @@ export default function ThreeDGraphViewer({
   const [hoverPoint, setHoverPoint] = useState(null);
   const [pinnedPoint, setPinnedPoint] = useState(null);
 
-  // Compute Z for (inputX, inputY)
+  const analysis = useMemo(() => {
+    try {
+      return analyzeEquation(equation);
+    } catch (e) {
+      return { raw: equation, clean: equation, variables: ["x"], varCount: 1, hasEquals: false, sides: [equation], cleanSides: [equation], isSingleVariableEquation: false };
+    }
+  }, [equation]);
+
+  const is2DMode = analysis.varCount < 2;
+
+  // Compute target point for surface mode (2+ var)
   const customTargetPoint = useMemo(() => {
-    if (!equation) return null;
+    if (!equation || is2DMode) return null;
     try {
       let exprStr = cleanExpression(equation);
       let parsedNode;
@@ -398,30 +655,16 @@ export default function ThreeDGraphViewer({
     } catch (e) {
       return { x: Number(inputX) || 0, y: Number(inputY) || 0, z: 0 };
     }
-  }, [equation, inputX, inputY, ampScale]);
-
-  const analysis = useMemo(() => analyzeEquation(equation), [equation]);
-
-  if (analysis.varCount < 2) {
-    return (
-      <div style={{ padding: "40px 20px", textAlign: "center", background: "#f8fafc", borderRadius: "12px", border: "0.5px solid var(--color-border-medium, #D4D4D4)", height: is3DFullscreen ? "calc(100vh - 85px)" : "350px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📈</div>
-        <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1E293B", marginBottom: "6px" }}>
-          Single-Variable Equation: <span style={{ color: "#2A7A50", fontFamily: "monospace" }}>{equation}</span>
-        </h3>
-        <p style={{ fontSize: "13px", color: "#64748B", maxWidth: "500px", lineHeight: "1.6", margin: "0 auto" }}>
-          This equation contains only 1 variable ({analysis.variables.join(", ") || "x"}). 3D surface visualization is designed for 2-variable functions (e.g. z = f(x,y)). Please refer to the 2D Line Plot below for line intersection solving.
-        </p>
-      </div>
-    );
-  }
+  }, [equation, inputX, inputY, ampScale, is2DMode]);
 
   return (
     <div style={{ position: "relative", height: is3DFullscreen ? "calc(100vh - 85px)" : "550px", width: "100%", borderRadius: is3DFullscreen ? "0px" : "12px", overflow: "hidden", border: "0.5px solid var(--color-border-medium, #D4D4D4)", background: "#182232", cursor: "crosshair", boxShadow: "none" }}>
       <Canvas
         shadows
         camera={{
-          position: [range * 1.5, range * 1.2, range * 1.8],
+          position: is2DMode
+            ? [0, range * 0.4, range * 2.2]
+            : [range * 1.5, range * 1.2, range * 1.8],
           fov: 45,
         }}
         gl={{ antialias: true }}
@@ -432,22 +675,31 @@ export default function ThreeDGraphViewer({
         <directionalLight position={[20, 30, 20]} intensity={2.5} castShadow />
         <directionalLight position={[-20, 15, -20]} intensity={1.0} />
 
-        <CameraPresetHandler preset={cameraPreset} range={range} />
-        <Axes3D range={range} />
+        <CameraPresetHandler preset={cameraPreset} range={range} is2DMode={is2DMode} />
+        <Axes3D range={range} showZAxis={!is2DMode} is2DMode={is2DMode} />
 
-        <SurfaceMesh
-          equation={equation}
-          resolution={resolution}
-          range={range}
-          isWireframe={wireframe}
-          isAnimated={isAnimated}
-          ampScale={ampScale}
-          colorPalette={colorPalette}
-          onHoverPoint={setHoverPoint}
-          onClickPoint={setPinnedPoint}
-        />
+        {/* Render lines for single-var, surface for multi-var */}
+        {is2DMode ? (
+          <LinePlot2DIn3D
+            equation={equation}
+            range={range}
+            colorPalette={colorPalette}
+          />
+        ) : (
+          <SurfaceMesh
+            equation={equation}
+            resolution={resolution}
+            range={range}
+            isWireframe={wireframe}
+            isAnimated={isAnimated}
+            ampScale={ampScale}
+            colorPalette={colorPalette}
+            onHoverPoint={setHoverPoint}
+            onClickPoint={setPinnedPoint}
+          />
+        )}
 
-        {customTargetPoint && (
+        {!is2DMode && customTargetPoint && (
           <PinpointMarker
             point={customTargetPoint}
             label="Input Coordinate"
@@ -456,19 +708,21 @@ export default function ThreeDGraphViewer({
           />
         )}
 
-        {hoverPoint && (
+        {!is2DMode && hoverPoint && (
           <PinpointMarker
             point={hoverPoint}
             label="Hover Cursor"
             color="#38bdf8"
+            is2DMode={is2DMode}
           />
         )}
 
-        {pinnedPoint && (
+        {!is2DMode && pinnedPoint && (
           <PinpointMarker
             point={pinnedPoint}
             label="Pinned Point"
             color="#ec4899"
+            is2DMode={is2DMode}
           />
         )}
 
@@ -481,8 +735,8 @@ export default function ThreeDGraphViewer({
         />
       </Canvas>
 
-      {/* Coordinate Inspector Overlay — CuriousClass Stat Card Style */}
-      {(hoverPoint || pinnedPoint) && (
+      {/* Coordinate Inspector Overlay — only in surface mode */}
+      {!is2DMode && (hoverPoint || pinnedPoint) && (
         <div
           style={{
             position: "absolute",
@@ -516,7 +770,7 @@ export default function ThreeDGraphViewer({
         </div>
       )}
 
-      {/* Info Amber Banner Overlay */}
+      {/* Info Banner Overlay */}
       <div
         style={{
           position: "absolute",
@@ -536,10 +790,14 @@ export default function ThreeDGraphViewer({
           pointerEvents: "none",
         }}
       >
-        <span>💡 Drag to rotate 360° • Scroll to zoom • Click surface to pin coordinate</span>
+        <span>
+          {is2DMode
+            ? "💡 Drag to rotate view • Scroll to zoom • Single-variable lines rendered in X-Y plane"
+            : "💡 Drag to rotate 360° • Scroll to zoom • Click surface to pin coordinate"
+          }
+        </span>
         <span style={{ fontSize: "11px", fontWeight: 400, opacity: 0.8 }}>CuriousClass Visual Engine</span>
       </div>
     </div>
   );
 }
-

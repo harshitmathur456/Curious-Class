@@ -57,7 +57,7 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
     }
   }, [equation]);
   const is1Var = eqAnalysis.varCount < 2;
-  const effectiveViewMode = is1Var ? "2D" : viewMode;
+  const effectiveViewMode = viewMode;
 
   // Handle Esc key to exit 3D fullscreen
   useEffect(() => {
@@ -126,7 +126,7 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
 
           <div className="look3d-header-actions">
             <span className="look3d-badge">
-              🌐 {is1Var ? "2D Line Visualizer" : "3D & 2D Visualizer"}
+              🌐 3D & 2D Visualizer
             </span>
             <button onClick={handleGoBack} className="look3d-return-btn">
               ← Return to Explano Chat
@@ -149,7 +149,7 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
               </h1>
               <p className="look3d-subtext">
                 {is1Var
-                  ? "Single-variable equation detected. Visualizing as intersecting 2D lines with exact solution root calculation."
+                  ? "Single-variable equation detected. Rendered as 2D planar lines inside the 3D WebGL canvas (X & Y axes) with solution root calculation."
                   : "Visualize mathematical functions and equations in real-time 3D surface space and 2D line plots."}
               </p>
             </div>
@@ -193,166 +193,170 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
           {/* Row 1: Mode Switcher & Feature Toggles */}
           <div className="look3d-controls-row">
             {/* View Mode Buttons */}
-            {is1Var ? (
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--color-bg-mint, #EAF3DE)", color: "var(--color-primary-dark, #27500A)", padding: "6px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: "600", border: "1px solid var(--color-primary, #2A7A50)" }}>
-                <span>📈 2D Line Plot Only (Single Variable: {eqAnalysis.variables.join(", ") || "x"})</span>
-              </div>
-            ) : (
-              <div className="look3d-button-group">
-                <button
-                  onClick={() => setViewMode((prev) => (prev === "3D" ? "BOTH" : "3D"))}
-                  className={`look3d-toggle-btn ${effectiveViewMode === "3D" ? "look3d-toggle-btn--active" : ""}`}
-                >
-                  🧊 3D Graph Only
-                </button>
-                <button
-                  onClick={() => setViewMode((prev) => (prev === "2D" ? "BOTH" : "2D"))}
-                  className={`look3d-toggle-btn ${effectiveViewMode === "2D" ? "look3d-toggle-btn--active" : ""}`}
-                >
-                  📈 2D Line Plot Only
-                </button>
-              </div>
-            )}
+            <div className="look3d-button-group">
+              <button
+                onClick={() => setViewMode("BOTH")}
+                className={`look3d-toggle-btn ${effectiveViewMode === "BOTH" ? "look3d-toggle-btn--active" : ""}`}
+              >
+                📊 View Both (3D + 2D)
+              </button>
+              <button
+                onClick={() => setViewMode("3D")}
+                className={`look3d-toggle-btn ${effectiveViewMode === "3D" ? "look3d-toggle-btn--active" : ""}`}
+              >
+                🧊 3D Canvas Only
+              </button>
+              <button
+                onClick={() => setViewMode("2D")}
+                className={`look3d-toggle-btn ${effectiveViewMode === "2D" ? "look3d-toggle-btn--active" : ""}`}
+              >
+                📈 2D Plot Only
+              </button>
+            </div>
 
-            {/* 3D Feature Toggles (Only when >= 2 variables) */}
-            {!is1Var && (
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <button
-                  onClick={() => setIsAnimated((prev) => !prev)}
-                  className={`look3d-action-btn ${isAnimated ? "look3d-action-btn--active" : ""}`}
-                >
-                  🌊 Animated Waves: {isAnimated ? "ON" : "OFF"}
-                </button>
-
-                <button
-                  onClick={() => setWireframe((prev) => !prev)}
-                  className={`look3d-action-btn ${wireframe ? "look3d-action-btn--active" : ""}`}
-                >
-                  🕸️ Wireframe: {wireframe ? "ON" : "OFF"}
-                </button>
-
-                <button
-                  onClick={() => setAutoRotate((prev) => !prev)}
-                  className={`look3d-action-btn ${autoRotate ? "look3d-action-btn--active" : ""}`}
-                >
-                  🔄 Auto-Spin: {autoRotate ? "ON" : "OFF"}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Row 2: Controls for 3D surfaces */}
-          {!is1Var && (
-            <div className="look3d-controls-row" style={{ paddingTop: "8px", borderTop: "0.5px solid var(--color-border-light, #E5E5E5)" }}>
-              {/* Coordinate Input Box */}
-              <div className="look3d-control-box">
-                <span>🎯 Coordinate Input:</span>
-                <span style={{ color: "#d97706" }}>X:</span>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={inputX}
-                  onChange={(e) => setInputX(e.target.value)}
-                  className="look3d-num-input"
-                />
-                <span style={{ color: "#2563eb", marginLeft: "4px" }}>Y:</span>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={inputY}
-                  onChange={(e) => setInputY(e.target.value)}
-                  className="look3d-num-input"
-                />
-              </div>
-
-              {/* Height Scale Slider */}
-              <div className="look3d-control-box">
-                <span>Height Scale:</span>
-                <input
-                  type="range"
-                  min="0.2"
-                  max="3.0"
-                  step="0.1"
-                  value={ampScale}
-                  onChange={(e) => setAmpScale(Number(e.target.value))}
-                  className="look3d-range-input"
-                />
-                <span style={{ color: "var(--color-primary, #2A7A50)", fontFamily: "monospace" }}>{ampScale.toFixed(1)}x</span>
-              </div>
-
-              {/* Custom Restyled Theme Selector Dropdown */}
-              <div className="look3d-control-box" style={{ padding: "4px 8px" }}>
-                <span style={{ color: "var(--color-text-secondary, #666)" }}>Theme:</span>
-                <div className="look3d-select-wrapper" ref={themeRef}>
+            {/* Feature Toggles */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+              {!is1Var && (
+                <>
                   <button
-                    type="button"
-                    onClick={() => setIsThemeOpen((prev) => !prev)}
-                    className="look3d-select-trigger"
+                    onClick={() => setIsAnimated((prev) => !prev)}
+                    className={`look3d-action-btn ${isAnimated ? "look3d-action-btn--active" : ""}`}
                   >
-                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span>{currentTheme.icon}</span>
-                      <span>{currentTheme.label}</span>
-                    </span>
-                    <svg
-                      className={`look3d-select-chevron ${isThemeOpen ? "look3d-select-chevron--open" : ""}`}
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
+                    🌊 Animated Waves: {isAnimated ? "ON" : "OFF"}
                   </button>
 
-                  {isThemeOpen && (
-                    <div className="look3d-select-menu">
-                      {themeOptions.map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => {
-                            setColorPalette(opt.id);
-                            setIsThemeOpen(false);
-                          }}
-                          className={`look3d-select-option ${colorPalette === opt.id ? "look3d-select-option--active" : ""}`}
-                        >
-                          <span>{opt.icon}</span>
-                          <span>{opt.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+                  <button
+                    onClick={() => setWireframe((prev) => !prev)}
+                    className={`look3d-action-btn ${wireframe ? "look3d-action-btn--active" : ""}`}
+                  >
+                    🕸️ Wireframe: {wireframe ? "ON" : "OFF"}
+                  </button>
+                </>
+              )}
 
-              {/* Camera Presets */}
-              <div className="look3d-button-group">
-                <span style={{ fontSize: "11px", padding: "0 4px", color: "var(--color-text-secondary, #666)" }}>Camera:</span>
-                <button
-                  onClick={() => setCameraPreset("iso")}
-                  className={`look3d-toggle-btn ${cameraPreset === "iso" ? "look3d-toggle-btn--active" : ""}`}
-                >
-                  Isometric
-                </button>
-                <button
-                  onClick={() => setCameraPreset("top")}
-                  className={`look3d-toggle-btn ${cameraPreset === "top" ? "look3d-toggle-btn--active" : ""}`}
-                >
-                  Top (XY)
-                </button>
-                <button
-                  onClick={() => setCameraPreset("front")}
-                  className={`look3d-toggle-btn ${cameraPreset === "front" ? "look3d-toggle-btn--active" : ""}`}
-                >
-                  Front (XZ)
-                </button>
-              </div>
+              <button
+                onClick={() => setAutoRotate((prev) => !prev)}
+                className={`look3d-action-btn ${autoRotate ? "look3d-action-btn--active" : ""}`}
+              >
+                🔄 Auto-Spin: {autoRotate ? "ON" : "OFF"}
+              </button>
             </div>
-          )}
+          </div>
+
+          {/* Row 2: Controls (Camera presets for all, Surface controls for 2+ vars) */}
+          <div className="look3d-controls-row" style={{ paddingTop: "8px", borderTop: "0.5px solid var(--color-border-light, #E5E5E5)" }}>
+            {!is1Var && (
+              <>
+                {/* Coordinate Input Box */}
+                <div className="look3d-control-box">
+                  <span>🎯 Coordinate Input:</span>
+                  <span style={{ color: "#d97706" }}>X:</span>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={inputX}
+                    onChange={(e) => setInputX(e.target.value)}
+                    className="look3d-num-input"
+                  />
+                  <span style={{ color: "#2563eb", marginLeft: "4px" }}>Y:</span>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={inputY}
+                    onChange={(e) => setInputY(e.target.value)}
+                    className="look3d-num-input"
+                  />
+                </div>
+
+                {/* Height Scale Slider */}
+                <div className="look3d-control-box">
+                  <span>Height Scale:</span>
+                  <input
+                    type="range"
+                    min="0.2"
+                    max="3.0"
+                    step="0.1"
+                    value={ampScale}
+                    onChange={(e) => setAmpScale(Number(e.target.value))}
+                    className="look3d-range-input"
+                  />
+                  <span style={{ color: "var(--color-primary, #2A7A50)", fontFamily: "monospace" }}>{ampScale.toFixed(1)}x</span>
+                </div>
+
+                {/* Custom Restyled Theme Selector Dropdown */}
+                <div className="look3d-control-box" style={{ padding: "4px 8px" }}>
+                  <span style={{ color: "var(--color-text-secondary, #666)" }}>Theme:</span>
+                  <div className="look3d-select-wrapper" ref={themeRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsThemeOpen((prev) => !prev)}
+                      className="look3d-select-trigger"
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span>{currentTheme.icon}</span>
+                        <span>{currentTheme.label}</span>
+                      </span>
+                      <svg
+                        className={`look3d-select-chevron ${isThemeOpen ? "look3d-select-chevron--open" : ""}`}
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </button>
+
+                    {isThemeOpen && (
+                      <div className="look3d-select-menu">
+                        {themeOptions.map((opt) => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              setColorPalette(opt.id);
+                              setIsThemeOpen(false);
+                            }}
+                            className={`look3d-select-option ${colorPalette === opt.id ? "look3d-select-option--active" : ""}`}
+                          >
+                            <span>{opt.icon}</span>
+                            <span>{opt.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Camera Presets (available in all modes) */}
+            <div className="look3d-button-group">
+              <span style={{ fontSize: "11px", padding: "0 4px", color: "var(--color-text-secondary, #666)" }}>Camera:</span>
+              <button
+                onClick={() => setCameraPreset("iso")}
+                className={`look3d-toggle-btn ${cameraPreset === "iso" ? "look3d-toggle-btn--active" : ""}`}
+              >
+                Isometric
+              </button>
+              <button
+                onClick={() => setCameraPreset("top")}
+                className={`look3d-toggle-btn ${cameraPreset === "top" ? "look3d-toggle-btn--active" : ""}`}
+              >
+                Top (XY)
+              </button>
+              <button
+                onClick={() => setCameraPreset("front")}
+                className={`look3d-toggle-btn ${cameraPreset === "front" ? "look3d-toggle-btn--active" : ""}`}
+              >
+                Front (XZ)
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Viewport Render Area */}
@@ -361,8 +365,8 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
             <div className={`look3d-viewport-card ${is3DFullscreen ? "look3d-viewport-card--fullscreen" : ""}`}>
               <div className="look3d-viewport-header">
                 <h3 className="look3d-viewport-title">
-                  <span>🧊 3D Interactive Surface Model</span>
-                  <span className="look3d-badge">z = {equation}</span>
+                  <span>🧊 3D WebGL Canvas {is1Var ? "(Planar Line Mode)" : "(Surface Model)"}</span>
+                  <span className="look3d-badge">{equation}</span>
                 </h3>
                 <button
                   type="button"
@@ -392,7 +396,7 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
               <div className="look3d-viewport-header">
                 <h3 className="look3d-viewport-title">
                   <span>📈 2D Scatter Line Plot</span>
-                  <span className="look3d-badge">{equation.includes("=") ? equation : `y = ${equation}`}</span>
+                  <span className="look3d-badge">{equation.includes("=") || is1Var ? equation : `y = ${equation}`}</span>
                 </h3>
               </div>
               <GraphViewer2D equation={equation} />
@@ -402,8 +406,8 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
           <div className={`look3d-viewport-card ${is3DFullscreen ? "look3d-viewport-card--fullscreen" : ""}`}>
             <div className="look3d-viewport-header">
               <h3 className="look3d-viewport-title">
-                <span>🧊 3D Interactive Surface Model</span>
-                <span className="look3d-badge">z = {equation}</span>
+                <span>🧊 3D WebGL Canvas {is1Var ? "(Planar Line Mode)" : "(Surface Model)"}</span>
+                <span className="look3d-badge">{equation}</span>
               </h3>
               <button
                 type="button"
