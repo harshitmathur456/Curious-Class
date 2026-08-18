@@ -551,7 +551,7 @@ function PinpointMarker({ point, label, color = "#2A7A50", isTarget = false, is2
 
 /* ---------------- 3D Axes — with showZAxis prop ---------------- */
 
-function Axes3D({ range = 10, showZAxis = true, is2DMode = false }) {
+function Axes3D({ range = 10, showZAxis = true, is2DMode = false, xLabel = "+X", yLabel = "+Y" }) {
   const ticks = useMemo(() => {
     const arr = [];
     const step = range <= 5 ? 2 : 5;
@@ -573,13 +573,13 @@ function Axes3D({ range = 10, showZAxis = true, is2DMode = false }) {
         position={[0, -0.01, 0]}
       />
 
-      {/* X Axis Red — always shown */}
+      {/* X / Independent Axis Red */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[range * 2, 0.06, 0.06]} />
         <meshBasicMaterial color="#ef4444" />
       </mesh>
       <Text position={[range + 0.8, 0, 0]} fontSize={0.7} color="#ef4444" fontWeight="bold">
-        +X
+        {xLabel}
       </Text>
 
       {ticks.map((t) => (
@@ -619,13 +619,13 @@ function Axes3D({ range = 10, showZAxis = true, is2DMode = false }) {
         </>
       )}
 
-      {/* Y Axis Blue — always shown, relabeled in 2D mode */}
+      {/* Y / Dependent Axis Blue */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[0.06, 0.06, range * 2]} />
         <meshBasicMaterial color="#3b82f6" />
       </mesh>
       <Text position={[0, 0, range + 0.8]} fontSize={0.7} color="#3b82f6" fontWeight="bold">
-        {is2DMode ? "+Y (Output)" : "+Y"}
+        {yLabel}
       </Text>
 
       {ticks.map((t) => (
@@ -710,6 +710,20 @@ export default function ThreeDGraphViewer({
 
   const is2DMode = analysis.varCount < 2;
 
+  const indepVarLabel = useMemo(() => {
+    if (!analysis || !analysis.variables || analysis.variables.length === 0) return "X";
+    return analysis.variables[0];
+  }, [analysis]);
+
+  const depVarLabel = useMemo(() => {
+    if (!analysis) return "Y";
+    if (analysis.explicitTarget) {
+      return analysis.explicitTarget === "a_n" ? "aₙ" : analysis.explicitTarget;
+    }
+    const mainVar = analysis.variables ? analysis.variables[0] : "x";
+    return mainVar === "n" ? "aₙ" : "Y";
+  }, [analysis]);
+
   // Compute target point for surface mode (2+ var)
   const customTargetPoint = useMemo(() => {
     if (!equation || is2DMode) return null;
@@ -759,7 +773,13 @@ export default function ThreeDGraphViewer({
         <directionalLight position={[-20, 15, -20]} intensity={1.0} />
 
         <CameraPresetHandler preset={cameraPreset} range={range} is2DMode={is2DMode} />
-        <Axes3D range={range} showZAxis={!is2DMode} is2DMode={is2DMode} />
+        <Axes3D
+          range={range}
+          showZAxis={!is2DMode}
+          is2DMode={is2DMode}
+          xLabel={`+${indepVarLabel.toUpperCase()}`}
+          yLabel={`+${depVarLabel}`}
+        />
 
         {/* Render lines for single-var, surface for multi-var */}
         {is2DMode ? (
@@ -845,12 +865,12 @@ export default function ThreeDGraphViewer({
           </span>
           {hoverPoint && (
             <div style={{ fontFamily: "monospace", fontSize: "12px", color: "var(--color-text-secondary, #666)" }}>
-              Hover: X: <span style={{ color: "#d97706", fontWeight: 500 }}>{hoverPoint.x.toFixed(2)}</span> | Y: <span style={{ color: "#2563eb", fontWeight: 500 }}>{hoverPoint.y.toFixed(2)}</span>{!is2DMode && <> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{hoverPoint.z.toFixed(2)}</span></>}
+              Hover: {indepVarLabel}: <span style={{ color: "#d97706", fontWeight: 500 }}>{hoverPoint.x.toFixed(2)}</span> | {depVarLabel}: <span style={{ color: "#2563eb", fontWeight: 500 }}>{hoverPoint.y.toFixed(2)}</span>{!is2DMode && <> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{hoverPoint.z.toFixed(2)}</span></>}
             </div>
           )}
           {pinnedPoint && (
             <div style={{ fontFamily: "monospace", fontSize: "12px", color: "var(--color-text-secondary, #666)", paddingTop: "4px", borderTop: "0.5px solid #C0DD97" }}>
-              Pinned: X: <span style={{ color: "#d97706", fontWeight: 500 }}>{pinnedPoint.x.toFixed(2)}</span> | Y: <span style={{ color: "#2563eb", fontWeight: 500 }}>{pinnedPoint.y.toFixed(2)}</span>{!is2DMode && <> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{pinnedPoint.z.toFixed(2)}</span></>}
+              Pinned: {indepVarLabel}: <span style={{ color: "#d97706", fontWeight: 500 }}>{pinnedPoint.x.toFixed(2)}</span> | {depVarLabel}: <span style={{ color: "#2563eb", fontWeight: 500 }}>{pinnedPoint.y.toFixed(2)}</span>{!is2DMode && <> | Z: <span style={{ color: "#2A7A50", fontWeight: 500 }}>{pinnedPoint.z.toFixed(2)}</span></>}
             </div>
           )}
         </div>

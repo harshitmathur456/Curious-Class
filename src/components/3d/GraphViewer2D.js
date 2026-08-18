@@ -45,6 +45,7 @@ export function cleanSingleExpression(exprStr) {
     .replace(/⁴/g, "^4");
 
   // Insert explicit multiplication (e.g. 2x -> 2*x, 3.5x -> 3.5*x, (a)(b) -> (a)*(b))
+  // BUT avoid breaking subscripted variables like a_n or x_1
   s = s.replace(/(\d)\s*([a-zA-Z\(])/g, "$1*$2");
   s = s.replace(/(\))\s*([\(a-zA-Z0-9])/g, "$1*$2");
 
@@ -90,7 +91,7 @@ export function sanitizeEquationString(raw) {
   str = str.replace(/[\.,;:!\?—–\-]+\s*$/g, "").trim();
 
   // 7. Strip leading sentence prose words (e.g. "...we get x+5=2x-3" -> "x+5=2x-3")
-  const mathFunctions = new Set(["sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "log", "ln", "log10", "exp", "sqrt", "cbrt", "abs", "floor", "ceil", "round", "min", "max", "pi", "f", "g", "h"]);
+  const mathFunctions = new Set(["sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "log", "ln", "log10", "exp", "sqrt", "cbrt", "abs", "floor", "ceil", "round", "min", "max", "pi", "f", "g", "h", "a_n", "an"]);
   
   // Loop to strip any leading words that are not math functions or single variables
   while (/^[a-zA-Z]{2,}\s+/.test(str)) {
@@ -162,6 +163,7 @@ export function sanitizeEquationString(raw) {
 
 /**
  * Analyze an equation string to detect variables, sides, and equation type
+ * Supports atomic subscripted variables e.g. a_n, t_n, x_1
  */
 export function analyzeEquation(rawEq) {
   const sanitizedRaw = sanitizeEquationString(rawEq);
@@ -170,6 +172,9 @@ export function analyzeEquation(rawEq) {
       raw: "2x + 3",
       clean: "2*x + 3",
       variables: ["x"],
+      independentVariables: ["x"],
+      dependentVariable: null,
+      allVariables: ["x"],
       varCount: 1,
       hasEquals: false,
       sides: ["2x + 3"],
@@ -184,25 +189,24 @@ export function analyzeEquation(rawEq) {
   const hasEquals = str.includes("=") && !str.includes("==");
   let rawSides = hasEquals ? str.split("=").map((s) => s.trim()) : [str];
 
-  // If explicit function prefix like "y = 2x + 3", "z = x^2 + y^2", "a_n = 100 + (n-1)*20"
+  let explicitTarget = null;
+  // If explicit function/sequence prefix like "y = 2x + 3", "z = x^2 + y^2", "a_n = 100 + (n-1)*20", "t_n = a * r^(n-1)"
   if (hasEquals && rawSides.length === 2) {
-    const leftLower = rawSides[0].toLowerCase().trim();
+    const leftTrim = rawSides[0].trim();
+    const leftLower = leftTrim.toLowerCase();
     if (
-      ["y", "z", "f(x)", "f(x,y)", "z(x,y)", "g(x)", "a_n", "an", "a(n)"].includes(leftLower) ||
-      /^[a-zA-Z]_[a-zA-Z0-9]+$/i.test(rawSides[0].trim())
+      ["y", "z", "f(x)", "f(x,y)", "z(x,y)", "g(x)", "a_n", "an", "a(n)", "t_n", "s_n"].includes(leftLower) ||
+      /^[a-zA-Z]+_[a-zA-Z0-9]+$/i.test(leftTrim) ||
+      /^[a-zA-Z]\([a-zA-Z0-9, ]+\)$/i.test(leftTrim)
     ) {
-      const innerAnalysis = analyzeEquation(rawSides[1]);
-      return {
-        ...innerAnalysis,
-        raw: rawEq,
-        explicitTarget: rawSides[0].trim(),
-      };
+      explicitTarget = leftTrim;
+      rawSides = [rawSides[1]];
     }
   }
 
   const cleanSides = rawSides.map(cleanSingleExpression);
 
-  // Extract symbol variables using mathjs parse
+  // Extract symbol variables using mathjs parse & fallback regex supporting subscripts
   const variablesSet = new Set();
   const knownKeywords = new Set([
     "sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh",
@@ -220,7 +224,7 @@ export function analyzeEquation(rawEq) {
         }
       });
     } catch (e) {
-      const matches = sideClean.match(/\b[a-zA-Z]\b/g);
+      const matches = sideClean.match(/\b[a-zA-Z]+(?:_[a-zA-Z0-9]+)?\b/g);
       if (matches) {
         matches.forEach((m) => {
           if (!knownKeywords.has(m)) variablesSet.add(m);
@@ -229,15 +233,27 @@ export function analyzeEquation(rawEq) {
     }
   });
 
-  const variables = Array.from(variablesSet);
-  const varCount = variables.length || 1;
-  const isSingleVariableEquation = hasEquals && rawSides.length >= 2 && varCount === 1;
+  const independentVariables = Array.from(variablesSet);
+  if (independentVariables.length === 0) independentVariables.push("x");
+
+  const dependentVariable = explicitTarget || null;
+  const allVariables = dependentVariable
+    ? [dependentVariable, ...independentVariables.filter((v) => v !== dependentVariable)]
+    : independentVariables;
+
+  const varCount = independentVariables.length;
+  const isSingleVariableEquation = hasEquals && !explicitTarget && rawSides.length >= 2 && varCount === 1;
 
   return {
     raw: rawEq,
     clean: cleanSides.join(" - "),
-    variables,
+    explicitTarget,
+    dependentVariable,
+    independentVariables,
+    variables: independentVariables,
+    allVariables,
     varCount,
+    totalVarCount: allVariables.length,
     hasEquals,
     sides: rawSides,
     cleanSides,

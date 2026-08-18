@@ -65,6 +65,20 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
   const inputX = varValues.x !== undefined ? varValues.x : (varValues.n !== undefined ? varValues.n : 2);
   const inputY = varValues.y !== undefined ? varValues.y : 2;
 
+  const indepVarLabel = useMemo(() => {
+    if (!eqAnalysis || !eqAnalysis.variables || eqAnalysis.variables.length === 0) return "x";
+    return eqAnalysis.variables[0];
+  }, [eqAnalysis]);
+
+  const depVarLabel = useMemo(() => {
+    if (!eqAnalysis) return "y";
+    if (eqAnalysis.explicitTarget) {
+      return eqAnalysis.explicitTarget.toLowerCase() === "a_n" ? "aₙ" : eqAnalysis.explicitTarget;
+    }
+    const mainVar = eqAnalysis.variables ? eqAnalysis.variables[0] : "x";
+    return mainVar === "n" ? "aₙ" : "y";
+  }, [eqAnalysis]);
+
   // Sync default variable values whenever equation analysis updates
   useEffect(() => {
     if (eqAnalysis && eqAnalysis.variables) {
@@ -214,7 +228,7 @@ export default function Take3DLookView({ initialEquation = "2x + 3" }) {
               </h1>
               <p className="look3d-subtext">
                 {is1Var
-                  ? "Single-variable equation detected. Rendered as 2D planar lines inside the 3D WebGL canvas (X & Y axes) with solution root calculation."
+                  ? `Single-variable equation in ${indepVarLabel} detected (computing ${depVarLabel}). Rendered as 2D planar lines inside the 3D WebGL canvas (${indepVarLabel.toUpperCase()} & ${depVarLabel} axes) with solution root calculation.`
                   : "Visualize mathematical functions and equations in real-time 3D surface space and 2D line plots."}
               </p>
             </div>
